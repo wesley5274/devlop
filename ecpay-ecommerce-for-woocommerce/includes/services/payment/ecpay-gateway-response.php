@@ -24,8 +24,6 @@ class Wooecpay_Gateway_Response
             
             $checkoutResponse = $factory->create(VerifiedArrayResponse::class);
             $info = $checkoutResponse->get($_POST);
-  
-            // error_log(print_r('respose', true), 3, 'path');
 
             // 解析訂單編號
             $order_id = $this->get_order_id($info) ;
@@ -45,22 +43,31 @@ class Wooecpay_Gateway_Response
                         // 付款完成
                         case 1:
                             
-                            $order->add_order_note(__('Payment completed', 'ecpay-ecommerce-for-woocommerce'));
-                            $order->payment_complete();
+                            if(isset($info['SimulatePaid']) && $info['SimulatePaid'] == 0){
 
-                            $order->update_meta_data('_ecpay_card6no', $info['card6no']);
-                            $order->update_meta_data('_ecpay_card4no', $info['card4no']);
-                            $order->save_meta_data();
+                                $order->add_order_note(__('Payment completed', 'ecpay-ecommerce-for-woocommerce'));
+                                $order->payment_complete();
 
-                            // 產生物流訂單
-                            if ('yes' === get_option('wooecpay_enable_logistic_auto', 'yes')) {
+                                $order->update_meta_data('_ecpay_card6no', $info['card6no']);
+                                $order->update_meta_data('_ecpay_card4no', $info['card4no']);
+                                $order->save_meta_data();
 
-                                // 是否已經開立
-                                $wooecpay_logistic_AllPayLogisticsID = get_post_meta( $order->get_id(), '_wooecpay_logistic_AllPayLogisticsID', true );
+                                // 產生物流訂單
+                                if ('yes' === get_option('wooecpay_enable_logistic_auto', 'yes')) {
 
-                                if(empty($wooecpay_logistic_AllPayLogisticsID)){
-                                    $this->send_logistic_order_action($order_id);
-                                }   
+                                    // 是否已經開立
+                                    $wooecpay_logistic_AllPayLogisticsID = get_post_meta( $order->get_id(), '_wooecpay_logistic_AllPayLogisticsID', true );
+
+                                    if(empty($wooecpay_logistic_AllPayLogisticsID)){
+                                        $this->send_logistic_order_action($order_id);
+                                    }
+                                }
+
+                            } else {
+
+                                // 模擬付款 僅執行備註寫入
+                                $note = print_r($info, true);
+                                $order->add_order_note('模擬付款/回傳參數：'. $note);
                             }
 
                         break;

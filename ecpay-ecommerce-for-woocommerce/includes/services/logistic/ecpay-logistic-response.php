@@ -378,15 +378,15 @@ class Wooecpay_Logistic_Response
             break;
 
             case 'ATM':
-                $input['ExpireDate'] = $this->get_option('_wooecpay_payment_expire_date', 3);
+                $input['ExpireDate'] = get_option('_wooecpay_payment_expire_date', 3);
             break;
 
             case 'BARCODE':               
-                $input['StoreExpireDate'] = $this->get_option('_wooecpay_payment_expire_date', 3);
+                $input['StoreExpireDate'] = get_option('_wooecpay_payment_expire_date', 3);
             break;
 
             case 'CVS':
-                $input['StoreExpireDate'] = $this->get_option('_wooecpay_payment_expire_date', 86400);
+                $input['StoreExpireDate'] = get_option('_wooecpay_payment_expire_date', 86400);
             break;
         }
 
@@ -415,6 +415,10 @@ class Wooecpay_Logistic_Response
             break;
             case 'Wooecpay_Gateway_Barcode':
                 $choose_payment = 'BARCODE' ;
+            break;
+
+            case 'Wooecpay_Gateway_Applepay':
+                $choose_payment = 'ApplePay' ;
             break;
         }
 

@@ -13,19 +13,19 @@ class Wooecpay_Order {
         	// wp_enqueue_style('wooecpay_barcode_css', WOOECPAY_PLUGIN_URL . 'public/css/style.css');
             add_action('admin_enqueue_scripts' , array( $this, 'wooecpay_register_scripts' ));
 
-			if ('yes' === get_option('wooecpay_ecpay_enabled_payment', 'yes')) {
+			if ('yes' === get_option('wooecpay_enabled_payment', 'yes')) {
 				add_action( 'woocommerce_admin_billing_fields', array($this,'custom_order_meta'), 10, 1 ); 
 				add_action( 'woocommerce_admin_order_data_after_billing_address', array($this,'add_address_meta'), 10, 1 );
 
 				add_action( 'woocommerce_admin_order_data_after_order_details', array($this,'add_payment_info'), 10, 1 );
 			}
 
-			if ('yes' === get_option('wooecpay_ecpay_enabled_logistic', 'yes')) {
+			if ('yes' === get_option('wooecpay_enabled_logistic', 'yes')) {
 				add_action( 'woocommerce_admin_order_data_after_shipping_address', array($this,'logistic_button_display'));	
 				add_action( 'wp_ajax_send_logistic_order_action', array( $this, 'ajax_send_logistic_order_action' ) );
 			}
 
-			if ('yes' === get_option('wooecpay_ecpay_enabled_invoice', 'yes')) {
+			if ('yes' === get_option('wooecpay_enabled_invoice', 'yes')) {
 				add_action( 'woocommerce_admin_order_data_after_billing_address', array($this,'add_invoice_meta'), 11, 1 );
 
 				// 手動開立
@@ -43,7 +43,7 @@ class Wooecpay_Order {
 			}
         }
 
-        if ('yes' === get_option('wooecpay_ecpay_enabled_invoice', 'yes')) {
+        if ('yes' === get_option('wooecpay_enabled_invoice', 'yes')) {
 			
 			// 自動開立
 			if ('auto_paid' === get_option('wooecpay_enabled_invoice_auto', 'auto_paid')) {
