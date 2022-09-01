@@ -116,7 +116,7 @@ class Wooecpay_Gateway_Base extends WC_Payment_Gateway
                         'MerchantTradeDate' => date('Y/m/d H:i:s'),
                         'PaymentType'       => 'aio',
                         'TotalAmount'       => (int) ceil($order->get_total()),
-                        'TradeDesc'         => UrlService::ecpayUrlEncode(get_bloginfo('name')),
+                        'TradeDesc'         => 'ecpay_module_woocommerce',
                         'ItemName'          => $item_name,
                         'ChoosePayment'     => $this->payment_type,
                         'EncryptType'       => 1,
