@@ -45,22 +45,32 @@ class Wooecpay_Gateway_Response
                             
                             if(isset($info['SimulatePaid']) && $info['SimulatePaid'] == 0){
 
-                                $order->add_order_note(__('Payment completed', 'ecpay-ecommerce-for-woocommerce'));
-                                $order->payment_complete();
+                                // 判斷付款完成旗標，如果旗標不存或為0則執行 僅允許綠界一次作動
+                                $payment_complete_flag = get_post_meta( $order->get_id(), '_payment_complete_flag', true );
+ 
+                                if(empty($payment_complete_flag)){
 
-                                $order->update_meta_data('_ecpay_card6no', $info['card6no']);
-                                $order->update_meta_data('_ecpay_card4no', $info['card4no']);
-                                $order->save_meta_data();
+                                    $order->add_order_note(__('Payment completed', 'ecpay-ecommerce-for-woocommerce'));
+                                    $order->payment_complete();
 
-                                // 產生物流訂單
-                                if ('yes' === get_option('wooecpay_enable_logistic_auto', 'yes')) {
+                                    $order->update_meta_data('_ecpay_card6no', $info['card6no']);
+                                    $order->update_meta_data('_ecpay_card4no', $info['card4no']);
+                                    $order->save_meta_data();
 
-                                    // 是否已經開立
-                                    $wooecpay_logistic_AllPayLogisticsID = get_post_meta( $order->get_id(), '_wooecpay_logistic_AllPayLogisticsID', true );
+                                    // 產生物流訂單
+                                    if ('yes' === get_option('wooecpay_enable_logistic_auto', 'yes')) {
 
-                                    if(empty($wooecpay_logistic_AllPayLogisticsID)){
-                                        $this->send_logistic_order_action($order_id);
+                                        // 是否已經開立
+                                        $wooecpay_logistic_AllPayLogisticsID = get_post_meta( $order->get_id(), '_wooecpay_logistic_AllPayLogisticsID', true );
+
+                                        if(empty($wooecpay_logistic_AllPayLogisticsID)){
+                                            $this->send_logistic_order_action($order_id);
+                                        }
                                     }
+
+                                    // 異動付款完成旗標為1
+                                    $order->update_meta_data('_payment_complete_flag', 1);
+                                    $order->save_meta_data();
                                 }
 
                             } else {
