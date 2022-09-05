@@ -290,6 +290,8 @@ class Wooecpay_Logistic_Response
 
                         $order->add_order_note('物流貨態回傳:'.$RtnMsg.' ('.$RtnCode.')');
                         $order->save();
+
+                        echo '1|OK';
                     }
                 }
             }
