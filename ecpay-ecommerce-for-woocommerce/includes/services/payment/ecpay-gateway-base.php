@@ -97,6 +97,8 @@ class Wooecpay_Gateway_Base extends WC_Payment_Gateway
                 // 紀錄訂單其他資訊
                 $order->update_meta_data( '_wooecpay_payment_order_prefix', get_option('wooecpay_payment_order_prefix') ); // 前綴
                 $order->update_meta_data( '_wooecpay_payment_merchant_trade_no', $merchant_trade_no ); //MerchantTradeNo 
+                $order->update_meta_data( '_wooecpay_query_trade_tag', 0);
+
                 $order->add_order_note(sprintf(__('Ecpay Payment Merchant Trade No %s', 'ecpay-ecommerce-for-woocommerce'), $merchant_trade_no));
 
                 $order->save();

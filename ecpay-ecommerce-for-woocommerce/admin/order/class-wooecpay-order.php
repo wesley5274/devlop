@@ -8,24 +8,28 @@ class Wooecpay_Order {
 
 	public function __construct() {
 
-        if (is_admin()) {
+    if (is_admin()) {
 
-        	// wp_enqueue_style('wooecpay_barcode_css', WOOECPAY_PLUGIN_URL . 'public/css/style.css');
-            add_action('admin_enqueue_scripts' , array( $this, 'wooecpay_register_scripts' ));
+    	// wp_enqueue_style('wooecpay_barcode_css', WOOECPAY_PLUGIN_URL . 'public/css/style.css');
+      add_action('admin_enqueue_scripts' , array( $this, 'wooecpay_register_scripts' ));
 
 			if ('yes' === get_option('wooecpay_enabled_payment', 'yes')) {
+
 				add_action( 'woocommerce_admin_billing_fields', array($this,'custom_order_meta'), 10, 1 ); 
 				add_action( 'woocommerce_admin_order_data_after_billing_address', array($this,'add_address_meta'), 10, 1 );
 
 				add_action( 'woocommerce_admin_order_data_after_order_details', array($this,'add_payment_info'), 10, 1 );
+				add_action( 'woocommerce_admin_order_data_after_order_details', array($this,'check_order_status_cancel'));
 			}
 
 			if ('yes' === get_option('wooecpay_enabled_logistic', 'yes')) {
+
 				add_action( 'woocommerce_admin_order_data_after_shipping_address', array($this,'logistic_button_display'));	
 				add_action( 'wp_ajax_send_logistic_order_action', array( $this, 'ajax_send_logistic_order_action' ) );
 			}
 
 			if ('yes' === get_option('wooecpay_enabled_invoice', 'yes')) {
+
 				add_action( 'woocommerce_admin_order_data_after_billing_address', array($this,'add_invoice_meta'), 11, 1 );
 
 				// 手動開立
@@ -38,12 +42,12 @@ class Wooecpay_Order {
 				if ('auto_cancel' === get_option('wooecpay_enabled_cancel_invoice_auto', 'auto_cancel')) {
 
 					add_action('woocommerce_order_status_cancelled', array( $this, 'invoice_invalid' ));
-	                add_action('woocommerce_order_status_refunded', array( $this, 'invoice_invalid' ));
+	        add_action('woocommerce_order_status_refunded', array( $this, 'invoice_invalid' ));
 				}
 			}
-        }
+    }
 
-        if ('yes' === get_option('wooecpay_enabled_invoice', 'yes')) {
+    if ('yes' === get_option('wooecpay_enabled_invoice', 'yes')) {
 			
 			// 自動開立
 			if ('auto_paid' === get_option('wooecpay_enabled_invoice_auto', 'auto_paid')) {
@@ -130,6 +134,102 @@ class Wooecpay_Order {
 			break;
 		}
 	}
+
+	/**
+   * 無效訂單狀態更新
+   *
+   * @return void
+   */
+  public function check_order_status_cancel($order) {
+
+  	$query_trade_tag = get_post_meta( $order->get_id(), '_wooecpay_query_trade_tag', true ) ;
+
+  	if($query_trade_tag == 0){
+
+  		// 判斷訂單狀態
+	  	$order_status = $order->get_status();	
+	  	if($order_status == 'on-hold' || $order_status == 'pending' ){
+
+	  		// 判斷金流方式
+	  		$payment_method = get_post_meta( $order->get_id(), '_payment_method', true ) ;
+	  		if(
+	  			$payment_method == 'Wooecpay_Gateway_Credit' ||
+					$payment_method == 'Wooecpay_Gateway_Credit_Installment' ||
+					$payment_method == 'Wooecpay_Gateway_Webatm' ||
+					$payment_method == 'Wooecpay_Gateway_Atm' ||
+					$payment_method == 'Wooecpay_Gateway_Cvs' ||
+					$payment_method == 'Wooecpay_Gateway_Barcode' ||
+					$payment_method == 'Wooecpay_Gateway_Applepay'
+	  		){
+
+  				// 判斷是否超過指定時間或自訂的保留時間
+
+  				// 計算訂單建立時間是否超過指定時間
+          if (
+          	$payment_method == 'Wooecpay_Gateway_Credit' ||
+          	$payment_method == 'Wooecpay_Gateway_Credit_Installment'
+          ) {
+              $offset =  60; // 信用卡
+          } else {
+          		$offset =  30; // 非信用卡
+          }
+
+          // 若使用者自訂的保留時間 > 綠界時間，則使用使用者設定的時間
+          $hold_stock_minutes = empty(get_option('woocommerce_hold_stock_minutes')) ? 0 : get_option('woocommerce_hold_stock_minutes'); // 取得保留庫存時間
+
+          if ($hold_stock_minutes > $offset) {
+          	$offset = $hold_stock_minutes;
+          }
+
+          $date_created = $order->get_date_created()->getTimestamp(); // 訂單建立時間
+          $dateCompare = strtotime('- '. $offset .' minute');
+
+          // 反查綠界訂單記錄API
+					if ($createDate <= $dateCompare || true) {
+
+						$api_payment_query_trade_info = $this->get_ecpay_payment_api_query_trade_info();
+				  	$merchant_trade_no = get_post_meta( $order->get_id(), '_wooecpay_payment_merchant_trade_no', true ) ;
+
+				  	try {
+				  		
+					    $factory = new Factory([
+								'hashKey'   => $api_payment_query_trade_info['hashKey'],
+								'hashIv'    => $api_payment_query_trade_info['hashIv'],
+					    ]);
+
+					    $postService = $factory->create('PostWithCmvVerifiedEncodedStrResponseService');
+
+					    $input = [
+				        'MerchantID'			=> $api_payment_query_trade_info['merchant_id'],
+				        'MerchantTradeNo' => $merchant_trade_no,
+				        'TimeStamp' 			=> time(),
+					    ];
+
+					    $response = $postService->post($input, $api_payment_query_trade_info['action']);
+					    // var_dump($response);
+
+					    // 逾期交易失敗
+              if (isset($response['TradeStatus']) && $response['TradeStatus'] == 10200095) {
+                
+                // 更新訂單狀態/備註
+                $order->add_order_note('逾期訂單自動取消');
+
+								$order->update_status('cancelled');
+                $order->update_meta_data('_wooecpay_query_trade_tag', 1);
+
+                $order->save();
+              }
+
+						} catch (RtnException $e) {
+					    echo '(' . $e->getCode() . ')' . $e->getMessage() . PHP_EOL;
+						}
+					}
+	  		}
+	  	}
+
+			error_log(print_r($order_status, true), 3, '/vhost/ecpay.grazia.tw/wordpress582/wp-content/debug.log');
+		}
+  }
 
 	/**
 	 * 訂單發票資訊顯示
@@ -254,19 +354,19 @@ class Wooecpay_Order {
 	/**
 	 * 註冊JS
 	 */
-    function wooecpay_register_scripts() {
-       
+  public function wooecpay_register_scripts() {
+     
 		wp_register_script(
 			'wooecpay_main',
 			WOOECPAY_PLUGIN_URL . 'public/js/wooecpay-main.js',
 			array(),
 			'1.0.0',
 			true
-       	);
+	     	);
 
-       	// 載入js
-        wp_enqueue_script('wooecpay_main');
-    }
+   	// 載入js
+  	wp_enqueue_script('wooecpay_main');
+  }
 
 	/**
 	 * 產生物流相關按鈕顯示
@@ -600,7 +700,7 @@ class Wooecpay_Order {
 				        'SenderCellPhone' 		=> $sender_cellphone,
 				        'SenderZipCode' 		=> $sender_zipcode,
 				        'SenderAddress' 		=> $sender_address,
-				        'ReceiverName' 			=> $order->get_shipping_first_name() . $order->get_shipping_last_name(),
+				        'ReceiverName'          => $order->get_shipping_last_name() . $order->get_shipping_first_name(),
 				        'ReceiverCellPhone' 	=> $order->get_billing_phone(),
 				        'ReceiverZipCode' 		=> $order->get_shipping_postcode(),
 				        'ReceiverAddress' 		=> $order->get_shipping_state().$order->get_shipping_city().$order->get_shipping_address_1().$order->get_shipping_address_2(),
@@ -624,7 +724,7 @@ class Wooecpay_Order {
 				        'GoodsName'				=> $item_name,
 				        'SenderName' 			=> $sender_name,
 				        'SenderCellPhone' 		=> $sender_cellphone,
-				        'ReceiverName' 			=> $order->get_shipping_first_name() . $order->get_shipping_last_name(),
+				        'ReceiverName'          => $order->get_shipping_last_name() . $order->get_shipping_first_name(),
 				        'ReceiverCellPhone' 	=> $order->get_billing_phone(),
 				        'ReceiverStoreID' 		=> $CVSStoreID,
 				        'IsCollection'			=> $IsCollection,
@@ -1086,33 +1186,35 @@ class Wooecpay_Order {
 
 					// 作廢發票
 					try {
-					    $factory = new Factory([
-					        'hashKey' 	=> $api_payment_info['hashKey'],
-					        'hashIv' 	=> $api_payment_info['hashIv'],
-					    ]);
-					    $postService = $factory->create('PostWithAesJsonResponseService');
 
-					    $data = [
-					        'MerchantID' 	=> $api_payment_info['merchant_id'],
-					        'InvoiceNo' 	=> $wooecpay_invoice_no,
-					        'InvoiceDate' 	=> $wooecpay_invoice_date,
-					        'Reason' 		=> __('Invalid invoice', 'ecpay-ecommerce-for-woocommerce'),
-					    ];
-					    $input = [
-					        'MerchantID' => $api_payment_info['merchant_id'],
-					        'RqHeader' => [
-					            'Timestamp' => time(),
-					            'Revision' => '3.0.0',
-					        ],
-					        'Data' => $data,
-					    ];
-	
-					    $response = $postService->post($input, $api_payment_info['action']);
+				    $factory = new Factory([
+				        'hashKey' 	=> $api_payment_info['hashKey'],
+				        'hashIv' 	=> $api_payment_info['hashIv'],
+				    ]);
+				    $postService = $factory->create('PostWithAesJsonResponseService');
 
-					    // var_dump($response);
-					    if($response['Data']['RtnCode'] == 1 || $response['Data']['RtnCode'] == 5070453){
+				    $data = [
+			        'MerchantID' 	=> $api_payment_info['merchant_id'],
+			        'InvoiceNo' 	=> $wooecpay_invoice_no,
+			        'InvoiceDate' 	=> $wooecpay_invoice_date,
+			        'Reason' 		=> __('Invalid invoice', 'ecpay-ecommerce-for-woocommerce'),
+				    ];
 
-					    	// 更新訂單
+				    $input = [
+			        'MerchantID' => $api_payment_info['merchant_id'],
+			        'RqHeader' => [
+			            'Timestamp' => time(),
+			            'Revision' => '3.0.0',
+			        ],
+			        'Data' => $data,
+				    ];
+
+				    $response = $postService->post($input, $api_payment_info['action']);
+
+				    // var_dump($response);
+				    if($response['Data']['RtnCode'] == 1 || $response['Data']['RtnCode'] == 5070453){
+
+				    	// 更新訂單
 							$order->update_meta_data( '_wooecpay_invoice_relate_number', ''); 
 							$order->update_meta_data( '_wooecpay_invoice_RtnCode', ''); 
 							$order->update_meta_data( '_wooecpay_invoice_RtnMsg', '' );  
@@ -1125,12 +1227,12 @@ class Wooecpay_Order {
 
 							$order->add_order_note('發票作廢成功: 發票號碼:' .$wooecpay_invoice_no . ' 狀態:' . $response['Data']['RtnMsg'] . '('. $response['Data']['RtnCode'] . ')');
 							$order->save();
+						
 						} else {
 
-					    	$order->add_order_note('發票作廢失敗:狀態:' . $response['Data']['RtnMsg'] . '('. $response['Data']['RtnCode'] . ')');
+				    	$order->add_order_note('發票作廢失敗:狀態:' . $response['Data']['RtnMsg'] . '('. $response['Data']['RtnCode'] . ')');
 							$order->save();
-					    }
-
+				    }
 
 					} catch (RtnException $e) {
 					    echo wp_kses_post( '(' . $e->getCode() . ')' . $e->getMessage() ) . PHP_EOL;
@@ -1142,29 +1244,32 @@ class Wooecpay_Order {
 					$wooecpay_invoice_tsr = get_post_meta( $order->get_id(), '_wooecpay_invoice_tsr', true ) ;
 
 					try {
-					    $factory = new Factory([
-					        'hashKey' 	=> $api_payment_info['hashKey'],
-					        'hashIv' 	=> $api_payment_info['hashIv'],
-					    ]);
-					    $postService = $factory->create('PostWithAesJsonResponseService');
-					    $data = [
-					        'MerchantID' => $api_payment_info['merchant_id'],
-					        'Tsr' => $wooecpay_invoice_tsr,
-					    ];
-					    $input = [
-					        'MerchantID' => $api_payment_info['merchant_id'],
-					        'RqHeader' => [
-					            'Timestamp' => time(),
-					            'Revision' => '3.0.0',
-					        ],
-					        'Data' => $data,
-					    ];
 
-					    $response = $postService->post($input, $api_payment_info['action']);
-					    
-					     if($response['Data']['RtnCode'] == 1){
+				    $factory = new Factory([
+			        'hashKey' 	=> $api_payment_info['hashKey'],
+			        'hashIv' 	=> $api_payment_info['hashIv'],
+				    ]);
 
-					    	// 更新訂單
+				    $postService = $factory->create('PostWithAesJsonResponseService');
+				    $data = [
+				        'MerchantID' => $api_payment_info['merchant_id'],
+				        'Tsr' => $wooecpay_invoice_tsr,
+				    ];
+
+				    $input = [
+				        'MerchantID' => $api_payment_info['merchant_id'],
+				        'RqHeader' => [
+				            'Timestamp' => time(),
+				            'Revision' => '3.0.0',
+				        ],
+				        'Data' => $data,
+				    ];
+
+				    $response = $postService->post($input, $api_payment_info['action']);
+				    
+				    if($response['Data']['RtnCode'] == 1){
+
+				    	// 更新訂單
 							$order->update_meta_data( '_wooecpay_invoice_relate_number', ''); 
 							$order->update_meta_data( '_wooecpay_invoice_RtnCode', ''); 
 							$order->update_meta_data( '_wooecpay_invoice_RtnMsg', '' );  
@@ -1179,400 +1284,437 @@ class Wooecpay_Order {
 							$order->add_order_note('發票作廢成功: 交易單號:' .$wooecpay_invoice_tsr . ' 狀態:' . $response['Data']['RtnMsg'] . '('. $response['Data']['RtnCode'] . ')');
 
 							$order->save();
+
 						} else {
 
-					    	$order->add_order_note('發票作廢失敗:狀態:' . $response['Data']['RtnMsg'] . '('. $response['Data']['RtnCode'] . ')');
+				    	$order->add_order_note('發票作廢失敗:狀態:' . $response['Data']['RtnMsg'] . '('. $response['Data']['RtnCode'] . ')');
 							$order->save();
-					    }
+				    }
 
 					} catch (RtnException $e) {
-					    echo wp_kses_post( '(' . $e->getCode() . ')' . $e->getMessage() ) . PHP_EOL;
+							echo wp_kses_post( '(' . $e->getCode() . ')' . $e->getMessage() ) . PHP_EOL;
 					}
-
 				}
 			}
 		}
 	}
 
 	// logistic 
-    // ---------------------------------------------------
+  // ---------------------------------------------------
 
-    protected function get_ecpay_logistic_api_info($action = '', $shipping_method_id = '' )
-    {
-        $wooecpay_logistic_cvs_type = get_option('wooecpay_logistic_cvs_type');
+  protected function get_ecpay_logistic_api_info($action = '', $shipping_method_id = '' )
+  {
+    $wooecpay_logistic_cvs_type = get_option('wooecpay_logistic_cvs_type');
+
+    $api_info = [
+        'merchant_id'   => '',
+        'hashKey'       => '',
+        'hashIv'        => '',
+        'action'        => '',
+    ] ;
+
+    if ('yes' === get_option('wooecpay_enabled_logistic_stage', 'yes')) {
+
+      if($wooecpay_logistic_cvs_type == 'C2C'){
 
         $api_info = [
-            'merchant_id'   => '',
-            'hashKey'       => '',
-            'hashIv'        => '',
-            'action'        => '',
+            'merchant_id'   => '2000933',
+            'hashKey'       => 'XBERn1YOvpM9nfZc',
+            'hashIv'        => 'h1ONHk4P4yqbl5LK',
         ] ;
 
-        if ('yes' === get_option('wooecpay_enabled_logistic_stage', 'yes')) {
+      } else if($wooecpay_logistic_cvs_type == 'B2C'){
 
-            if($wooecpay_logistic_cvs_type == 'C2C'){
-
-                $api_info = [
-                    'merchant_id'   => '2000933',
-                    'hashKey'       => 'XBERn1YOvpM9nfZc',
-                    'hashIv'        => 'h1ONHk4P4yqbl5LK',
-                ] ;
-
-            } else if($wooecpay_logistic_cvs_type == 'B2C'){
-
-                $api_info = [
-                    'merchant_id'   => '2000132',
-                    'hashKey'       => '5294y06JbISpM5x9',
-                    'hashIv'        => 'v77hoKGq4kWxNNIS',
-                ] ;
-            }
-
-        } else {
-            
-            $merchant_id = get_option('wooecpay_logistic_mid');
-            $hash_key    = get_option('wooecpay_logistic_hashkey');
-            $hash_iv     = get_option('wooecpay_logistic_hashiv');
-
-            $api_info = [
-                'merchant_id'   => $merchant_id,
-                'hashKey'       => $hash_key,
-                'hashIv'        => $hash_iv,
-            ] ;
-        }
-
-
-        // URL位置判斷
-        if ('yes' === get_option('wooecpay_enabled_logistic_stage', 'yes')) {
-
-	        switch ($action) {
-
-	        	case 'map':
-	        		$api_info['action'] = 'https://logistics-stage.ecpay.com.tw/Express/map' ;
-	        	break;
-	        	
-	        	case 'create':
-	        		$api_info['action'] = 'https://logistics-stage.ecpay.com.tw/Express/Create' ;
-	        	break;
-
-	        	case 'print':
-
-	        		if($wooecpay_logistic_cvs_type == 'C2C'){
-
-		        		switch ($shipping_method_id) {
-
-		        			case 'Wooecpay_Logistic_CVS_711':
-		        				$api_info['action'] = 'https://logistics-stage.ecpay.com.tw/Express/PrintUniMartC2COrderInfo' ;
-		        			break;
-
-		        			case 'Wooecpay_Logistic_CVS_Family':
-		        				$api_info['action'] = 'https://logistics-stage.ecpay.com.tw/Express/PrintFAMIC2COrderInfo' ;
-		        			break;
-
-		        			case 'Wooecpay_Logistic_CVS_Hilife':
-		        				$api_info['action'] = 'https://logistics-stage.ecpay.com.tw/Express/PrintHILIFEC2COrderInfo' ;
-		        			break;
-
-		        			case 'Wooecpay_Logistic_CVS_Okmart':
-		        				$api_info['action'] = 'https://logistics-stage.ecpay.com.tw/Express/PrintOKMARTC2COrderInfo' ;
-		        			break;
-
-		        			case 'Wooecpay_Logistic_Home_Tcat':
-		        			case 'Wooecpay_Logistic_Home_Ecan':
-		        				$api_info['action'] = 'https://logistics-stage.ecpay.com.tw/helper/printTradeDocument' ;
-		        			break;
-		        			
-		        			default:
-		        				$api_info['action'] = '' ;
-		        			break;
-		        		}
-
-		        	} else if($wooecpay_logistic_cvs_type == 'B2C'){
-
-		        		switch ($shipping_method_id) {
-
-		        			case 'Wooecpay_Logistic_CVS_711':
-		        			case 'Wooecpay_Logistic_CVS_Family':
-		        			case 'Wooecpay_Logistic_CVS_Hilife':
-		        			case 'Wooecpay_Logistic_Home_Tcat':
-		        			case 'Wooecpay_Logistic_Home_Ecan':
-		        				$api_info['action'] = 'https://logistics-stage.ecpay.com.tw/helper/printTradeDocument' ;
-		        			break;
-		        			default:
-		        				$api_info['action'] = '' ;
-		        			break;
-		        		}
-		        	}
-	        		
-	        	break;
-
-	        	default:
-	        	break;
-	        }
-
-	    } else {
-
-	    	switch ($action) {
-
-	        	case 'map':
-	        		$api_info['action'] = 'https://logistics.ecpay.com.tw/Express/map' ;
-	        	break;
-	        	
-	        	case 'create':
-	        		$api_info['action'] = 'https://logistics.ecpay.com.tw/Express/Create' ;
-	        	break;
-
-	        	case 'print':
-
-	        		if($wooecpay_logistic_cvs_type == 'C2C'){
-
-		        		switch ($shipping_method_id) {
-
-		        			case 'Wooecpay_Logistic_CVS_711':
-		        				$api_info['action'] = 'https://logistics.ecpay.com.tw/Express/PrintUniMartC2COrderInfo' ;
-		        			break;
-
-		        			case 'Wooecpay_Logistic_CVS_Family':
-		        				$api_info['action'] = 'https://logistics.ecpay.com.tw/Express/PrintFAMIC2COrderInfo' ;
-		        			break;
-
-		        			case 'Wooecpay_Logistic_CVS_Hilife':
-		        				$api_info['action'] = 'https://logistics.ecpay.com.tw/Express/PrintHILIFEC2COrderInfo' ;
-		        			break;
-
-		        			case 'Wooecpay_Logistic_CVS_Okmart':
-		        				$api_info['action'] = 'https://logistics.ecpay.com.tw/Express/PrintOKMARTC2COrderInfo' ;
-		        			break;
-
-		        			case 'Wooecpay_Logistic_Home_Tcat':
-		        			case 'Wooecpay_Logistic_Home_Ecan':
-		        				$api_info['action'] = 'https://logistics.ecpay.com.tw/helper/printTradeDocument' ;
-		        			break;
-		        			
-		        			default:
-		        				$api_info['action'] = '' ;
-		        			break;
-		        		}
-
-		        	} else if($wooecpay_logistic_cvs_type == 'B2C'){
-
-		        		switch ($shipping_method_id) {
-
-		        			case 'Wooecpay_Logistic_CVS_711':
-		        			case 'Wooecpay_Logistic_CVS_Family':
-		        			case 'Wooecpay_Logistic_CVS_Hilife':
-		        			case 'Wooecpay_Logistic_Home_Tcat':
-		        			case 'Wooecpay_Logistic_Home_Ecan':
-		        				$api_info['action'] = 'https://logistics.ecpay.com.tw/helper/printTradeDocument' ;
-		        			break;
-		        			default:
-		        				$api_info['action'] = '' ;
-		        			break;
-		        		}
-		        	}
-	        		
-	        	break;
-
-	        	default:
-	        	break;
-	        }
-	    }
-
-        return $api_info;
-    }
-
-    protected function get_merchant_trade_no($order_id, $order_prefix = '')
-    {
-        $trade_no = $order_prefix . $order_id . 'SN' .(string) time() ;
-        return substr($trade_no, 0, 20);
-    }
-
-    protected function get_logistics_sub_type($shipping_method_id)
-    {
-        $wooecpay_logistic_cvs_type = get_option('wooecpay_logistic_cvs_type');
-
-        $logisticsType = [
-        	'type' 		=> '',
-        	'sub_type' 	=> '',
+        $api_info = [
+            'merchant_id'   => '2000132',
+            'hashKey'       => '5294y06JbISpM5x9',
+            'hashIv'        => 'v77hoKGq4kWxNNIS',
         ] ;
+      }
 
-        switch ($shipping_method_id) { 
-            case 'Wooecpay_Logistic_CVS_711':
+    } else {
+        
+      $merchant_id = get_option('wooecpay_logistic_mid');
+      $hash_key    = get_option('wooecpay_logistic_hashkey');
+      $hash_iv     = get_option('wooecpay_logistic_hashiv');
 
-            	$logisticsType['type'] = 'CVS' ;
-
-            	if($wooecpay_logistic_cvs_type == 'C2C'){
-                	$logisticsType['sub_type'] = 'UNIMARTC2C' ;
-                } else if($wooecpay_logistic_cvs_type == 'B2C'){
-                	$logisticsType['sub_type'] = 'UNIMART' ;
-                }
-
-            break;
-            case 'Wooecpay_Logistic_CVS_Family':
-                
-                $logisticsType['type'] = 'CVS' ;
-
-                if($wooecpay_logistic_cvs_type == 'C2C'){
-                	$logisticsType['sub_type'] = 'FAMIC2C' ;
-                } else if($wooecpay_logistic_cvs_type == 'B2C'){
-                	$logisticsType['sub_type'] = 'FAMI' ;
-                }
-
-
-            break;
-            case 'Wooecpay_Logistic_CVS_Hilife':
-
-	            $logisticsType['type'] = 'CVS' ;
-
-                if($wooecpay_logistic_cvs_type == 'C2C'){
-                	$logisticsType['sub_type'] = 'HILIFEC2C' ;
-                } else if($wooecpay_logistic_cvs_type == 'B2C'){
-                	$logisticsType['sub_type'] = 'HILIFE' ;
-                }
-
-            break;
-            case 'Wooecpay_Logistic_CVS_Okmart':
-
-            	$logisticsType['type'] = 'CVS' ;
-
-                if($wooecpay_logistic_cvs_type == 'C2C'){
-                	$logisticsType['sub_type'] = 'OKMARTC2C' ;
-                }
-
-            break;
-
-            case 'Wooecpay_Logistic_Home_Tcat':
-            	$logisticsType['type'] = 'HOME' ;
-            	$logisticsType['sub_type'] = 'TCAT' ;
-            break;
-
-            case 'Wooecpay_Logistic_Home_Ecan':
-            	$logisticsType['type'] = 'HOME' ;
-            	$logisticsType['sub_type'] = 'ECAN' ;
-            break;
-        }
-
-        return $logisticsType;
+      $api_info = [
+          'merchant_id'   => $merchant_id,
+          'hashKey'       => $hash_key,
+          'hashIv'        => $hash_iv,
+      ] ;
     }
+
+    // URL位置判斷
+    if ('yes' === get_option('wooecpay_enabled_logistic_stage', 'yes')) {
+
+      switch ($action) {
+
+      	case 'map':
+      		$api_info['action'] = 'https://logistics-stage.ecpay.com.tw/Express/map' ;
+      	break;
+      	
+      	case 'create':
+      		$api_info['action'] = 'https://logistics-stage.ecpay.com.tw/Express/Create' ;
+      	break;
+
+      	case 'print':
+
+      		if($wooecpay_logistic_cvs_type == 'C2C'){
+
+        		switch ($shipping_method_id) {
+
+        			case 'Wooecpay_Logistic_CVS_711':
+        				$api_info['action'] = 'https://logistics-stage.ecpay.com.tw/Express/PrintUniMartC2COrderInfo' ;
+        			break;
+
+        			case 'Wooecpay_Logistic_CVS_Family':
+        				$api_info['action'] = 'https://logistics-stage.ecpay.com.tw/Express/PrintFAMIC2COrderInfo' ;
+        			break;
+
+        			case 'Wooecpay_Logistic_CVS_Hilife':
+        				$api_info['action'] = 'https://logistics-stage.ecpay.com.tw/Express/PrintHILIFEC2COrderInfo' ;
+        			break;
+
+        			case 'Wooecpay_Logistic_CVS_Okmart':
+        				$api_info['action'] = 'https://logistics-stage.ecpay.com.tw/Express/PrintOKMARTC2COrderInfo' ;
+        			break;
+
+        			case 'Wooecpay_Logistic_Home_Tcat':
+        			case 'Wooecpay_Logistic_Home_Ecan':
+        				$api_info['action'] = 'https://logistics-stage.ecpay.com.tw/helper/printTradeDocument' ;
+        			break;
+        			
+        			default:
+        				$api_info['action'] = '' ;
+        			break;
+        		}
+
+        	} else if($wooecpay_logistic_cvs_type == 'B2C'){
+
+        		switch ($shipping_method_id) {
+
+        			case 'Wooecpay_Logistic_CVS_711':
+        			case 'Wooecpay_Logistic_CVS_Family':
+        			case 'Wooecpay_Logistic_CVS_Hilife':
+        			case 'Wooecpay_Logistic_Home_Tcat':
+        			case 'Wooecpay_Logistic_Home_Ecan':
+        				$api_info['action'] = 'https://logistics-stage.ecpay.com.tw/helper/printTradeDocument' ;
+        			break;
+        			default:
+        				$api_info['action'] = '' ;
+        			break;
+        		}
+        	}
+      		
+      	break;
+
+      	default:
+      	break;
+      }
+
+  	} else {
+
+    	switch ($action) {
+
+      	case 'map':
+      		$api_info['action'] = 'https://logistics.ecpay.com.tw/Express/map' ;
+      	break;
+      	
+      	case 'create':
+      		$api_info['action'] = 'https://logistics.ecpay.com.tw/Express/Create' ;
+      	break;
+
+      	case 'print':
+
+      		if($wooecpay_logistic_cvs_type == 'C2C'){
+
+        		switch ($shipping_method_id) {
+
+        			case 'Wooecpay_Logistic_CVS_711':
+        				$api_info['action'] = 'https://logistics.ecpay.com.tw/Express/PrintUniMartC2COrderInfo' ;
+        			break;
+
+        			case 'Wooecpay_Logistic_CVS_Family':
+        				$api_info['action'] = 'https://logistics.ecpay.com.tw/Express/PrintFAMIC2COrderInfo' ;
+        			break;
+
+        			case 'Wooecpay_Logistic_CVS_Hilife':
+        				$api_info['action'] = 'https://logistics.ecpay.com.tw/Express/PrintHILIFEC2COrderInfo' ;
+        			break;
+
+        			case 'Wooecpay_Logistic_CVS_Okmart':
+        				$api_info['action'] = 'https://logistics.ecpay.com.tw/Express/PrintOKMARTC2COrderInfo' ;
+        			break;
+
+        			case 'Wooecpay_Logistic_Home_Tcat':
+        			case 'Wooecpay_Logistic_Home_Ecan':
+        				$api_info['action'] = 'https://logistics.ecpay.com.tw/helper/printTradeDocument' ;
+        			break;
+        			
+        			default:
+        				$api_info['action'] = '' ;
+        			break;
+        		}
+
+        	} else if($wooecpay_logistic_cvs_type == 'B2C'){
+
+        		switch ($shipping_method_id) {
+
+        			case 'Wooecpay_Logistic_CVS_711':
+        			case 'Wooecpay_Logistic_CVS_Family':
+        			case 'Wooecpay_Logistic_CVS_Hilife':
+        			case 'Wooecpay_Logistic_Home_Tcat':
+        			case 'Wooecpay_Logistic_Home_Ecan':
+        				$api_info['action'] = 'https://logistics.ecpay.com.tw/helper/printTradeDocument' ;
+        			break;
+        			default:
+        				$api_info['action'] = '' ;
+        			break;
+        		}
+        	}
+      		
+      	break;
+
+      	default:
+      	break;
+      }
+  	}
+
+    return $api_info;
+  }
+
+  protected function get_merchant_trade_no($order_id, $order_prefix = '')
+  {
+    $trade_no = $order_prefix . $order_id . 'SN' .(string) time() ;
+    return substr($trade_no, 0, 20);
+  }
+
+  protected function get_logistics_sub_type($shipping_method_id)
+  {
+    $wooecpay_logistic_cvs_type = get_option('wooecpay_logistic_cvs_type');
+
+    $logisticsType = [
+    	'type' 		=> '',
+    	'sub_type' 	=> '',
+    ] ;
+
+    switch ($shipping_method_id) { 
+
+      case 'Wooecpay_Logistic_CVS_711':
+
+      	$logisticsType['type'] = 'CVS' ;
+
+      	if($wooecpay_logistic_cvs_type == 'C2C'){
+          	$logisticsType['sub_type'] = 'UNIMARTC2C' ;
+          } else if($wooecpay_logistic_cvs_type == 'B2C'){
+          	$logisticsType['sub_type'] = 'UNIMART' ;
+          }
+
+      break;
+      case 'Wooecpay_Logistic_CVS_Family':
+          
+          $logisticsType['type'] = 'CVS' ;
+
+          if($wooecpay_logistic_cvs_type == 'C2C'){
+          	$logisticsType['sub_type'] = 'FAMIC2C' ;
+          } else if($wooecpay_logistic_cvs_type == 'B2C'){
+          	$logisticsType['sub_type'] = 'FAMI' ;
+          }
+
+
+      break;
+      case 'Wooecpay_Logistic_CVS_Hilife':
+
+        $logisticsType['type'] = 'CVS' ;
+
+          if($wooecpay_logistic_cvs_type == 'C2C'){
+          	$logisticsType['sub_type'] = 'HILIFEC2C' ;
+          } else if($wooecpay_logistic_cvs_type == 'B2C'){
+          	$logisticsType['sub_type'] = 'HILIFE' ;
+          }
+
+      break;
+      case 'Wooecpay_Logistic_CVS_Okmart':
+
+      	$logisticsType['type'] = 'CVS' ;
+
+          if($wooecpay_logistic_cvs_type == 'C2C'){
+          	$logisticsType['sub_type'] = 'OKMARTC2C' ;
+          }
+
+      break;
+
+      case 'Wooecpay_Logistic_Home_Tcat':
+      	$logisticsType['type'] = 'HOME' ;
+      	$logisticsType['sub_type'] = 'TCAT' ;
+      break;
+
+      case 'Wooecpay_Logistic_Home_Ecan':
+      	$logisticsType['type'] = 'HOME' ;
+      	$logisticsType['sub_type'] = 'ECAN' ;
+      break;
+    }
+
+    return $logisticsType;
+  }
 
 	protected function get_item_name($order)
-    {
-        $item_name = '';
+  {
+    $item_name = '';
 
-        if ( count($order->get_items()) ) {
-            foreach ($order->get_items() as $item) {
-                $item_name .=  trim($item->get_name()) . ' ' ;
-            }
+    if ( count($order->get_items()) ) {
+        foreach ($order->get_items() as $item) {
+            $item_name .=  trim($item->get_name()) . ' ' ;
         }
-
-        return $item_name;
     }
 
-    // invoice 
-    // ---------------------------------------------------
+    return $item_name;
+  }
+
+  // invoice 
+  // ---------------------------------------------------
 
 	protected function get_ecpay_invoice_api_info($action = '')
-    {
+  {
+    $api_info = [
+        'merchant_id'   => '',
+        'hashKey'       => '',
+        'hashIv'        => '',
+        'action'        => '',
+    ] ;
+
+    if ('yes' === get_option('wooecpay_enabled_invoice_stage', 'yes')) {
+
+       	$api_info = [
+            'merchant_id'   => '2000132',
+            'hashKey'       => 'ejCk326UnaZWKisg ',
+            'hashIv'        => 'q9jcZX8Ib9LM8wYk',
+        ] ;
+
+    } else {
+        
+        $merchant_id = get_option('wooecpay_invoice_mid');
+        $hash_key    = get_option('wooecpay_invoice_hashkey');
+        $hash_iv     = get_option('wooecpay_invoice_hashiv');
+
         $api_info = [
+            'merchant_id'   => $merchant_id,
+            'hashKey'       => $hash_key,
+            'hashIv'        => $hash_iv,
+        ] ;
+    }
+
+    if ('yes' === get_option('wooecpay_enabled_invoice_stage', 'yes')) {
+
+        switch ($action) {
+
+            case 'check_Love_code':
+                $api_info['action'] = 'https://einvoice-stage.ecpay.com.tw/B2CInvoice/CheckLoveCode' ;
+            break;
+
+            case 'check_barcode':
+                $api_info['action'] = 'https://einvoice-stage.ecpay.com.tw/B2CInvoice/CheckBarcode' ;
+            break;
+
+            case 'issue':
+                $api_info['action'] = 'https://einvoice-stage.ecpay.com.tw/B2CInvoice/Issue' ;
+            break;
+
+            case 'delay_issue':
+                $api_info['action'] = 'https://einvoice-stage.ecpay.com.tw/B2CInvoice/DelayIssue' ;
+            break;
+
+            case 'invalid':
+                $api_info['action'] = 'https://einvoice-stage.ecpay.com.tw/B2CInvoice/Invalid' ;
+            break;
+
+            case 'cancel_delay_issue':
+                $api_info['action'] = 'https://einvoice-stage.ecpay.com.tw/B2CInvoice/CancelDelayIssue' ;
+            break;
+
+            default:
+            break;
+        }
+
+    } else {
+
+        switch ($action) {
+
+            case 'check_Love_code':
+                $api_info['action'] = 'https://einvoice.ecpay.com.tw/B2CInvoice/CheckLoveCode' ;
+            break;
+            
+            case 'check_barcode':
+                $api_info['action'] = 'https://einvoice.ecpay.com.tw/B2CInvoice/CheckBarcode' ;
+            break;
+
+            case 'issue':
+                $api_info['action'] = 'https://einvoice.ecpay.com.tw/B2CInvoice/Issue' ;
+            break;
+
+            case 'delay_issue':
+                $api_info['action'] = 'https://einvoice.ecpay.com.tw/B2CInvoice/DelayIssue' ;
+            break;
+           	
+           	case 'invalid':
+                $api_info['action'] = 'https://einvoice.ecpay.com.tw/B2CInvoice/Invalid' ;
+            break;
+
+            case 'cancel_delay_issue':
+                $api_info['action'] = 'https://einvoice.ecpay.com.tw/B2CInvoice/CancelDelayIssue' ;
+            break;
+
+            default:
+            break;
+        }
+    }
+
+    return $api_info;
+  }
+
+	protected function get_relate_number($order_id, $order_prefix = '')
+  {
+    $relate_no = $order_prefix . $order_id . 'SN' .(string) time() ;
+    return substr($relate_no, 0, 20);
+  }  
+
+  // payment
+  // ---------------------------------------------------
+  protected function get_ecpay_payment_api_query_trade_info()
+    {
+        $api_payment_info = [
             'merchant_id'   => '',
             'hashKey'       => '',
             'hashIv'        => '',
             'action'        => '',
         ] ;
 
-        if ('yes' === get_option('wooecpay_enabled_invoice_stage', 'yes')) {
+        if ('yes' === get_option('wooecpay_enabled_payment_stage', 'yes')) {
 
-           	$api_info = [
-                'merchant_id'   => '2000132',
-                'hashKey'       => 'ejCk326UnaZWKisg ',
-                'hashIv'        => 'q9jcZX8Ib9LM8wYk',
+            $api_payment_info = [
+                'merchant_id'   => '3002607',
+                'hashKey'       => 'pwFHCqoQZGmho4w6',
+                'hashIv'        => 'EkRm7iFT261dpevs',
+                'action'        => 'https://payment-stage.ecpay.com.tw/Cashier/QueryTradeInfo/V5',
             ] ;
 
         } else {
             
-            $merchant_id = get_option('wooecpay_invoice_mid');
-            $hash_key    = get_option('wooecpay_invoice_hashkey');
-            $hash_iv     = get_option('wooecpay_invoice_hashiv');
+            $merchant_id    = get_option('wooecpay_payment_mid');
+            $hash_key       = get_option('wooecpay_payment_hashkey');
+            $hash_iv        = get_option('wooecpay_payment_hashiv');
 
-            $api_info = [
+            $api_payment_info = [
                 'merchant_id'   => $merchant_id,
                 'hashKey'       => $hash_key,
                 'hashIv'        => $hash_iv,
+                'action'        => 'https://payment.ecpay.com.tw/Cashier/QueryTradeInfo/V5',
             ] ;
         }
 
-        if ('yes' === get_option('wooecpay_enabled_invoice_stage', 'yes')) {
-
-            switch ($action) {
-
-                case 'check_Love_code':
-                    $api_info['action'] = 'https://einvoice-stage.ecpay.com.tw/B2CInvoice/CheckLoveCode' ;
-                break;
-
-                case 'check_barcode':
-                    $api_info['action'] = 'https://einvoice-stage.ecpay.com.tw/B2CInvoice/CheckBarcode' ;
-                break;
-
-                case 'issue':
-                    $api_info['action'] = 'https://einvoice-stage.ecpay.com.tw/B2CInvoice/Issue' ;
-                break;
-
-                case 'delay_issue':
-                    $api_info['action'] = 'https://einvoice-stage.ecpay.com.tw/B2CInvoice/DelayIssue' ;
-                break;
-
-                case 'invalid':
-                    $api_info['action'] = 'https://einvoice-stage.ecpay.com.tw/B2CInvoice/Invalid' ;
-                break;
-
-                case 'cancel_delay_issue':
-                    $api_info['action'] = 'https://einvoice-stage.ecpay.com.tw/B2CInvoice/CancelDelayIssue' ;
-                break;
-
-                default:
-                break;
-            }
-
-        } else {
-
-            switch ($action) {
-
-                case 'check_Love_code':
-                    $api_info['action'] = 'https://einvoice.ecpay.com.tw/B2CInvoice/CheckLoveCode' ;
-                break;
-                
-                case 'check_barcode':
-                    $api_info['action'] = 'https://einvoice.ecpay.com.tw/B2CInvoice/CheckBarcode' ;
-                break;
-
-                case 'issue':
-                    $api_info['action'] = 'https://einvoice.ecpay.com.tw/B2CInvoice/Issue' ;
-                break;
-
-                case 'delay_issue':
-                    $api_info['action'] = 'https://einvoice.ecpay.com.tw/B2CInvoice/DelayIssue' ;
-                break;
-               	
-               	case 'invalid':
-                    $api_info['action'] = 'https://einvoice.ecpay.com.tw/B2CInvoice/Invalid' ;
-                break;
-
-                case 'cancel_delay_issue':
-                    $api_info['action'] = 'https://einvoice.ecpay.com.tw/B2CInvoice/CancelDelayIssue' ;
-                break;
-
-                default:
-                break;
-            }
-        }
-
-        return $api_info;
+        return $api_payment_info;
     }
-
-	protected function get_relate_number($order_id, $order_prefix = '')
-    {
-        $relate_no = $order_prefix . $order_id . 'SN' .(string) time() ;
-        return substr($relate_no, 0, 20);
-    }  
 
 }
 
