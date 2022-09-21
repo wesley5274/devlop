@@ -229,8 +229,6 @@ class Wooecpay_Order {
 					}
 	  		}
 	  	}
-
-			error_log(print_r($order_status, true), 3, '/vhost/ecpay.grazia.tw/wordpress582/wp-content/debug.log');
 		}
   }
 
@@ -682,7 +680,31 @@ class Wooecpay_Order {
 					$IsCollection = 'N';
 				}
 
-				$item_name = $this->get_item_name($order) ;
+				// 綠界訂單顯示商品名稱判斷
+        if ('yes' === get_option('wooecpay_enabled_logistic_disp_item_name', 'yes')) {
+
+					// 取出訂單品項
+					$item_name = $this->get_item_name($order);
+
+					// 判斷是否超過長度，如果超過長度改為預設文字
+					if(strlen($item_name) > 50 ) {
+						$item_name = '網路商品一批';
+						$order->add_order_note('商品名稱超過綠界物流可允許長度強制改為:'.$item_name);
+						$order->save();
+					}
+
+					// todo:判斷特殊字元
+					if(true){
+
+					}
+
+        } else {
+          $item_name = '網路商品一批';
+        }
+// 
+        error_log(print_r('here', true), 3, '/vhost/ecpay.grazia.tw/wordpress582/wp-content/debug.log');
+        error_log(print_r($item_name, true), 3, '/vhost/ecpay.grazia.tw/wordpress582/wp-content/debug.log');
+         error_log(print_r(get_option('wooecpay_enabled_logistic_disp_item_name', 'yes'), true), 3, '/vhost/ecpay.grazia.tw/wordpress582/wp-content/debug.log');
 
         if($LogisticsType['type'] == 'HOME'){
 
@@ -709,6 +731,7 @@ class Wooecpay_Order {
 		        'ScheduledDeliveryTime' => '4',
 		        'ServerReplyURL' 				=> $serverReplyURL,
 		    	];
+
         } else if($LogisticsType['type'] == 'CVS'){
 
       		$inputLogisticOrder = [
