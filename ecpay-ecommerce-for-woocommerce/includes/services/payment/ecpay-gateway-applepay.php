@@ -6,7 +6,7 @@ class Wooecpay_Gateway_Applepay extends Wooecpay_Gateway_Base
     public function __construct()
     {
         $this->id                   = 'Wooecpay_Gateway_Applepay';
-        $this->payment_type         = 'Applepay';
+        $this->payment_type         = 'ApplePay';
         $this->icon                 = plugins_url('images/icon.png', dirname(dirname( __FILE__ )) );
         $this->has_fields           = false;
         $this->method_title         = '綠界ApplePay';

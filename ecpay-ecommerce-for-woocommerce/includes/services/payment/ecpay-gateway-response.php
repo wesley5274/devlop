@@ -209,7 +209,35 @@ class Wooecpay_Gateway_Response
                     $IsCollection = 'N';
                 }
 
-                $item_name = $this->get_item_name($order) ;
+                // 綠界訂單顯示商品名稱判斷
+                $item_name_default = '網路商品一批';
+
+                if ('yes' === get_option('wooecpay_enabled_logistic_disp_item_name', 'yes')) {
+
+                    // 取出訂單品項
+                    $item_name = $this->get_item_name($order);
+
+                    // 判斷是否超過長度，如果超過長度改為預設文字
+                    if(strlen($item_name) > 50 ) {
+
+                        $item_name = $item_name_default;
+
+                        $order->add_order_note('商品名稱超過綠界物流可允許長度強制改為:'.$item_name);
+                        $order->save();
+                    }
+
+                    // 判斷特殊字元
+                    if(preg_match('/[\^\'\[\]`!@#%\\\&*+\"<>|_]/', $item_name)){
+
+                        $item_name = $item_name_default;
+
+                        $order->add_order_note('商品名稱存在綠界物流不允許的特殊字元強制改為:'.$item_name);
+                        $order->save();
+                    }
+
+                } else {
+                  $item_name = $item_name_default;
+                }
 
                 if($LogisticsType['type'] == 'HOME'){
 

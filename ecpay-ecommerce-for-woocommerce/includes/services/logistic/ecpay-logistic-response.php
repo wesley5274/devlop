@@ -125,7 +125,7 @@ class Wooecpay_Logistic_Response
                         'MerchantTradeDate' => date('Y/m/d H:i:s'),
                         'PaymentType'       => 'aio',
                         'TotalAmount'       => (int) ceil($order->get_total()),
-                        'TradeDesc'         => 'ecpay_module_woocommerce',
+                        'TradeDesc'         => 'woocommerce_v2',
                         'ItemName'          => $item_name,
                         'ChoosePayment'     => $this->get_ChoosePayment($order->get_payment_method()),
                         'EncryptType'       => 1,
