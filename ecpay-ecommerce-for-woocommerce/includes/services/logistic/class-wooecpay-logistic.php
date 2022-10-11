@@ -46,6 +46,7 @@ class Wooecpay_Logistic {
 		
 		include WOOECPAY_PLUGIN_INCLUDE_DIR . '/services/logistic/ecpay-logistic-home-tcat.php';
 		// include WOOECPAY_PLUGIN_INCLUDE_DIR . '/services/logistic/ecpay-logistic-home-ecan.php';
+		include WOOECPAY_PLUGIN_INCLUDE_DIR . '/services/logistic/ecpay-logistic-home-post.php';
 	}
 
 	public function add_method($methods)
@@ -60,6 +61,7 @@ class Wooecpay_Logistic {
 
         $methods['Wooecpay_Logistic_Home_Tcat']     = 'Wooecpay_Logistic_Home_Tcat';
         // $methods['Wooecpay_Logistic_Home_Ecan']     = 'Wooecpay_Logistic_Home_Ecan';
+        $methods['Wooecpay_Logistic_Home_Post']     = 'Wooecpay_Logistic_Home_Post';
 
         return $methods;
     }

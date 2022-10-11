@@ -6,7 +6,7 @@
  * Plugin Name: ECPay Ecommerce for WooCommerce
  * Plugin URI: https://www.ecpay.com.tw
  * Description: Ecpay Plug for WooCommerce
- * Version: 1.0.220921
+ * Version: 1.0.221005
  * Author: ECPay Green World FinTech Service Co., Ltd.
  * Author URI: https://www.ecpay.com.tw
  * License: GPLv2

@@ -174,7 +174,8 @@ class Wooecpay_Gateway_Response
                 $shipping_method_id == 'Wooecpay_Logistic_CVS_Hilife' || 
                 $shipping_method_id == 'Wooecpay_Logistic_CVS_Okmart' || 
                 $shipping_method_id == 'Wooecpay_Logistic_Home_Tcat' ||
-                $shipping_method_id == 'Wooecpay_Logistic_Home_Ecan' 
+                $shipping_method_id == 'Wooecpay_Logistic_Home_Ecan' ||
+                $shipping_method_id == 'Wooecpay_Logistic_Home_Post' 
             ){
 
                 $LogisticsType      = $this->get_logistics_sub_type($shipping_method_id) ;
@@ -241,6 +242,9 @@ class Wooecpay_Gateway_Response
 
                 if($LogisticsType['type'] == 'HOME'){
 
+                    // 重量計算
+                    $goods_weight = 4 ;
+
                     $inputLogisticOrder = [
                         'MerchantID'            => $api_logistic_info['merchant_id'],
                         'MerchantTradeNo'       => $MerchantTradeNo,
@@ -249,6 +253,7 @@ class Wooecpay_Gateway_Response
                         'LogisticsSubType'      => $LogisticsType['sub_type'],
                         'GoodsAmount'           => $order->get_total(),
                         'GoodsName'             => $item_name,
+                        'GoodsWeight'           => $goods_weight,
                         'SenderName'            => $sender_name,
                         'SenderCellPhone'       => $sender_cellphone,
                         'SenderZipCode'         => $sender_zipcode,
@@ -468,6 +473,7 @@ class Wooecpay_Gateway_Response
 
                             case 'Wooecpay_Logistic_Home_Tcat':
                             case 'Wooecpay_Logistic_Home_Ecan':
+                            case 'Wooecpay_Logistic_Home_Post':
                                 $api_info['action'] = 'https://logistics-stage.ecpay.com.tw/helper/printTradeDocument' ;
                             break;
                             
@@ -485,6 +491,7 @@ class Wooecpay_Gateway_Response
                             case 'Wooecpay_Logistic_CVS_Hilife':
                             case 'Wooecpay_Logistic_Home_Tcat':
                             case 'Wooecpay_Logistic_Home_Ecan':
+                            case 'Wooecpay_Logistic_Home_Post':
                                 $api_info['action'] = 'https://logistics-stage.ecpay.com.tw/helper/printTradeDocument' ;
                             break;
                             default:
@@ -535,6 +542,7 @@ class Wooecpay_Gateway_Response
 
                             case 'Wooecpay_Logistic_Home_Tcat':
                             case 'Wooecpay_Logistic_Home_Ecan':
+                            case 'Wooecpay_Logistic_Home_Post':
                                 $api_info['action'] = 'https://logistics.ecpay.com.tw/helper/printTradeDocument' ;
                             break;
                             
@@ -552,6 +560,7 @@ class Wooecpay_Gateway_Response
                             case 'Wooecpay_Logistic_CVS_Hilife':
                             case 'Wooecpay_Logistic_Home_Tcat':
                             case 'Wooecpay_Logistic_Home_Ecan':
+                            case 'Wooecpay_Logistic_Home_Post':
                                 $api_info['action'] = 'https://logistics.ecpay.com.tw/helper/printTradeDocument' ;
                             break;
                             default:
@@ -638,6 +647,11 @@ class Wooecpay_Gateway_Response
             case 'Wooecpay_Logistic_Home_Ecan':
                 $logisticsType['type'] = 'HOME' ;
                 $logisticsType['sub_type'] = 'ECAN' ;
+            break;
+
+            case 'Wooecpay_Logistic_Home_Post':
+                $logisticsType['type'] = 'HOME' ;
+                $logisticsType['sub_type'] = 'POST' ;
             break;
         }
 
