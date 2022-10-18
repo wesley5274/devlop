@@ -16,7 +16,7 @@ class Wooecpay_Logistic_Home_Post extends Wooecpay_Logistic_Base
         ];
 
         // 載入欄位
-        $this->instance_form_fields = include WOOECPAY_PLUGIN_INCLUDE_DIR . '/config/logistic/settings-logistic-base.php';
+        $this->instance_form_fields = include WOOECPAY_PLUGIN_INCLUDE_DIR . '/config/logistic/settings-logistic-post.php';
 
         parent::__construct();
 
