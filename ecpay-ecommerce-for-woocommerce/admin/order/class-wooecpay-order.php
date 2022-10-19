@@ -191,7 +191,7 @@ class Wooecpay_Order {
           $dateCompare = strtotime('- '. $offset .' minute');
 
           // 反查綠界訂單記錄API
-					if ($createDate <= $dateCompare || true) {
+					if ($date_created <= $dateCompare) {
 
 						$api_payment_query_trade_info = $this->get_ecpay_payment_api_query_trade_info();
 				  	$merchant_trade_no = get_post_meta( $order->get_id(), '_wooecpay_payment_merchant_trade_no', true ) ;
