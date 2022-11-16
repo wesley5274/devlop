@@ -29,8 +29,6 @@ class Wooecpay_Logistic_Home_Post extends Wooecpay_Logistic_Base
 
         $total_weight = WC()->cart->get_cart_contents_weight();
 
-        // error_log(print_r($total_weight , true), 3, '/vhost/ecpay.grazia.tw/wordpress600/wp-content/debug.log');
-
         if($total_weight > 20){
            $is_available = false ; 
         }
