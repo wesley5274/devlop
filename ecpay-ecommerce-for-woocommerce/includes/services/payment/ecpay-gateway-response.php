@@ -246,7 +246,7 @@ class Wooecpay_Gateway_Response
                     if($LogisticsType['type'] == 'HOME'){
 
                         // 重量計算
-                        $goods_weight = 4 ;
+                        $goods_weight = get_post_meta( $order->get_id(), '_cart_weight', true ) ;
 
                         $inputLogisticOrder = [
                             'MerchantID'            => $api_logistic_info['merchant_id'],

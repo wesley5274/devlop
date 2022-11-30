@@ -16,6 +16,8 @@ class Wooecpay_Logistic {
 			add_filter('woocommerce_checkout_fields', array($this, 'wooecpay_show_logistic_fields' ), 11 ,1);		// 收件人手機
 			add_action('woocommerce_checkout_create_order', array($this, 'wooecpay_save_logistic_fields'), 11, 2); 
 		}
+
+		add_action( 'woocommerce_checkout_update_order_meta', array( $this, 'save_weight_order' ));
 	}
 
 	/**
@@ -131,5 +133,14 @@ class Wooecpay_Logistic {
     	){
     		$order->update_meta_data('wooecpay_shipping_phone', $data['billing_phone']);
     	}
+    }
+
+    /**
+     * 額外增加訂單重量欄位
+     */
+    public function save_weight_order($order_id) {
+
+        $weight = WC()->cart->get_cart_contents_weight();
+        update_post_meta( $order_id, '_cart_weight', $weight );
     }
 }
