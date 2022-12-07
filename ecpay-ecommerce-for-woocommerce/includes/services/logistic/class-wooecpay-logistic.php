@@ -102,6 +102,17 @@ class Wooecpay_Logistic {
 						}
 					}
 				}	
+
+				// 限制貨到付款僅適用超商物流
+				$chosen_methods = WC()->session->get( 'chosen_shipping_methods' );
+				$chosen_shipping = $chosen_methods[0];
+				
+				if ( isset( $available_gateways['cod'] ) && (
+					0 === strpos( $chosen_shipping, 'Wooecpay_Logistic_Home_Tcat' ) || 
+					0 === strpos( $chosen_shipping, 'Wooecpay_Logistic_Home_Post' )
+				) ){
+					unset( $available_gateways['cod'] );
+				}
 			}	
        	}
 
