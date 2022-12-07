@@ -77,8 +77,8 @@ class Wooecpay_Order {
 	 * 訂單頁面姓名欄位格式調整
 	 */
 	public function add_address_meta($order) {
-
 		echo '<style>.order_data_column:nth-child(2) .address p:first-child {display: none;}</style>';
+		echo '<style>.logistic_csv_info {display: inline-block;}</style>';
 		echo wp_kses_post('<p><strong>帳單姓名:<br/></strong>' . get_post_meta( $order->get_id(), '_billing_last_name', true ) . ' ' . get_post_meta( $order->get_id(), '_billing_first_name', true ) . '</p>');
 	}
 
@@ -501,13 +501,16 @@ class Wooecpay_Order {
               $shipping_method_id == 'Wooecpay_Logistic_CVS_Hilife' || 
               $shipping_method_id == 'Wooecpay_Logistic_CVS_Okmart' 
           ){
-          	echo wp_kses_post('<p><strong>超商編號:</strong>'. get_post_meta( $order->get_id(), '_ecpay_logistic_cvs_store_id', true ) . '</p>') ;	
+			echo '<div class="logistic_csv_info">';
+        	echo '<h3>超商資訊</h3>' ;
+			echo wp_kses_post('<p><strong>超商編號:</strong>'. get_post_meta( $order->get_id(), '_ecpay_logistic_cvs_store_id', true ) . '</p>') ;	
           	echo wp_kses_post('<p><strong>超商名稱:</strong>'. get_post_meta( $order->get_id(), '_ecpay_logistic_cvs_store_name', true ) . '</p>') ;
 
           	if ('yes' === get_option('wooecpay_keep_logistic_phone', 'yes')) {
           		echo wp_kses_post('<p><strong>收件人電話:</strong>'. get_post_meta( $order->get_id(), 'wooecpay_shipping_phone', true ) . '</p>') ;
           	}	
-          }
+			echo '</div>' ;
+		}
 
           echo '<div class="logistic_button_display">';
         	echo '<h3>物流單資訊</h3>' ;
