@@ -29,7 +29,7 @@ class Wooecpay_Logistic_Home_Post extends Wooecpay_Logistic_Base
 
         $total_weight = WC()->cart->get_cart_contents_weight();
 
-        if($total_weight > 20){
+        if ($total_weight > 20) {
            $is_available = false ; 
         }
 
@@ -89,16 +89,16 @@ class Wooecpay_Logistic_Home_Post extends Wooecpay_Logistic_Base
         $cost3 = $this->get_option('cost3');
         $cost4 = $this->get_option('cost4');
 
-        if($total_weight <= 5){
+        if ($total_weight <= 5) {
             $rate['cost'] = $cost1;
 
-        } else if($total_weight > 5 && $total_weight <= 10){
+        } else if ($total_weight > 5 && $total_weight <= 10) {
             $rate['cost'] = $cost2;
 
-        } else if($total_weight > 10 && $total_weight <= 15){
+        } else if ($total_weight > 10 && $total_weight <= 15) {
             $rate['cost'] = $cost3;
 
-        } else if($total_weight > 15 && $total_weight <= 20){
+        } else if ($total_weight > 15 && $total_weight <= 20) {
             $rate['cost'] = $cost4;
         }
 

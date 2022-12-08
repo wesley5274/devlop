@@ -149,8 +149,8 @@ class Wooecpay_Logistic {
     /**
      * 額外增加訂單重量欄位
      */
-    public function save_weight_order($order_id) {
-
+    public function save_weight_order($order_id) 
+	{
         $weight = WC()->cart->get_cart_contents_weight();
         update_post_meta( $order_id, '_cart_weight', $weight );
     }

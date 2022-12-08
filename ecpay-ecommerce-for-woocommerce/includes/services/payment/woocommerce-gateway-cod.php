@@ -139,7 +139,7 @@ class Wooecpay_Gateway_Cod extends Wooecpay_Gateway_Base
                         // 是否已經開立
                         $wooecpay_logistic_AllPayLogisticsID = get_post_meta( $order->get_id(), '_wooecpay_logistic_AllPayLogisticsID', true );
 
-                        if(empty($wooecpay_logistic_AllPayLogisticsID)){
+                        if (empty($wooecpay_logistic_AllPayLogisticsID)) {
                             $this->send_logistic_order_action($order_id);
                         }
                     }
@@ -365,26 +365,18 @@ class Wooecpay_Gateway_Cod extends Wooecpay_Gateway_Base
     public function send_logistic_order_action($order_id)
     {
         // 產生物流訂單
-        if ($order = wc_get_order($order_id)){
+        if ($order = wc_get_order($order_id)) {
 
             // 取得物流方式
             $shipping_method_id = $order->get_items('shipping') ;
 
-            if(!empty($shipping_method_id)){
-                $path = 'D:\wan\wooLog\\';
-                $sLog_Path  =  $path.date('Ymd').'.log' ; // LOG路徑
-                $sLog = __FUNCTION__ . "\n";
-                $sLog = "in not empty \n";
-                $fp=fopen($sLog_Path, "a+");
-                fputs($fp, $sLog);
-                fclose($fp);
-
+            if (!empty($shipping_method_id)) {
 
                 $shipping_method_id = reset($shipping_method_id);    
                 $shipping_method_id = $shipping_method_id->get_method_id() ;
 
                 // 判斷是否為綠界物流 產生物流訂單
-                if(
+                if (
                     $shipping_method_id == 'Wooecpay_Logistic_CVS_711' || 
                     $shipping_method_id == 'Wooecpay_Logistic_CVS_Family' || 
                     $shipping_method_id == 'Wooecpay_Logistic_CVS_Hilife' || 
@@ -392,19 +384,11 @@ class Wooecpay_Gateway_Cod extends Wooecpay_Gateway_Base
                     $shipping_method_id == 'Wooecpay_Logistic_Home_Tcat' ||
                     $shipping_method_id == 'Wooecpay_Logistic_Home_Ecan' ||
                     $shipping_method_id == 'Wooecpay_Logistic_Home_Post' 
-                ){
+                ) {
 
                     $LogisticsType      = $this->get_logistics_sub_type($shipping_method_id) ;
                     $api_logistic_info  = $this->get_ecpay_logistic_api_info('create');
                     $MerchantTradeNo    = $this->get_merchant_trade_no($order->get_id(), get_option('wooecpay_logistic_order_prefix'));
-
-                    $path = 'D:\wan\wooLog\\';
-                    $sLog_Path  =  $path.date('Ymd').'.log' ; // LOG路徑
-                    $sLog = __FUNCTION__ . "\n";
-                    $sLog .= "api_logistic_info:".json_encode($api_logistic_info)." \n";
-                    $fp=fopen($sLog_Path, "a+");
-                    fputs($fp, $sLog);
-                    fclose($fp);
 
                     $sender_name        = get_option('wooecpay_logistic_sender_name') ;
                     $sender_cellphone   = get_option('wooecpay_logistic_sender_cellphone') ;
@@ -413,13 +397,12 @@ class Wooecpay_Gateway_Cod extends Wooecpay_Gateway_Base
 
                     $serverReplyURL    = WC()->api_request_url('wooecpay_logistic_status_callback', true);
 
-
                     // 取得訂單資訊
                     // $order_data = $order->get_data();
 
                     $CVSStoreID = $order->get_meta('_ecpay_logistic_cvs_store_id') ;
 
-                    if(!isset($CVSStoreID) || empty($CVSStoreID)){
+                    if (!isset($CVSStoreID) || empty($CVSStoreID)) {
                         $ajaxReturn = [
                             'code'  => '0003',
                             'msg'   => '查無超商資料',
@@ -427,7 +410,7 @@ class Wooecpay_Gateway_Cod extends Wooecpay_Gateway_Base
                     }
 
                     $payment_method = $order->get_payment_method() ;
-                    if($payment_method == 'cod'){
+                    if ($payment_method == 'cod') {
                         $IsCollection = 'Y';
                     } else {
                         $IsCollection = 'N';
@@ -442,7 +425,7 @@ class Wooecpay_Gateway_Cod extends Wooecpay_Gateway_Base
                         $item_name = $this->get_item_name($order);
 
                         // 判斷是否超過長度，如果超過長度改為預設文字
-                        if(strlen($item_name) > 50 ) {
+                        if (strlen($item_name) > 50 ) {
 
                             $item_name = $item_name_default;
 
@@ -451,7 +434,7 @@ class Wooecpay_Gateway_Cod extends Wooecpay_Gateway_Base
                         }
 
                         // 判斷特殊字元
-                        if(preg_match('/[\^\'\[\]`!@#%\\\&*+\"<>|_]/', $item_name)){
+                        if (preg_match('/[\^\'\[\]`!@#%\\\&*+\"<>|_]/', $item_name)) {
 
                             $item_name = $item_name_default;
 
@@ -463,7 +446,7 @@ class Wooecpay_Gateway_Cod extends Wooecpay_Gateway_Base
                       $item_name = $item_name_default;
                     }
 
-                    if($LogisticsType['type'] == 'HOME'){
+                    if ($LogisticsType['type'] == 'HOME') {
 
                         // 重量計算
                         $goods_weight = get_post_meta( $order->get_id(), '_cart_weight', true ) ;
@@ -493,7 +476,7 @@ class Wooecpay_Gateway_Cod extends Wooecpay_Gateway_Base
                             'ServerReplyURL'        => $serverReplyURL,
                         ];
 
-                    } else if($LogisticsType['type'] == 'CVS'){
+                    } else if($LogisticsType['type'] == 'CVS') {
 
                         $inputLogisticOrder = [
                             'MerchantID'            => $api_logistic_info['merchant_id'],
@@ -524,10 +507,10 @@ class Wooecpay_Gateway_Cod extends Wooecpay_Gateway_Base
                         $postService = $factory->create('PostWithCmvEncodedStrResponseService');
                         $response = $postService->post($inputLogisticOrder, $api_logistic_info['action']);
 
-                        if(
+                        if (
                             isset($response['RtnCode']) &&
                             ( $response['RtnCode'] == 300 || $response['RtnCode'] == 2001 )
-                        ){
+                        ) {
 
                             // 更新訂單
                             $order->update_meta_data( '_wooecpay_logistic_merchant_trade_no', $response['MerchantTradeNo'] ); 
