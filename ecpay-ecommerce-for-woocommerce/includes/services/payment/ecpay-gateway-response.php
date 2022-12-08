@@ -153,7 +153,6 @@ class Wooecpay_Gateway_Response
         }
     }
 
-
     /**
      * 產生物流訂單
      */

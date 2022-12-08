@@ -73,8 +73,8 @@ class Wooecpay_Logistic {
        
         if ( ! is_admin() ) {
 
-			$chosen_shipping_tmp = wc_get_chosen_shipping_method_ids();
-            $chosen_shipping = $chosen_shipping_tmp[0] ;
+        	$chosen_shipping_tmp = wc_get_chosen_shipping_method_ids();
+        	$chosen_shipping = $chosen_shipping_tmp[0] ;
 
 			if(!empty($chosen_shipping)){
 
