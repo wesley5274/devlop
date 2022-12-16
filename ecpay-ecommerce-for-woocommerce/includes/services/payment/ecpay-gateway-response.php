@@ -4,16 +4,16 @@ use Ecpay\Sdk\Factories\Factory;
 use Ecpay\Sdk\Services\UrlService;
 use Ecpay\Sdk\Exceptions\RtnException;
 use Ecpay\Sdk\Response\VerifiedArrayResponse;
+use Helpers\Logistic\Wooecpay_Logistic_Helper;
 
 class Wooecpay_Gateway_Response
 {
     protected $logisticHelper;
-     
+
     public function __construct() {
         add_action('woocommerce_api_wooecpay_payment_callback', [$this, 'check_callback']);
 
         //載入物流共用
-        require_once plugin_dir_path( __FILE__ ) . 'includes/services/helpers/logistic/ecpay-logistic-helper.php';
         $this->logisticHelper = new Wooecpay_Logistic_Helper;
     }
 

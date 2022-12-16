@@ -1,4 +1,5 @@
 <?php
+namespace Helpers\Logistic;
 
 use Ecpay\Sdk\Factories\Factory;
 use Ecpay\Sdk\Exceptions\RtnException;

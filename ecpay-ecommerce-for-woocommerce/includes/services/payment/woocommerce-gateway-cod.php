@@ -3,6 +3,7 @@
 use Ecpay\Sdk\Factories\Factory;
 use Ecpay\Sdk\Services\UrlService;
 use Ecpay\Sdk\Exceptions\RtnException;
+use Helpers\Logistic\Wooecpay_Logistic_Helper;
 
 class Wooecpay_Gateway_Cod extends Wooecpay_Gateway_Base
 {
@@ -19,7 +20,6 @@ class Wooecpay_Gateway_Cod extends Wooecpay_Gateway_Base
         add_filter( 'woocommerce_cod_process_payment_order_status', array($this, 'woocommerce_cod_pending_payment_order_status'), 1, 2 );
 
         //載入物流共用
-        require_once plugin_dir_path( __FILE__ ) . 'includes/services/helpers/logistic/ecpay-logistic-helper.php';
         $this->logisticHelper = new Wooecpay_Logistic_Helper;
 		
         // parent::__construct();
