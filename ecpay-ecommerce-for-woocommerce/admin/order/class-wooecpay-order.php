@@ -85,6 +85,7 @@ class Wooecpay_Order
 	public function add_address_meta($order) {
 		echo '<style>.order_data_column:nth-child(2) .address p:first-child {display: none;}</style>';
 		echo '<style>.logistic_csv_info {display: inline-block;}</style>';
+		echo '<style>.logistic_button_display {display: inline-block;}</style>';
 		echo wp_kses_post('<p><strong>帳單姓名:<br/></strong>' . get_post_meta( $order->get_id(), '_billing_last_name', true ) . ' ' . get_post_meta( $order->get_id(), '_billing_first_name', true ) . '</p>');
 	}
 
