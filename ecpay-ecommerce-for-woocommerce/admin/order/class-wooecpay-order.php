@@ -84,8 +84,24 @@ class Wooecpay_Order
 	 */
 	public function add_address_meta($order) {
 		echo '<style>.order_data_column:nth-child(2) .address p:first-child {display: none;}</style>';
-		echo '<style>.logistic_csv_info {display: inline-block;}</style>';
-		echo '<style>.logistic_button_display {display: inline-block;}</style>';
+
+		$shipping_method_id = $order->get_items('shipping') ;
+		if (!empty($shipping_method_id)) {
+			$shipping_method_id = reset($shipping_method_id);    
+			$shipping_method_id = $shipping_method_id->get_method_id() ;
+		}
+		if (
+			$shipping_method_id == 'Wooecpay_Logistic_CVS_711' || 
+			$shipping_method_id == 'Wooecpay_Logistic_CVS_Family' || 
+			$shipping_method_id == 'Wooecpay_Logistic_CVS_Hilife' || 
+			$shipping_method_id == 'Wooecpay_Logistic_CVS_Okmart'
+		) {
+			echo '<style>.logistic_csv_info {display: inline-block;}</style>';
+		}
+		else {
+			echo '<style>.logistic_button_display {display: inline-block;}</style>';
+		}
+		
 		echo wp_kses_post('<p><strong>帳單姓名:<br/></strong>' . get_post_meta( $order->get_id(), '_billing_last_name', true ) . ' ' . get_post_meta( $order->get_id(), '_billing_first_name', true ) . '</p>');
 	}
 
