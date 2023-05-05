@@ -63,7 +63,7 @@ class Wooecpay_Gateway_Credit_Installment extends Wooecpay_Gateway_Base
             // 圓夢分期有2W的限制
             if($number_of_periods == 30){
 
-                if($total < 20000){
+                if($total >= 20000){
                     echo '<option value="' . esc_attr($number_of_periods) . '">' . wp_kses_post($number_of_periods) . '</option>';
                 }
 

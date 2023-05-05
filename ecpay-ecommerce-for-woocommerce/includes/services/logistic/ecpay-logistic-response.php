@@ -125,7 +125,7 @@ class Wooecpay_Logistic_Response
                         'MerchantTradeDate' => date('Y/m/d H:i:s'),
                         'PaymentType'       => 'aio',
                         'TotalAmount'       => (int) ceil($order->get_total()),
-                        'TradeDesc'         => 'ecpay_module_woocommerce',
+                        'TradeDesc'         => 'woocommerce_v2',
                         'ItemName'          => $item_name,
                         'ChoosePayment'     => $this->get_ChoosePayment($order->get_payment_method()),
                         'EncryptType'       => 1,
@@ -283,7 +283,8 @@ class Wooecpay_Logistic_Response
                         $shipping_method_id == 'Wooecpay_Logistic_CVS_Hilife' || 
                         $shipping_method_id == 'Wooecpay_Logistic_CVS_Okmart' || 
                         $shipping_method_id == 'Wooecpay_Logistic_Home_Tcat' ||
-                        $shipping_method_id == 'Wooecpay_Logistic_Home_Ecan' 
+                        $shipping_method_id == 'Wooecpay_Logistic_Home_Ecan' ||
+                        $shipping_method_id == 'Wooecpay_Logistic_Home_Post'
                     ){
                         
                         $RtnMsg  = sanitize_text_field($_POST['RtnMsg']);

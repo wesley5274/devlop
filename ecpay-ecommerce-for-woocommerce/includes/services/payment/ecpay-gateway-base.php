@@ -118,7 +118,7 @@ class Wooecpay_Gateway_Base extends WC_Payment_Gateway
                         'MerchantTradeDate' => date('Y/m/d H:i:s'),
                         'PaymentType'       => 'aio',
                         'TotalAmount'       => (int) ceil($order->get_total()),
-                        'TradeDesc'         => 'ecpay_module_woocommerce',
+                        'TradeDesc'         => 'woocommerce_v2',
                         'ItemName'          => $item_name,
                         'ChoosePayment'     => $this->payment_type,
                         'EncryptType'       => 1,
@@ -418,6 +418,11 @@ class Wooecpay_Gateway_Base extends WC_Payment_Gateway
             case 'Wooecpay_Logistic_Home_Ecan':
                 $logisticsType['type'] = 'HOME' ;
                 $logisticsType['sub_type'] = 'ECAN' ;
+            break;
+
+            case 'Wooecpay_Logistic_Home_Post':
+                $logisticsType['type'] = 'HOME' ;
+                $logisticsType['sub_type'] = 'POST' ;
             break;
         }
 

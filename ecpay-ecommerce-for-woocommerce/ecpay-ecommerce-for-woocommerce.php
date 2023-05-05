@@ -1,12 +1,12 @@
 <?php
 /**
  * @copyright Copyright (c) 2016 Green World FinTech Service Co., Ltd. (https://www.ecpay.com.tw)
- * @version 1.0.110115
+ * @version 1.0.2305040
  *
  * Plugin Name: ECPay Ecommerce for WooCommerce
  * Plugin URI: https://www.ecpay.com.tw
  * Description: Ecpay Plug for WooCommerce
- * Version: 1.0.220815
+ * Version: 1.0.2305040
  * Author: ECPay Green World FinTech Service Co., Ltd.
  * Author URI: https://www.ecpay.com.tw
  * License: GPLv2
@@ -20,7 +20,7 @@
 defined( 'ABSPATH' ) or exit;
 
 // 相關常數定義
-define( 'WOOECPAY_VERSION', '1.0.220714' );
+define( 'WOOECPAY_VERSION', '1.0.2305040' );
 define( 'WOOECPAY_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'WOOECPAY_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'WOOECPAY_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
@@ -32,6 +32,9 @@ require_once(WOOECPAY_PLUGIN_DIR . '/vendor/autoload.php');
 // 相關載入程序
 require plugin_dir_path( __FILE__ ) . 'admin/settings/class-wooecpay-setting.php';
 require plugin_dir_path( __FILE__ ) . 'admin/order/class-wooecpay-order.php';
+
+// 載入物流共用 helper
+require plugin_dir_path( __FILE__ ) . 'includes/services/helpers/logistic/ecpay-logistic-helper.php';
 
 $plugin_main        = new Wooecpay_Setting();
 $plugin_order       = new Wooecpay_Order();

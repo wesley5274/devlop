@@ -3,9 +3,11 @@
 use Ecpay\Sdk\Factories\Factory;
 use Ecpay\Sdk\Services\UrlService;
 use Ecpay\Sdk\Exceptions\RtnException;
+use Helpers\Logistic\Wooecpay_Logistic_Helper;
 
 class Wooecpay_Gateway_Cod extends Wooecpay_Gateway_Base
 {
+    protected $logisticHelper;
 
     public function __construct()
     {
@@ -17,17 +19,20 @@ class Wooecpay_Gateway_Cod extends Wooecpay_Gateway_Base
 
         add_filter( 'woocommerce_cod_process_payment_order_status', array($this, 'woocommerce_cod_pending_payment_order_status'), 1, 2 );
 
+        //載入物流共用
+        $this->logisticHelper = new Wooecpay_Logistic_Helper;
+		
         // parent::__construct();
     }
 
-    public function woocommerce_cod_pending_payment_order_status($order_status, $order){
+    public function woocommerce_cod_pending_payment_order_status($order_status, $order) {
         
         // 物流方式
         $shipping_method_id = $order->get_items('shipping') ;
         $shipping_method_id = reset($shipping_method_id);    
         $shipping_method_id = $shipping_method_id->get_method_id() ;
 
-        if(
+        if (
             $shipping_method_id == 'Wooecpay_Logistic_CVS_711' || 
             $shipping_method_id == 'Wooecpay_Logistic_CVS_Family' || 
             $shipping_method_id == 'Wooecpay_Logistic_CVS_Hilife' || 
@@ -65,7 +70,7 @@ class Wooecpay_Gateway_Cod extends Wooecpay_Gateway_Base
         // 物流方式
         $shipping_method_id = $order->get_items('shipping') ;
 
-        if(empty($shipping_method_id)){
+        if (empty($shipping_method_id)) {
             $shippping_tag = false ;
 
         } else {
@@ -75,14 +80,14 @@ class Wooecpay_Gateway_Cod extends Wooecpay_Gateway_Base
             $shippping_tag = true ;
         }
 
-        if(
+        if (
             $payment_method == 'cod' && 
             $shippping_tag  && 
             ($shipping_method_id == 'Wooecpay_Logistic_CVS_711' || 
             $shipping_method_id == 'Wooecpay_Logistic_CVS_Family' || 
             $shipping_method_id == 'Wooecpay_Logistic_CVS_Hilife' || 
             $shipping_method_id == 'Wooecpay_Logistic_CVS_Okmart')
-        ){
+        ) {
 
             // 取出商店代號
             $CVSStoreID = $order->get_meta('_ecpay_logistic_cvs_store_id') ;
@@ -90,11 +95,11 @@ class Wooecpay_Gateway_Cod extends Wooecpay_Gateway_Base
             // 判斷是否存在
 
             // 不存在
-            if(empty($CVSStoreID)){
+            if (empty($CVSStoreID)) {
 
 
                 // 判斷是否有回傳資訊
-                if(isset($_POST['CVSStoreID'])){
+                if (isset($_POST['CVSStoreID'])) {
 
                     $CVSStoreID   = sanitize_text_field($_POST['CVSStoreID']);
                     $CVSStoreName = sanitize_text_field($_POST['CVSStoreName']);
@@ -133,13 +138,23 @@ class Wooecpay_Gateway_Cod extends Wooecpay_Gateway_Base
 
                     $order->update_status('processing');
 
+                    // 產生物流訂單
+                    if ('yes' === get_option('wooecpay_enable_logistic_auto', 'yes')) {
+
+                        // 是否已經開立
+                        $wooecpay_logistic_AllPayLogisticsID = get_post_meta( $order->get_id(), '_wooecpay_logistic_AllPayLogisticsID', true );
+
+                        if (empty($wooecpay_logistic_AllPayLogisticsID)) {
+                            $this->logisticHelper->send_logistic_order_action($order_id, false);
+                        }
+                    }
                 } else {
 
                     // 不存在則走向地圖API
-                    $api_logistic_info  = $this->get_ecpay_logistic_api_info();
                     $client_back_url    = $this->get_return_url($order);
-                    $MerchantTradeNo    = $this->get_merchant_trade_no($order->get_id(), get_option('wooecpay_logistic_order_prefix'));
-                    $LogisticsType      = $this->get_logistics_sub_type($shipping_method_id) ;
+                    $api_logistic_info  = $this->logisticHelper->get_ecpay_logistic_api_info('map');
+                    $MerchantTradeNo    = $this->logisticHelper->get_merchant_trade_no($order->get_id(), get_option('wooecpay_logistic_order_prefix'));
+                    $LogisticsType      = $this->logisticHelper->get_logistics_sub_type($shipping_method_id) ;
 
                     try {
                         $factory = new Factory([
@@ -182,7 +197,7 @@ class Wooecpay_Gateway_Cod extends Wooecpay_Gateway_Base
         // 取出商店代號
         $CVSStoreID = $order->get_meta('_ecpay_logistic_cvs_store_id') ;
 
-        if(!empty($CVSStoreID)){
+        if (!empty($CVSStoreID)) {
 
             $template_file = 'logistic/cvs_map.php';
 
@@ -195,131 +210,7 @@ class Wooecpay_Gateway_Cod extends Wooecpay_Gateway_Base
             }
         }
     }
-
-    protected function get_ecpay_logistic_api_info()
-    {
-        $api_info = [
-            'merchant_id'   => '',
-            'hashKey'       => '',
-            'hashIv'        => '',
-            'action'        => '',
-        ] ;
-
-        if ('yes' === get_option('wooecpay_enabled_logistic_stage', 'yes')) {
-
-            $wooecpay_logistic_cvs_type = get_option('wooecpay_logistic_cvs_type');
-
-            if($wooecpay_logistic_cvs_type == 'C2C'){
-
-                $api_info = [
-                    'merchant_id'   => '2000933',
-                    'hashKey'       => 'XBERn1YOvpM9nfZc',
-                    'hashIv'        => 'h1ONHk4P4yqbl5LK',
-                    'action'        => 'https://logistics-stage.ecpay.com.tw/Express/map',
-                ] ;
-
-            } else if($wooecpay_logistic_cvs_type == 'B2C'){
-
-                $api_info = [
-                    'merchant_id'   => '2000132',
-                    'hashKey'       => '5294y06JbISpM5x9',
-                    'hashIv'        => 'v77hoKGq4kWxNNIS',
-                    'action'        => 'https://logistics-stage.ecpay.com.tw/Express/map',
-                ] ;
-            }
-
-        } else {
-            
-            $merchant_id = get_option('wooecpay_logistic_mid');
-            $hash_key    = get_option('wooecpay_logistic_hashkey');
-            $hash_iv     = get_option('wooecpay_logistic_hashiv');
-
-            $api_info = [
-                'merchant_id'   => $merchant_id,
-                'hashKey'       => $hash_key,
-                'hashIv'        => $hash_iv,
-                'action'        => 'https://logistics.ecpay.com.tw/Express/map',
-            ] ;
-        }
-
-        return $api_info;
-    }
-
-    protected function get_logistics_sub_type($shipping_method_id)
-    {
-        $wooecpay_logistic_cvs_type = get_option('wooecpay_logistic_cvs_type');
-
-        $logisticsType = [
-            'type'      => '',
-            'sub_type'  => '',
-        ] ;
-
-        switch ($shipping_method_id) { 
-            case 'Wooecpay_Logistic_CVS_711':
-
-                $logisticsType['type'] = 'CVS' ;
-
-                if($wooecpay_logistic_cvs_type == 'C2C'){
-                    $logisticsType['sub_type'] = 'UNIMARTC2C' ;
-                } else if($wooecpay_logistic_cvs_type == 'B2C'){
-                    $logisticsType['sub_type'] = 'UNIMART' ;
-                }
-
-            break;
-            case 'Wooecpay_Logistic_CVS_Family':
-                
-                $logisticsType['type'] = 'CVS' ;
-
-                if($wooecpay_logistic_cvs_type == 'C2C'){
-                    $logisticsType['sub_type'] = 'FAMIC2C' ;
-                } else if($wooecpay_logistic_cvs_type == 'B2C'){
-                    $logisticsType['sub_type'] = 'FAMI' ;
-                }
-
-
-            break;
-            case 'Wooecpay_Logistic_CVS_Hilife':
-
-                $logisticsType['type'] = 'CVS' ;
-
-                if($wooecpay_logistic_cvs_type == 'C2C'){
-                    $logisticsType['sub_type'] = 'HILIFEC2C' ;
-                } else if($wooecpay_logistic_cvs_type == 'B2C'){
-                    $logisticsType['sub_type'] = 'HILIFE' ;
-                }
-
-            break;
-            case 'Wooecpay_Logistic_CVS_Okmart':
-
-                $logisticsType['type'] = 'CVS' ;
-
-                if($wooecpay_logistic_cvs_type == 'C2C'){
-                    $logisticsType['sub_type'] = 'OKMARTC2C' ;
-                }
-
-            break;
-
-            case 'Wooecpay_Logistic_Home_Tcat':
-                $logisticsType['type'] = 'HOME' ;
-                $logisticsType['sub_type'] = 'TCAT' ;
-            break;
-
-            case 'Wooecpay_Logistic_Home_Ecan':
-                $logisticsType['type'] = 'HOME' ;
-                $logisticsType['sub_type'] = 'ECAN' ;
-            break;
-        }
-
-        return $logisticsType;
-    }
-
-    protected function get_merchant_trade_no($order_id, $order_prefix = '')
-    {
-        $trade_no = $order_prefix . $order_id . 'SN' .(string) time() ;
-        return substr($trade_no, 0, 20);
-    }
-
-    
+   
 }
 
 
