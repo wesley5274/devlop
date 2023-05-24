@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ECPay Ecommerce for WooCommerce\n"
 "POT-Creation-Date: 2022-11-15 11:24+0800\n"
-"PO-Revision-Date: 2023-05-05 09:36+0800\n"
+"PO-Revision-Date: 2023-05-24 14:40+0800\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: zh_TW\n"
@@ -288,10 +288,11 @@ msgstr "物流費(10-15kg)"
 msgid "Shipping fee4"
 msgstr "物流費(15-20kg以下)"
 
+#: includes/config/invoice/settings.php:12
 #: includes/config/logistic/settings.php:12
 #: includes/config/payment/settings.php:12
-msgid "Only letters and numbers allowed."
-msgstr "僅允許英文與數字。"
+msgid "Only a maximum of 5-character letters and numbers are allowed."
+msgstr "僅允許最多5碼英文與數字。"
 
 #: includes/config/logistic/settings.php:16
 #: includes/config/logistic/settings.php:20
