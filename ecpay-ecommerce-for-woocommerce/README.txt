@@ -3,8 +3,8 @@ Contributors: ecpaytechsupport
 Tags: ecommerce, e-commerce, store, sales, sell, shop, cart, checkout, payment, ecpay
 Requires at least: 6.0
 Tested up to: 6.0
-Requires PHP: 7.4 
-Stable tag: 1.0.2305040
+Requires PHP: 7.4
+Stable tag: 1.0.2305230
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -29,6 +29,9 @@ v1.0.221123
 
 v1.0.2304120
 綠界服務優化設定
+
+v1.0.2305230
+修正前綴詞長度設定過長會造成訂單重覆問題
 
  == Upgrade Notice ==
 
