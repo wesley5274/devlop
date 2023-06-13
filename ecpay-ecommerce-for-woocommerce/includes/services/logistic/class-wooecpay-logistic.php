@@ -49,6 +49,13 @@ class Wooecpay_Logistic {
 		include WOOECPAY_PLUGIN_INCLUDE_DIR . '/services/logistic/ecpay-logistic-home-tcat.php';
 		// include WOOECPAY_PLUGIN_INCLUDE_DIR . '/services/logistic/ecpay-logistic-home-ecan.php';
 		include WOOECPAY_PLUGIN_INCLUDE_DIR . '/services/logistic/ecpay-logistic-home-post.php';
+
+		if ( in_array('Wooecpay_Logistic_CVS_711', get_option('wooecpay_enabled_logistic_outside', []))) {
+			include WOOECPAY_PLUGIN_INCLUDE_DIR . '/services/logistic/ecpay-logistic-cvs-711-outside.php';
+		}
+		if ( in_array('Wooecpay_Logistic_Home_Tcat', get_option('wooecpay_enabled_logistic_outside', []))) {
+			include WOOECPAY_PLUGIN_INCLUDE_DIR . '/services/logistic/ecpay-logistic-home-tcat-outside.php';
+		}
 	}
 
 	public function add_method($methods)
@@ -64,6 +71,13 @@ class Wooecpay_Logistic {
         $methods['Wooecpay_Logistic_Home_Tcat']     = 'Wooecpay_Logistic_Home_Tcat';
         // $methods['Wooecpay_Logistic_Home_Ecan']     = 'Wooecpay_Logistic_Home_Ecan';
         $methods['Wooecpay_Logistic_Home_Post']     = 'Wooecpay_Logistic_Home_Post';
+
+		if ( in_array('Wooecpay_Logistic_CVS_711', get_option('wooecpay_enabled_logistic_outside', []))) {
+			$methods['Wooecpay_Logistic_CVS_711_Outside'] = 'Wooecpay_Logistic_CVS_711_Outside';
+		}
+		if ( in_array('Wooecpay_Logistic_Home_Tcat', get_option('wooecpay_enabled_logistic_outside', []))) {
+			$methods['Wooecpay_Logistic_Home_Tcat_Outside'] = 'Wooecpay_Logistic_Home_Tcat_Outside';
+		}
 
         return $methods;
     }

@@ -87,6 +87,21 @@ return [
         'default' => 'no',
         'desc' => __('Keep shipping phone', 'ecpay-ecommerce-for-woocommerce')
     ],
+    [
+        'title' => __('Enable ECPay outlying islands shipping', 'ecpay-ecommerce-for-woocommerce'),
+        'id' => 'wooecpay_enabled_logistic_outside',
+        'type' => 'multiselect',
+        'class' => 'wc-enhanced-select',
+        'default' => '',
+        'desc' => '離島物流注意事項：<br>1. 啟用後才會在「運送方式」出現選項<br>2. 若未啟用「超商取貨 7-ELEVEN」離島物流，則不分本島離島，共用物流設定<br>3. 若啟用「超商取貨 7-ELEVEN」離島物流，選擇門市後會檢查所選門市是否與所選物流方式相符<br>4. 若未啟用「宅配 黑貓」離島物流，則不分本島離島，共用物流設定<br>5. 若啟用「宅配 黑貓」離島物流，結帳前會檢查運送地點是否與所選務流方式相符',
+        'options' => [
+            'Wooecpay_Logistic_CVS_711'   => __('Ecpay CVS 7-11', 'ecpay-ecommerce-for-woocommerce'),
+            'Wooecpay_Logistic_Home_Tcat' => __('Ecpay Home Tcat', 'ecpay-ecommerce-for-woocommerce'),
+        ],
+        'custom_attributes' => [
+            'data-placeholder' => __('Ecpay shipping methods ', 'ecpay-ecommerce-for-woocommerce'),
+        ],
+    ],
 
     [
         'type' => 'sectionend',
