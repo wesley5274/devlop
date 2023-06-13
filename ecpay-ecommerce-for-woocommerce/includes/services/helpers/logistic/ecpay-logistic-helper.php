@@ -507,4 +507,26 @@ class Wooecpay_Logistic_Helper
 
         return $item_name;
     }
+
+    public function get_available_state_home_tcat_outside()
+    {
+        return [
+            '澎湖縣',
+            '金門縣',
+            '連江縣',
+        ];
+    }
+
+    public function is_available_state_home_tcat($shipping_method_id, $state)
+    {
+        // 是否為黑貓允許離島
+        $is_available_outside = in_array(str_replace(' ', '', $state), $this->get_available_state_home_tcat_outside());
+
+        switch ($shipping_method_id) {
+            case 'Wooecpay_Logistic_Home_Tcat':
+                return !$is_available_outside;
+            case 'Wooecpay_Logistic_Home_Tcat_Outside':
+                return $is_available_outside;
+        }
+    }
 }

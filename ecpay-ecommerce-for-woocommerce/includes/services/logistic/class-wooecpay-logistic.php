@@ -1,11 +1,18 @@
 <?php
 
-class Wooecpay_Logistic {
+use Helpers\Logistic\Wooecpay_Logistic_Helper;
+
+class Wooecpay_Logistic
+{
+	protected $logisticHelper;
 
 	public function __construct()
 	{
 
 		$this->load_api();
+
+		// 載入物流共用
+        $this->logisticHelper = new Wooecpay_Logistic_Helper;
 
 		add_filter( 'woocommerce_shipping_methods', array( $this, 'add_method' ) );
 		add_action( 'woocommerce_shipping_init', array( $this, 'load_logistic_logistic' ) );
@@ -18,6 +25,11 @@ class Wooecpay_Logistic {
 		}
 
 		add_action( 'woocommerce_checkout_update_order_meta', array( $this, 'save_weight_order' ));
+
+		if ( in_array('Wooecpay_Logistic_Home_Tcat', get_option('wooecpay_enabled_logistic_outside'))) {
+			// 前台結帳頁欄位檢查 Hook
+			add_action('woocommerce_after_checkout_validation', array($this, 'wooecpay_check_logistic_home_tcat_fields' ), 10, 2);
+		}
 	}
 
 	/**
@@ -146,6 +158,26 @@ class Wooecpay_Logistic {
 
        	return $available_gateways;
     }
+
+	/**
+	 * 前台結帳頁欄位檢查 - 黑貓
+	 */
+	public function wooecpay_check_logistic_home_tcat_fields($data, $errors)
+	{
+		// 取得當前選擇的運送方式
+		$chosen_shipping = $this->get_chosen_shipping_method_ids();
+		$chosen_shipping = (empty($chosen_shipping)) ? '' : $chosen_shipping[0] ;
+
+		// 當前選擇的運送方式是否為綠界宅配黑貓
+		if (in_array($chosen_shipping, ['Wooecpay_Logistic_Home_Tcat', 'Wooecpay_Logistic_Home_Tcat_Outside'])) {
+			// 比對運送方式與地址
+			$result = $this->logisticHelper->is_available_state_home_tcat($chosen_shipping, $data['shipping_state']);
+			if (!$result) {
+				// 比對失敗，顯示錯誤訊息
+				$errors->add('validation', __( '黑貓地址檢查錯誤訊息。' ));
+			}
+		}
+	}
 
 	/**
      * 額外增加物流欄位
