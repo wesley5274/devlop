@@ -136,6 +136,7 @@ class Wooecpay_Logistic {
 
 				if ( isset( $available_gateways['cod'] ) && (
 					0 === strpos( $chosen_shipping, 'Wooecpay_Logistic_Home_Tcat' ) ||
+					0 === strpos( $chosen_shipping, 'Wooecpay_Logistic_Home_Tcat_Outside' ) ||
 					0 === strpos( $chosen_shipping, 'Wooecpay_Logistic_Home_Post' )
 				) ){
 					unset( $available_gateways['cod'] );

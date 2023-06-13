@@ -32,12 +32,13 @@ class Wooecpay_Logistic_Response
                 $shipping_method_id = $shipping_method_id->get_method_id() ;
 
                 // 判斷是否為超商取貨
-                if(
-                    $shipping_method_id == 'Wooecpay_Logistic_CVS_711' || 
-                    $shipping_method_id == 'Wooecpay_Logistic_CVS_Family' || 
-                    $shipping_method_id == 'Wooecpay_Logistic_CVS_Hilife' || 
-                    $shipping_method_id == 'Wooecpay_Logistic_CVS_Okmart' 
-                ){
+                if (
+                    $shipping_method_id == 'Wooecpay_Logistic_CVS_711' ||
+                    $shipping_method_id == 'Wooecpay_Logistic_CVS_711_Outside' ||
+                    $shipping_method_id == 'Wooecpay_Logistic_CVS_Family' ||
+                    $shipping_method_id == 'Wooecpay_Logistic_CVS_Hilife' ||
+                    $shipping_method_id == 'Wooecpay_Logistic_CVS_Okmart'
+                ) {
 
                     // 取出商店代號
                     $CVSStoreID = $order->get_meta('_ecpay_logistic_cvs_store_id') ;
@@ -192,10 +193,11 @@ class Wooecpay_Logistic_Response
 
                 // 判斷是否為超商取貨
                 if(
-                    $shipping_method_id == 'Wooecpay_Logistic_CVS_711' || 
-                    $shipping_method_id == 'Wooecpay_Logistic_CVS_Family' || 
-                    $shipping_method_id == 'Wooecpay_Logistic_CVS_Hilife' || 
-                    $shipping_method_id == 'Wooecpay_Logistic_CVS_Okmart' 
+                    $shipping_method_id == 'Wooecpay_Logistic_CVS_711' ||
+                    $shipping_method_id == 'Wooecpay_Logistic_CVS_711_Outside' ||
+                    $shipping_method_id == 'Wooecpay_Logistic_CVS_Family' ||
+                    $shipping_method_id == 'Wooecpay_Logistic_CVS_Hilife' ||
+                    $shipping_method_id == 'Wooecpay_Logistic_CVS_Okmart'
                 ){
 
                     $CVSStoreID   = sanitize_text_field($_POST['CVSStoreID']);
@@ -278,11 +280,13 @@ class Wooecpay_Logistic_Response
 
                     // 判斷是否為綠界物流
                     if(
-                        $shipping_method_id == 'Wooecpay_Logistic_CVS_711' || 
-                        $shipping_method_id == 'Wooecpay_Logistic_CVS_Family' || 
-                        $shipping_method_id == 'Wooecpay_Logistic_CVS_Hilife' || 
-                        $shipping_method_id == 'Wooecpay_Logistic_CVS_Okmart' || 
+                        $shipping_method_id == 'Wooecpay_Logistic_CVS_711' ||
+                        $shipping_method_id == 'Wooecpay_Logistic_CVS_711_Outside' ||
+                        $shipping_method_id == 'Wooecpay_Logistic_CVS_Family' ||
+                        $shipping_method_id == 'Wooecpay_Logistic_CVS_Hilife' ||
+                        $shipping_method_id == 'Wooecpay_Logistic_CVS_Okmart' ||
                         $shipping_method_id == 'Wooecpay_Logistic_Home_Tcat' ||
+                        $shipping_method_id == 'Wooecpay_Logistic_Home_Tcat_Outside' ||
                         $shipping_method_id == 'Wooecpay_Logistic_Home_Ecan' ||
                         $shipping_method_id == 'Wooecpay_Logistic_Home_Post'
                     ){

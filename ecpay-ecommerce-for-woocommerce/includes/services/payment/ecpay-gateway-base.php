@@ -37,9 +37,10 @@ class Wooecpay_Gateway_Base extends WC_Payment_Gateway
             }
 
             if(
-                $shippping_tag  && ($shipping_method_id == 'Wooecpay_Logistic_CVS_711' || 
-                $shipping_method_id == 'Wooecpay_Logistic_CVS_Family' || 
-                $shipping_method_id == 'Wooecpay_Logistic_CVS_Hilife' || 
+                $shippping_tag  && ($shipping_method_id == 'Wooecpay_Logistic_CVS_711' ||
+                $shipping_method_id == 'Wooecpay_Logistic_CVS_711_Outside' ||
+                $shipping_method_id == 'Wooecpay_Logistic_CVS_Family' ||
+                $shipping_method_id == 'Wooecpay_Logistic_CVS_Hilife' ||
                 $shipping_method_id == 'Wooecpay_Logistic_CVS_Okmart')
             ){
 
@@ -367,6 +368,7 @@ class Wooecpay_Gateway_Base extends WC_Payment_Gateway
 
         switch ($shipping_method_id) { 
             case 'Wooecpay_Logistic_CVS_711':
+            case 'Wooecpay_Logistic_CVS_711_Outside':
 
                 $logisticsType['type'] = 'CVS' ;
 
@@ -411,6 +413,7 @@ class Wooecpay_Gateway_Base extends WC_Payment_Gateway
             break;
 
             case 'Wooecpay_Logistic_Home_Tcat':
+            case 'Wooecpay_Logistic_Home_Tcat_Outside':
                 $logisticsType['type'] = 'HOME' ;
                 $logisticsType['sub_type'] = 'TCAT' ;
             break;

@@ -33,10 +33,11 @@ class Wooecpay_Gateway_Cod extends Wooecpay_Gateway_Base
         $shipping_method_id = $shipping_method_id->get_method_id() ;
 
         if (
-            $shipping_method_id == 'Wooecpay_Logistic_CVS_711' || 
-            $shipping_method_id == 'Wooecpay_Logistic_CVS_Family' || 
-            $shipping_method_id == 'Wooecpay_Logistic_CVS_Hilife' || 
-            $shipping_method_id == 'Wooecpay_Logistic_CVS_Okmart' 
+            $shipping_method_id == 'Wooecpay_Logistic_CVS_711' ||
+            $shipping_method_id == 'Wooecpay_Logistic_CVS_711_Outside' ||
+            $shipping_method_id == 'Wooecpay_Logistic_CVS_Family' ||
+            $shipping_method_id == 'Wooecpay_Logistic_CVS_Hilife' ||
+            $shipping_method_id == 'Wooecpay_Logistic_CVS_Okmart'
         ) {
             $order_status = 'pending';    
         }
@@ -81,11 +82,12 @@ class Wooecpay_Gateway_Cod extends Wooecpay_Gateway_Base
         }
 
         if (
-            $payment_method == 'cod' && 
-            $shippping_tag  && 
-            ($shipping_method_id == 'Wooecpay_Logistic_CVS_711' || 
-            $shipping_method_id == 'Wooecpay_Logistic_CVS_Family' || 
-            $shipping_method_id == 'Wooecpay_Logistic_CVS_Hilife' || 
+            $payment_method == 'cod' &&
+            $shippping_tag  &&
+            ($shipping_method_id == 'Wooecpay_Logistic_CVS_711' ||
+            $shipping_method_id == 'Wooecpay_Logistic_CVS_711_Outside' ||
+            $shipping_method_id == 'Wooecpay_Logistic_CVS_Family' ||
+            $shipping_method_id == 'Wooecpay_Logistic_CVS_Hilife' ||
             $shipping_method_id == 'Wooecpay_Logistic_CVS_Okmart')
         ) {
 

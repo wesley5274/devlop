@@ -89,9 +89,10 @@ class Wooecpay_Order
 			$shipping_method_id = $shipping_method_id->get_method_id() ;
 		}
 		if (
-			$shipping_method_id == 'Wooecpay_Logistic_CVS_711' || 
-			$shipping_method_id == 'Wooecpay_Logistic_CVS_Family' || 
-			$shipping_method_id == 'Wooecpay_Logistic_CVS_Hilife' || 
+			$shipping_method_id == 'Wooecpay_Logistic_CVS_711' ||
+			$shipping_method_id == 'Wooecpay_Logistic_CVS_711_Outside' ||
+			$shipping_method_id == 'Wooecpay_Logistic_CVS_Family' ||
+			$shipping_method_id == 'Wooecpay_Logistic_CVS_Hilife' ||
 			$shipping_method_id == 'Wooecpay_Logistic_CVS_Okmart'
 		) {
 			echo '<style>.logistic_csv_info {display: inline-block;}</style>';
@@ -428,10 +429,11 @@ class Wooecpay_Order
 					if (
 						( $order_status == 'on-hold' || $order_status == 'processing') && 
 						(
-							$shipping_method_id == 'Wooecpay_Logistic_CVS_711' || 
-							$shipping_method_id == 'Wooecpay_Logistic_CVS_Family' || 
-							$shipping_method_id == 'Wooecpay_Logistic_CVS_Hilife' || 
-							$shipping_method_id == 'Wooecpay_Logistic_CVS_Okmart' 
+							$shipping_method_id == 'Wooecpay_Logistic_CVS_711' ||
+							$shipping_method_id == 'Wooecpay_Logistic_CVS_711_Outside' ||
+							$shipping_method_id == 'Wooecpay_Logistic_CVS_Family' ||
+							$shipping_method_id == 'Wooecpay_Logistic_CVS_Hilife' ||
+							$shipping_method_id == 'Wooecpay_Logistic_CVS_Okmart'
 						)
 					) {
 
@@ -451,20 +453,23 @@ class Wooecpay_Order
 
 					// 判斷是否為綠界物流
 					if (
-						$shipping_method_id == 'Wooecpay_Logistic_CVS_711' || 
-						$shipping_method_id == 'Wooecpay_Logistic_CVS_Family' || 
-						$shipping_method_id == 'Wooecpay_Logistic_CVS_Hilife' || 
-						$shipping_method_id == 'Wooecpay_Logistic_CVS_Okmart' || 
+						$shipping_method_id == 'Wooecpay_Logistic_CVS_711' ||
+						$shipping_method_id == 'Wooecpay_Logistic_CVS_711_Outside' ||
+						$shipping_method_id == 'Wooecpay_Logistic_CVS_Family' ||
+						$shipping_method_id == 'Wooecpay_Logistic_CVS_Hilife' ||
+						$shipping_method_id == 'Wooecpay_Logistic_CVS_Okmart' ||
 						$shipping_method_id == 'Wooecpay_Logistic_Home_Tcat' ||
+						$shipping_method_id == 'Wooecpay_Logistic_Home_Tcat_Outside' ||
 						$shipping_method_id == 'Wooecpay_Logistic_Home_Ecan' ||
 						$shipping_method_id == 'Wooecpay_Logistic_Home_Post'
 					) {
-					
+
 						if (
-							$shipping_method_id == 'Wooecpay_Logistic_CVS_711' || 
-							$shipping_method_id == 'Wooecpay_Logistic_CVS_Family' || 
-							$shipping_method_id == 'Wooecpay_Logistic_CVS_Hilife' || 
-							$shipping_method_id == 'Wooecpay_Logistic_CVS_Okmart' 
+							$shipping_method_id == 'Wooecpay_Logistic_CVS_711' ||
+							$shipping_method_id == 'Wooecpay_Logistic_CVS_711_Outside' ||
+							$shipping_method_id == 'Wooecpay_Logistic_CVS_Family' ||
+							$shipping_method_id == 'Wooecpay_Logistic_CVS_Hilife' ||
+							$shipping_method_id == 'Wooecpay_Logistic_CVS_Okmart'
 						) {
 							
 							// 狀態判斷 _ecpay_logistic_cvs_store_id門市代號不存在
@@ -506,21 +511,23 @@ class Wooecpay_Order
 
 				// 判斷是否為綠界物流
 				if (
-					$shipping_method_id == 'Wooecpay_Logistic_CVS_711' || 
-					$shipping_method_id == 'Wooecpay_Logistic_CVS_Family' || 
-					$shipping_method_id == 'Wooecpay_Logistic_CVS_Hilife' || 
-					$shipping_method_id == 'Wooecpay_Logistic_CVS_Okmart' || 
+					$shipping_method_id == 'Wooecpay_Logistic_CVS_711' ||
+					$shipping_method_id == 'Wooecpay_Logistic_CVS_711_Outside' ||
+					$shipping_method_id == 'Wooecpay_Logistic_CVS_Family' ||
+					$shipping_method_id == 'Wooecpay_Logistic_CVS_Hilife' ||
+					$shipping_method_id == 'Wooecpay_Logistic_CVS_Okmart' ||
 					$shipping_method_id == 'Wooecpay_Logistic_Home_Tcat' ||
+					$shipping_method_id == 'Wooecpay_Logistic_Home_Tcat_Outside' ||
 					$shipping_method_id == 'Wooecpay_Logistic_Home_Ecan' ||
 					$shipping_method_id == 'Wooecpay_Logistic_Home_Post'
 				) {
 				
 					// 判斷是否為超商取貨
 					if (
-						$shipping_method_id == 'Wooecpay_Logistic_CVS_711' || 
-						$shipping_method_id == 'Wooecpay_Logistic_CVS_Family' || 
-						$shipping_method_id == 'Wooecpay_Logistic_CVS_Hilife' || 
-						$shipping_method_id == 'Wooecpay_Logistic_CVS_Okmart' 
+						$shipping_method_id == 'Wooecpay_Logistic_CVS_711' ||
+						$shipping_method_id == 'Wooecpay_Logistic_CVS_Family' ||
+						$shipping_method_id == 'Wooecpay_Logistic_CVS_Hilife' ||
+						$shipping_method_id == 'Wooecpay_Logistic_CVS_Okmart'
 					) {
 						echo '<div class="logistic_csv_info">';
 						echo '<h3>超商資訊</h3>' ;
@@ -606,6 +613,7 @@ class Wooecpay_Order
 						switch ($shipping_method_id) {
 
 							case 'Wooecpay_Logistic_CVS_711':
+							case 'Wooecpay_Logistic_CVS_711_Outside':
 								$inputPrint['CVSPaymentNo'] = $CVSPaymentNo ;
 								$inputPrint['CVSValidationNo'] = $CVSValidationNo ;
 							break;
@@ -617,6 +625,7 @@ class Wooecpay_Order
 							break;
 
 							case 'Wooecpay_Logistic_Home_Tcat':
+							case 'Wooecpay_Logistic_Home_Tcat_Outside':
 							case 'Wooecpay_Logistic_Home_Ecan':
 							case 'Wooecpay_Logistic_Home_Post':
 							break;

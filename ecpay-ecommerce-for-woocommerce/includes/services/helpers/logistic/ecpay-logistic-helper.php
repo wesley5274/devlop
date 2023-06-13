@@ -31,13 +31,15 @@ class Wooecpay_Logistic_Helper
 
                 // 判斷是否為綠界物流 產生物流訂單
                 if (
-                    $shipping_method_id == 'Wooecpay_Logistic_CVS_711' || 
-                    $shipping_method_id == 'Wooecpay_Logistic_CVS_Family' || 
-                    $shipping_method_id == 'Wooecpay_Logistic_CVS_Hilife' || 
-                    $shipping_method_id == 'Wooecpay_Logistic_CVS_Okmart' || 
+                    $shipping_method_id == 'Wooecpay_Logistic_CVS_711' ||
+                    $shipping_method_id == 'Wooecpay_Logistic_CVS_711_Outside' ||
+                    $shipping_method_id == 'Wooecpay_Logistic_CVS_Family' ||
+                    $shipping_method_id == 'Wooecpay_Logistic_CVS_Hilife' ||
+                    $shipping_method_id == 'Wooecpay_Logistic_CVS_Okmart' ||
                     $shipping_method_id == 'Wooecpay_Logistic_Home_Tcat' ||
+                    $shipping_method_id == 'Wooecpay_Logistic_Home_Tcat_Outside' ||
                     $shipping_method_id == 'Wooecpay_Logistic_Home_Ecan' ||
-                    $shipping_method_id == 'Wooecpay_Logistic_Home_Post' 
+                    $shipping_method_id == 'Wooecpay_Logistic_Home_Post'
                 ) {
 
                     $LogisticsType      = $this->get_logistics_sub_type($shipping_method_id) ;
@@ -281,6 +283,7 @@ class Wooecpay_Logistic_Helper
                         switch ($shipping_method_id) {
     
                             case 'Wooecpay_Logistic_CVS_711':
+                            case 'Wooecpay_Logistic_CVS_711_Outside':
                                 $api_info['action'] = 'https://logistics-stage.ecpay.com.tw/Express/PrintUniMartC2COrderInfo' ;
                             break;
     
@@ -297,6 +300,7 @@ class Wooecpay_Logistic_Helper
                             break;
     
                             case 'Wooecpay_Logistic_Home_Tcat':
+                            case 'Wooecpay_Logistic_Home_Tcat_Outside':
                             case 'Wooecpay_Logistic_Home_Ecan':
                             case 'Wooecpay_Logistic_Home_Post':
                                 $api_info['action'] = 'https://logistics-stage.ecpay.com.tw/helper/printTradeDocument' ;
@@ -312,9 +316,11 @@ class Wooecpay_Logistic_Helper
                         switch ($shipping_method_id) {
     
                             case 'Wooecpay_Logistic_CVS_711':
+                            case 'Wooecpay_Logistic_CVS_711_Outside':
                             case 'Wooecpay_Logistic_CVS_Family':
                             case 'Wooecpay_Logistic_CVS_Hilife':
                             case 'Wooecpay_Logistic_Home_Tcat':
+                            case 'Wooecpay_Logistic_Home_Tcat_Outside':
                             case 'Wooecpay_Logistic_Home_Ecan':
                             case 'Wooecpay_Logistic_Home_Post':
                                 $api_info['action'] = 'https://logistics-stage.ecpay.com.tw/helper/printTradeDocument' ;
@@ -350,6 +356,7 @@ class Wooecpay_Logistic_Helper
                         switch ($shipping_method_id) {
     
                             case 'Wooecpay_Logistic_CVS_711':
+                            case 'Wooecpay_Logistic_CVS_711_Outside':
                                 $api_info['action'] = 'https://logistics.ecpay.com.tw/Express/PrintUniMartC2COrderInfo' ;
                             break;
     
@@ -366,6 +373,7 @@ class Wooecpay_Logistic_Helper
                             break;
     
                             case 'Wooecpay_Logistic_Home_Tcat':
+                            case 'Wooecpay_Logistic_Home_Tcat_Outside':
                             case 'Wooecpay_Logistic_Home_Ecan':
                             case 'Wooecpay_Logistic_Home_Post':
                                 $api_info['action'] = 'https://logistics.ecpay.com.tw/helper/printTradeDocument' ;
@@ -381,9 +389,11 @@ class Wooecpay_Logistic_Helper
                         switch ($shipping_method_id) {
     
                             case 'Wooecpay_Logistic_CVS_711':
+                            case 'Wooecpay_Logistic_CVS_711_Outside':
                             case 'Wooecpay_Logistic_CVS_Family':
                             case 'Wooecpay_Logistic_CVS_Hilife':
                             case 'Wooecpay_Logistic_Home_Tcat':
+                            case 'Wooecpay_Logistic_Home_Tcat_Outside':
                             case 'Wooecpay_Logistic_Home_Ecan':
                             case 'Wooecpay_Logistic_Home_Post':
                                 $api_info['action'] = 'https://logistics.ecpay.com.tw/helper/printTradeDocument' ;
@@ -415,6 +425,7 @@ class Wooecpay_Logistic_Helper
 
         switch ($shipping_method_id) { 
             case 'Wooecpay_Logistic_CVS_711':
+            case 'Wooecpay_Logistic_CVS_711_Outside':
 
                 $logisticsType['type'] = 'CVS' ;
 
@@ -459,6 +470,7 @@ class Wooecpay_Logistic_Helper
             break;
 
             case 'Wooecpay_Logistic_Home_Tcat':
+            case 'Wooecpay_Logistic_Home_Tcat_Outside':
                 $logisticsType['type'] = 'HOME' ;
                 $logisticsType['sub_type'] = 'TCAT' ;
             break;
