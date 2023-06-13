@@ -14,7 +14,7 @@ class Wooecpay_Logistic {
 
 		if ('yes' === get_option('wooecpay_keep_logistic_phone', 'yes')) {
 			add_filter('woocommerce_checkout_fields', array($this, 'wooecpay_show_logistic_fields' ), 11 ,1);		// 收件人手機
-			add_action('woocommerce_checkout_create_order', array($this, 'wooecpay_save_logistic_fields'), 11, 2); 
+			add_action('woocommerce_checkout_create_order', array($this, 'wooecpay_save_logistic_fields'), 11, 2);
 		}
 
 		add_action( 'woocommerce_checkout_update_order_meta', array( $this, 'save_weight_order' ));
@@ -45,14 +45,14 @@ class Wooecpay_Logistic {
 		if ( get_option('wooecpay_logistic_cvs_type') == 'C2C') {
 			include WOOECPAY_PLUGIN_INCLUDE_DIR . '/services/logistic/ecpay-logistic-cvs-okmart.php';
 		}
-		
+
 		include WOOECPAY_PLUGIN_INCLUDE_DIR . '/services/logistic/ecpay-logistic-home-tcat.php';
 		// include WOOECPAY_PLUGIN_INCLUDE_DIR . '/services/logistic/ecpay-logistic-home-ecan.php';
 		include WOOECPAY_PLUGIN_INCLUDE_DIR . '/services/logistic/ecpay-logistic-home-post.php';
 	}
 
 	public function add_method($methods)
-    {   
+    {
         $methods['Wooecpay_Logistic_CVS_711']       = 'Wooecpay_Logistic_CVS_711';
         $methods['Wooecpay_Logistic_CVS_Hilife']    = 'Wooecpay_Logistic_CVS_Hilife';
         $methods['Wooecpay_Logistic_CVS_Family']    = 'Wooecpay_Logistic_CVS_Family';
@@ -83,11 +83,11 @@ class Wooecpay_Logistic {
 
     // 限制綠界物流僅能使用綠界金流
     function gateway_disable_for_shipping_rate( $available_gateways ) {
-       
+
         if ( ! is_admin() ) {
 
         	$chosen_shipping_tmp = $this->get_chosen_shipping_method_ids();
-        	$chosen_shipping = $chosen_shipping_tmp[0] ;
+        	$chosen_shipping = (empty($chosen_shipping_tmp)) ? '' : $chosen_shipping_tmp[0] ;
 
 			if(!empty($chosen_shipping)){
 
@@ -114,19 +114,19 @@ class Wooecpay_Logistic {
 							unset( $available_gateways[$key] );
 						}
 					}
-				}	
+				}
 
 				// 限制貨到付款僅適用超商物流
 				$chosen_methods = WC()->session->get( 'chosen_shipping_methods' );
 				$chosen_shipping = $chosen_methods[0];
-				
+
 				if ( isset( $available_gateways['cod'] ) && (
-					0 === strpos( $chosen_shipping, 'Wooecpay_Logistic_Home_Tcat' ) || 
+					0 === strpos( $chosen_shipping, 'Wooecpay_Logistic_Home_Tcat' ) ||
 					0 === strpos( $chosen_shipping, 'Wooecpay_Logistic_Home_Post' )
 				) ){
 					unset( $available_gateways['cod'] );
 				}
-			}	
+			}
        	}
 
        	return $available_gateways;
@@ -149,7 +149,7 @@ class Wooecpay_Logistic {
 
     public function wooecpay_save_logistic_fields($order, $data)
     {
-        
+
     	if(
     		isset($data['billing_phone']) &&
     		isset($data['wooecpay_shipping_phone']) &&
@@ -162,7 +162,7 @@ class Wooecpay_Logistic {
     /**
      * 額外增加訂單重量欄位
      */
-    public function save_weight_order($order_id) 
+    public function save_weight_order($order_id)
 	{
         $weight = WC()->cart->get_cart_contents_weight();
         update_post_meta( $order_id, '_cart_weight', $weight );
