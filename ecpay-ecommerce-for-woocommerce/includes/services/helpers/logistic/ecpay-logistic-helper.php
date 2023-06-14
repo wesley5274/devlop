@@ -3,6 +3,7 @@ namespace Helpers\Logistic;
 
 use Ecpay\Sdk\Factories\Factory;
 use Ecpay\Sdk\Exceptions\RtnException;
+use Ecpay\Sdk\Services\AesService;
 
 class Wooecpay_Logistic_Helper
 {
@@ -528,5 +529,52 @@ class Wooecpay_Logistic_Helper
             case 'Wooecpay_Logistic_Home_Tcat_Outside':
                 return $is_available_outside;
         }
+    }
+
+    public function check_cvs_is_valid($shipping_method_id, $is_cvs_outside)
+    {
+        $is_valid = true;
+
+        switch ($shipping_method_id) {
+            case 'Wooecpay_Logistic_CVS_711':
+                $is_valid = ($is_cvs_outside === '0') ? true : false;
+                break;
+            case 'Wooecpay_Logistic_CVS_711_Outside':
+                $is_valid = ($is_cvs_outside === '0') ? false : true;
+                break;
+        }
+
+        return $is_valid;
+    }
+
+    public function decrypt_order_id($encryption_order_id)
+    {
+        $api_logistic_info  = $this->get_ecpay_logistic_api_info();
+        $factory = new Factory([
+            'hashKey'   => $api_logistic_info['hashKey'],
+            'hashIv'    => $api_logistic_info['hashIv'],
+        ]);
+
+        $aes_service = $factory->create(AesService::class);
+        $data = $aes_service->decrypt($encryption_order_id);
+        $order_id = $data['orderId'];
+
+        return $order_id;
+    }
+
+    public function encrypt_order_id($order_id)
+    {
+        $api_logistic_info  = $this->get_ecpay_logistic_api_info();
+        $factory = new Factory([
+            'hashKey'   => $api_logistic_info['hashKey'],
+            'hashIv'    => $api_logistic_info['hashIv'],
+        ]);
+
+        $aes_service = $factory->create(AesService::class);
+        $encryption_order_id = $aes_service->encrypt([
+            'orderId' => $order_id
+        ]);
+
+        return $encryption_order_id;
     }
 }

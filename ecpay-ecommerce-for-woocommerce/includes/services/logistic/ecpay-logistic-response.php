@@ -4,15 +4,20 @@
 use Ecpay\Sdk\Factories\Factory;
 use Ecpay\Sdk\Exceptions\RtnException;
 use Ecpay\Sdk\Response\VerifiedArrayResponse;
-use Ecpay\Sdk\Services\UrlService;
+use Helpers\Logistic\Wooecpay_Logistic_Helper;
 
 class Wooecpay_Logistic_Response
 {
+    protected $logisticHelper;
+
     public function __construct() {
         
         add_action('woocommerce_api_wooecpay_logistic_map_callback', array($this, 'map_response'));                 // 前台選擇門市 Response
         add_action('woocommerce_api_wooecpay_change_logistic_map_callback', array($this, 'change_map_response'));   // 後台變更門市 Response
         add_action('woocommerce_api_wooecpay_logistic_status_callback', array($this, 'logistic_status_response'));  // 貨態回傳
+
+        // 載入物流共用
+        $this->logisticHelper = new Wooecpay_Logistic_Helper;
     }
 
     public function map_response()
@@ -39,6 +44,27 @@ class Wooecpay_Logistic_Response
                     $shipping_method_id == 'Wooecpay_Logistic_CVS_Hilife' ||
                     $shipping_method_id == 'Wooecpay_Logistic_CVS_Okmart'
                 ) {
+                    // 是否啟用超商離島物流
+                    if (in_array('Wooecpay_Logistic_CVS_711', get_option('wooecpay_enabled_logistic_outside', []))) {
+
+                        // 門市檢查
+                        $is_valid = $this->logisticHelper->check_cvs_is_valid($shipping_method_id, $_POST['CVSOutSide']);
+                        if (!$is_valid) {
+                            $encryption_order_id = $this->logisticHelper->encrypt_order_id($order_id);
+                            $url = WC()->api_request_url('wooecpay_logistic_redirect_map', true) . '&id=' . $encryption_order_id;
+
+                            // Todo: 提示訊息等文案
+                            echo '<script>';
+                            echo '  if (confirm("請確認選取門市是否正確，將重新轉導電子地圖，或取消重新下單 (' . $order_id . ')")) {';
+                            echo '      window.location.href = "' . $url . '"; ';
+                            echo '  } else {';
+                            echo '      window.location.href = "' . wc_get_page_permalink( 'checkout' ) . '"; ';
+                            echo '  }';
+                            echo '</script>';
+
+                            exit;
+                        }
+                    }
 
                     // 取出商店代號
                     $CVSStoreID = $order->get_meta('_ecpay_logistic_cvs_store_id') ;

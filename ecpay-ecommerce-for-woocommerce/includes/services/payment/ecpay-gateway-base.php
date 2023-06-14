@@ -1,15 +1,21 @@
 <?php
 
 use Ecpay\Sdk\Factories\Factory;
-use Ecpay\Sdk\Services\UrlService;
 use Ecpay\Sdk\Exceptions\RtnException;
+use Helpers\Logistic\Wooecpay_Logistic_Helper;
 
 class Wooecpay_Gateway_Base extends WC_Payment_Gateway
 {
+    protected $logisticHelper;
+
     public function __construct()
     {
+        // 載入物流共用
+        $this->logisticHelper = new Wooecpay_Logistic_Helper;
+
         if ($this->enabled) {
             add_action('woocommerce_receipt_' . $this->id, array( $this, 'receipt_page' ));
+            add_action('woocommerce_api_wooecpay_logistic_redirect_map',array( $this, 'redirect_map'));
         }
 
         // 感謝頁
@@ -167,7 +173,19 @@ class Wooecpay_Gateway_Base extends WC_Payment_Gateway
         }
     }
 
-    // payment 
+    public function redirect_map()
+    {
+        $id = str_replace(' ','+', $_GET['id']);
+        $order_id = $this->logisticHelper->decrypt_order_id($id);
+
+        if (wc_get_order($order_id)) {
+            $this->receipt_page($order_id);
+        }
+
+        exit;
+    }
+
+    // payment
     // ---------------------------------------------------
 
     // 感謝頁面
