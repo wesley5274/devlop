@@ -225,55 +225,78 @@ class Wooecpay_Logistic_Response
                     $shipping_method_id == 'Wooecpay_Logistic_CVS_Hilife' ||
                     $shipping_method_id == 'Wooecpay_Logistic_CVS_Okmart'
                 ){
+                    $is_valid = true;
 
-                    $CVSStoreID   = sanitize_text_field($_POST['CVSStoreID']);
-                    $CVSStoreName = sanitize_text_field($_POST['CVSStoreName']);
-                    $CVSAddress   = sanitize_text_field($_POST['CVSAddress']);
-                    $CVSTelephone = sanitize_text_field($_POST['CVSTelephone']);
-                    
-                    // 驗證
-                    if (mb_strlen( $CVSStoreName, "utf-8") > 10) {
-                        $CVSStoreName = mb_substr($CVSStoreName, 0, 10, "utf-8");
-                    }
-                    if (mb_strlen( $CVSAddress, "utf-8") > 60) {
-                        $CVSAddress = mb_substr($CVSAddress , 0, 60, "utf-8");
-                    }
-                    if (strlen($CVSTelephone) > 20) {
-                        $CVSTelephone = substr($CVSTelephone  , 0, 20);
-                    }
-                    if (strlen($CVSStoreID) > 10) {
-                        $CVSStoreID = substr($CVSTelephone , 0, 10);
+                    // 是否啟用超商離島物流
+                    if (in_array('Wooecpay_Logistic_CVS_711', get_option('wooecpay_enabled_logistic_outside', []))) {
+                        // 門市檢查
+                        $is_valid = $this->logisticHelper->check_cvs_is_valid($shipping_method_id, $_POST['CVSOutSide']);
                     }
 
-                    $order->update_meta_data( '_ecpay_logistic_cvs_store_id', $CVSStoreID ); 
-                    $order->update_meta_data( '_ecpay_logistic_cvs_store_name', $CVSStoreName ); 
-                    $order->update_meta_data( '_ecpay_logistic_cvs_store_address', $CVSAddress );  
-                    $order->update_meta_data( '_ecpay_logistic_cvs_store_telephone', $CVSTelephone ); 
+                    if ($is_valid) {
 
-                    $order->add_order_note(sprintf(__('Change store %1$s (%2$s)', 'ecpay-ecommerce-for-woocommerce'),$CVSStoreName,$CVSStoreID));
+                        $CVSStoreID   = sanitize_text_field($_POST['CVSStoreID']);
+                        $CVSStoreName = sanitize_text_field($_POST['CVSStoreName']);
+                        $CVSAddress   = sanitize_text_field($_POST['CVSAddress']);
+                        $CVSTelephone = sanitize_text_field($_POST['CVSTelephone']);
 
-                    $order->save();
+                        // 驗證
+                        if (mb_strlen( $CVSStoreName, "utf-8") > 10) {
+                            $CVSStoreName = mb_substr($CVSStoreName, 0, 10, "utf-8");
+                        }
+                        if (mb_strlen( $CVSAddress, "utf-8") > 60) {
+                            $CVSAddress = mb_substr($CVSAddress , 0, 60, "utf-8");
+                        }
+                        if (strlen($CVSTelephone) > 20) {
+                            $CVSTelephone = substr($CVSTelephone  , 0, 20);
+                        }
+                        if (strlen($CVSStoreID) > 10) {
+                            $CVSStoreID = substr($CVSTelephone , 0, 10);
+                        }
+
+                        $order->update_meta_data( '_ecpay_logistic_cvs_store_id', $CVSStoreID );
+                        $order->update_meta_data( '_ecpay_logistic_cvs_store_name', $CVSStoreName );
+                        $order->update_meta_data( '_ecpay_logistic_cvs_store_address', $CVSAddress );
+                        $order->update_meta_data( '_ecpay_logistic_cvs_store_telephone', $CVSTelephone );
+
+                        $order->add_order_note(sprintf(__('Change store %1$s (%2$s)', 'ecpay-ecommerce-for-woocommerce'),$CVSStoreName,$CVSStoreID));
+
+                        $order->save();
+
+                        echo '<section>';
+                        echo '<h2>變更後門市資訊:</h2>';
+                        echo '<table>';
+                        echo '<tbody>';
+                        echo '<tr>';
+                        echo '<td>超商店舖編號:</td>';
+                        echo wp_kses_post('<td>'. $CVSStoreID.'</td>');
+                        echo '</tr>';
+                        echo '<tr>';
+                        echo '<td>超商店舖名稱:</td>';
+                        echo wp_kses_post('<td>'. $CVSStoreName.'</td>');
+                        echo '</tr>';
+                        echo '<tr>';
+                        echo '<td>超商店舖地址:</td>';
+                        echo wp_kses_post('<td>'. $CVSAddress.'</td>');
+                        echo '</tr>';
+                        echo '</tbody>';
+                        echo '</table>';
+                        echo '</section>';
+                    } else {
+                        // 組合地圖FORM
+                        $form_map = $this->logisticHelper->generate_ecpay_map_form($shipping_method_id, $order->get_id());
+                        $form_map = str_replace('<!DOCTYPE html><html><head><meta charset="utf-8"></head><body>', '', $form_map) ;
+                        $form_map = str_replace('</body></html>', '', $form_map) ;
+                        $form_map = str_replace('<script type="text/javascript">document.getElementById("ecpay-form").submit();</script>', '', $form_map) ;
+
+                        echo '</form>';
+                        echo $form_map ;
+						echo '<p>物流與超商門市地點不符，若要重選門市請點擊「變更門市」按鈕。</p>';
+						echo '<input class=\'button\' type=\'button\' onclick=\'document.getElementById("ecpay-form").submit();\' value=\'變更門市\' />&nbsp;&nbsp;';
+                    }
                 }
 
-                echo '<section>';
-                echo '<h2>變更後門市資訊:</h2>';
-                echo '<table>';
-                echo '<tbody>';
-                echo '<tr>';
-                echo '<td>超商店舖編號:</td>';
-                echo wp_kses_post('<td>'. $CVSStoreID.'</td>');
-                echo '</tr>';
-                echo '<tr>';
-                echo '<td>超商店舖名稱:</td>';
-                echo wp_kses_post('<td>'. $CVSStoreName.'</td>');
-                echo '</tr>';
-                echo '<tr>';
-                echo '<td>超商店舖地址:</td>';
-                echo wp_kses_post('<td>'. $CVSAddress.'</td>');
-                echo '</tr>';
-                echo '</tbody>';
-                echo '</table>';
-                echo '</section>';
+
             }
         }
 

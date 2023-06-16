@@ -518,6 +518,38 @@ class Wooecpay_Logistic_Helper
         ];
     }
 
+    public function generate_ecpay_map_form($shipping_method_id, $order_id)
+    {
+        $api_logistic_info  = $this->get_ecpay_logistic_api_info('map');
+        $client_back_url    = WC()->api_request_url('wooecpay_change_logistic_map_callback', true);
+        $MerchantTradeNo    = $this->get_merchant_trade_no($order_id, get_option('wooecpay_logistic_order_prefix'));
+        $LogisticsType   	= $this->get_logistics_sub_type($shipping_method_id) ;
+
+        try {
+            $factory = new Factory([
+                'hashKey'       => $api_logistic_info['hashKey'],
+                'hashIv'        => $api_logistic_info['hashIv'],
+                'hashMethod'    => 'md5',
+            ]);
+            $autoSubmitFormService = $factory->create('AutoSubmitFormWithCmvService');
+
+            $inputMap = [
+                'MerchantID'        => $api_logistic_info['merchant_id'],
+                'MerchantTradeNo'   => $MerchantTradeNo,
+                'LogisticsType'     => $LogisticsType['type'],
+                'LogisticsSubType'  => $LogisticsType['sub_type'],
+                'IsCollection'      => 'Y',
+                'ServerReplyURL'    => $client_back_url,
+            ];
+
+            $form_map = $autoSubmitFormService->generate($inputMap, $api_logistic_info['action'], 'ecpay_map');
+
+            return $form_map;
+        } catch (RtnException $e) {
+            return wp_kses_post( '(' . $e->getCode() . ')' . $e->getMessage() ) . PHP_EOL;
+        }
+    }
+
     public function is_available_state_home_tcat($shipping_method_id, $state)
     {
         // 是否為黑貓允許離島

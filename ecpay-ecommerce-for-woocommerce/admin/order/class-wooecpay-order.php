@@ -552,43 +552,15 @@ class Wooecpay_Order
 
 					// 產生地圖按鈕兒
 					if ($map_button) {
-						
+
 						// 組合地圖FORM
-						$api_logistic_info  = $this->logisticHelper->get_ecpay_logistic_api_info('map');
-						$client_back_url    = WC()->api_request_url('wooecpay_change_logistic_map_callback', true);
-						$MerchantTradeNo    = $this->logisticHelper->get_merchant_trade_no($order->get_id(), get_option('wooecpay_logistic_order_prefix'));
-						$LogisticsType   	= $this->logisticHelper->get_logistics_sub_type($shipping_method_id) ;
+						$form_map = $this->logisticHelper->generate_ecpay_map_form($shipping_method_id, $order->get_id());
+						$form_map =  str_replace('<!DOCTYPE html><html><head><meta charset="utf-8"></head><body>', '', $form_map) ;
+						$form_map =  str_replace('</body></html>', '', $form_map) ;
+						$form_map =  str_replace('<script type="text/javascript">document.getElementById("ecpay-form").submit();</script>', '', $form_map) ;
 
-						try {
-							$factory = new Factory([
-								'hashKey'       => $api_logistic_info['hashKey'],
-								'hashIv'        => $api_logistic_info['hashIv'],
-								'hashMethod'    => 'md5',
-							]);
-							$autoSubmitFormService = $factory->create('AutoSubmitFormWithCmvService');
-
-							$inputMap = [
-								'MerchantID'        => $api_logistic_info['merchant_id'],
-								'MerchantTradeNo'   => $MerchantTradeNo,
-								'LogisticsType'     => $LogisticsType['type'],
-								'LogisticsSubType'  => $LogisticsType['sub_type'],
-								'IsCollection'      => 'Y',
-								'ServerReplyURL'    => $client_back_url,
-							];
-
-							$form_map = $autoSubmitFormService->generate($inputMap, $api_logistic_info['action'], 'ecpay_map');
-
-							$form_map =  str_replace('<!DOCTYPE html><html><head><meta charset="utf-8"></head><body>', '', $form_map) ;
-							$form_map =  str_replace('</body></html>', '', $form_map) ;
-							$form_map =  str_replace('<script type="text/javascript">document.getElementById("ecpay-form").submit();</script>', '', $form_map) ;
-						
-							echo '</form>';
-							echo $form_map ;
-
-						} catch (RtnException $e) {
-							echo wp_kses_post( '(' . $e->getCode() . ')' . $e->getMessage() ) . PHP_EOL;
-						}
-						
+						echo '</form>';
+						echo $form_map ;
 						echo '<input class=\'button\' type=\'button\' onclick=\'ecpayChangeStore();\' value=\'變更門市\' />&nbsp;&nbsp;';
 					}
 
