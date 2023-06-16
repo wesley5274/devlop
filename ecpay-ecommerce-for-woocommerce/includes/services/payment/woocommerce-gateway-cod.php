@@ -23,15 +23,15 @@ class Wooecpay_Gateway_Cod extends Wooecpay_Gateway_Base
 
         //載入物流共用
         $this->logisticHelper = new Wooecpay_Logistic_Helper;
-		
+
         // parent::__construct();
     }
 
     public function woocommerce_cod_pending_payment_order_status($order_status, $order) {
-        
+
         // 物流方式
         $shipping_method_id = $order->get_items('shipping') ;
-        $shipping_method_id = reset($shipping_method_id);    
+        $shipping_method_id = reset($shipping_method_id);
         $shipping_method_id = $shipping_method_id->get_method_id() ;
 
         if (
@@ -41,7 +41,7 @@ class Wooecpay_Gateway_Cod extends Wooecpay_Gateway_Base
             $shipping_method_id == 'Wooecpay_Logistic_CVS_Hilife' ||
             $shipping_method_id == 'Wooecpay_Logistic_CVS_Okmart'
         ) {
-            $order_status = 'pending';    
+            $order_status = 'pending';
         }
 
         return $order_status ;
@@ -51,7 +51,6 @@ class Wooecpay_Gateway_Cod extends Wooecpay_Gateway_Base
     // 修改必填欄位判斷
     public function cvs_info_process($fields)
     {
-
         $fields['shipping']['shipping_country']['required']     = false;
         $fields['shipping']['shipping_address_1']['required']   = false;
         $fields['shipping']['shipping_address_2']['required']   = false;
@@ -78,7 +77,7 @@ class Wooecpay_Gateway_Cod extends Wooecpay_Gateway_Base
 
         } else {
 
-            $shipping_method_id = reset($shipping_method_id);   
+            $shipping_method_id = reset($shipping_method_id);
             $shipping_method_id = $shipping_method_id->get_method_id() ;
             $shippping_tag = true ;
         }
@@ -203,7 +202,7 @@ class Wooecpay_Gateway_Cod extends Wooecpay_Gateway_Base
                     } catch (RtnException $e) {
                         // echo wp_kses_post( '(' . $e->getCode() . ')' . $e->getMessage() ) . PHP_EOL;
                     }
-                } 
+                }
             }
         }
     }
@@ -253,7 +252,7 @@ class Wooecpay_Gateway_Cod extends Wooecpay_Gateway_Base
             return;
         }
 
-        if (!$order = wc_get_order($order_id)) { 
+        if (!$order = wc_get_order($order_id)) {
             return;
         }
 
@@ -273,7 +272,7 @@ class Wooecpay_Gateway_Cod extends Wooecpay_Gateway_Base
             }
         }
     }
-   
+
 }
 
 
