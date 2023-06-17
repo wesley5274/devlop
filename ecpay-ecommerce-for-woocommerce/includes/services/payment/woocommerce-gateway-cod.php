@@ -34,13 +34,7 @@ class Wooecpay_Gateway_Cod extends Wooecpay_Gateway_Base
         $shipping_method_id = reset($shipping_method_id);
         $shipping_method_id = $shipping_method_id->get_method_id() ;
 
-        if (
-            $shipping_method_id == 'Wooecpay_Logistic_CVS_711' ||
-            $shipping_method_id == 'Wooecpay_Logistic_CVS_711_Outside' ||
-            $shipping_method_id == 'Wooecpay_Logistic_CVS_Family' ||
-            $shipping_method_id == 'Wooecpay_Logistic_CVS_Hilife' ||
-            $shipping_method_id == 'Wooecpay_Logistic_CVS_Okmart'
-        ) {
+        if ($this->logisticHelper->is_ecpay_cvs_logistics($shipping_method_id)) {
             $order_status = 'pending';
         }
 
@@ -85,11 +79,7 @@ class Wooecpay_Gateway_Cod extends Wooecpay_Gateway_Base
         if (
             $payment_method == 'cod' &&
             $shippping_tag  &&
-            ($shipping_method_id == 'Wooecpay_Logistic_CVS_711' ||
-            $shipping_method_id == 'Wooecpay_Logistic_CVS_711_Outside' ||
-            $shipping_method_id == 'Wooecpay_Logistic_CVS_Family' ||
-            $shipping_method_id == 'Wooecpay_Logistic_CVS_Hilife' ||
-            $shipping_method_id == 'Wooecpay_Logistic_CVS_Okmart')
+            $this->logisticHelper->is_ecpay_cvs_logistics($shipping_method_id)
         ) {
             // 取出商店代號
             $CVSStoreID = $order->get_meta('_ecpay_logistic_cvs_store_id') ;

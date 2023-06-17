@@ -31,17 +31,7 @@ class Wooecpay_Logistic_Helper
                 $shipping_method_id = $shipping_method_id->get_method_id();
 
                 // 判斷是否為綠界物流 產生物流訂單
-                if (
-                    $shipping_method_id == 'Wooecpay_Logistic_CVS_711' ||
-                    $shipping_method_id == 'Wooecpay_Logistic_CVS_711_Outside' ||
-                    $shipping_method_id == 'Wooecpay_Logistic_CVS_Family' ||
-                    $shipping_method_id == 'Wooecpay_Logistic_CVS_Hilife' ||
-                    $shipping_method_id == 'Wooecpay_Logistic_CVS_Okmart' ||
-                    $shipping_method_id == 'Wooecpay_Logistic_Home_Tcat' ||
-                    $shipping_method_id == 'Wooecpay_Logistic_Home_Tcat_Outside' ||
-                    $shipping_method_id == 'Wooecpay_Logistic_Home_Ecan' ||
-                    $shipping_method_id == 'Wooecpay_Logistic_Home_Post'
-                ) {
+                if ($this->is_ecpay_logistics($shipping_method_id)) {
 
                     $LogisticsType      = $this->get_logistics_sub_type($shipping_method_id);
                     $api_logistic_info  = $this->get_ecpay_logistic_api_info('create');
@@ -412,6 +402,42 @@ class Wooecpay_Logistic_Helper
         return $api_info;
     }
 
+    public function get_ecpay_all_logistics()
+    {
+        return [
+            'Wooecpay_Logistic_CVS_711',
+            'Wooecpay_Logistic_CVS_711_Outside',
+            'Wooecpay_Logistic_CVS_Family',
+            'Wooecpay_Logistic_CVS_Hilife',
+            'Wooecpay_Logistic_CVS_Okmart',
+            'Wooecpay_Logistic_Home_Tcat',
+            'Wooecpay_Logistic_Home_Tcat_Outside',
+            'Wooecpay_Logistic_Home_Post',
+            'Wooecpay_Logistic_Home_Ecan'
+        ];
+    }
+
+    public function get_ecpay_cvs_logistics()
+    {
+        return [
+            'Wooecpay_Logistic_CVS_711',
+            'Wooecpay_Logistic_CVS_711_Outside',
+            'Wooecpay_Logistic_CVS_Family',
+            'Wooecpay_Logistic_CVS_Hilife',
+            'Wooecpay_Logistic_CVS_Okmart'
+        ];
+    }
+
+    public function get_ecpay_home_logistics()
+    {
+        return [
+            'Wooecpay_Logistic_Home_Tcat',
+            'Wooecpay_Logistic_Home_Tcat_Outside',
+            'Wooecpay_Logistic_Home_Post',
+            'Wooecpay_Logistic_Home_Ecan'
+        ];
+    }
+
     public function get_logistics_sub_type($shipping_method_id)
     {
         $wooecpay_logistic_cvs_type = get_option('wooecpay_logistic_cvs_type');
@@ -560,6 +586,21 @@ class Wooecpay_Logistic_Helper
             case 'Wooecpay_Logistic_Home_Tcat_Outside':
                 return $is_available_outside;
         }
+    }
+
+    public function is_ecpay_logistics($shipping_method_id)
+    {
+        return in_array($shipping_method_id, $this->get_ecpay_all_logistics());
+    }
+
+    public function is_ecpay_cvs_logistics($shipping_method_id)
+    {
+        return in_array($shipping_method_id, $this->get_ecpay_cvs_logistics());
+    }
+
+    public function is_ecpay_home_logistics($shipping_method_id)
+    {
+        return in_array($shipping_method_id, $this->get_ecpay_home_logistics());
     }
 
     public function check_cvs_is_valid($shipping_method_id, $is_cvs_outside)

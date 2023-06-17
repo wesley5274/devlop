@@ -89,13 +89,7 @@ class Wooecpay_Order
 			$shipping_method_id = reset($shipping_method_id);
 			$shipping_method_id = $shipping_method_id->get_method_id();
 		}
-		if (
-			$shipping_method_id == 'Wooecpay_Logistic_CVS_711' ||
-			$shipping_method_id == 'Wooecpay_Logistic_CVS_711_Outside' ||
-			$shipping_method_id == 'Wooecpay_Logistic_CVS_Family' ||
-			$shipping_method_id == 'Wooecpay_Logistic_CVS_Hilife' ||
-			$shipping_method_id == 'Wooecpay_Logistic_CVS_Okmart'
-		) {
+		if ($this->logisticHelper->is_ecpay_cvs_logistics($shipping_method_id)) {
 			echo '<style>.logistic_csv_info {display: inline-block;}</style>';
 		} else {
 			echo '<style>.logistic_button_display {display: inline-block;}</style>';
@@ -428,13 +422,7 @@ class Wooecpay_Order
 					// 判斷物流方式是否允許變更門市
 					if (
 						( $order_status == 'on-hold' || $order_status == 'processing') &&
-						(
-							$shipping_method_id == 'Wooecpay_Logistic_CVS_711' ||
-							$shipping_method_id == 'Wooecpay_Logistic_CVS_711_Outside' ||
-							$shipping_method_id == 'Wooecpay_Logistic_CVS_Family' ||
-							$shipping_method_id == 'Wooecpay_Logistic_CVS_Hilife' ||
-							$shipping_method_id == 'Wooecpay_Logistic_CVS_Okmart'
-						)
+						$this->logisticHelper->is_ecpay_cvs_logistics($shipping_method_id)
 					) {
 
 						// 狀態判斷是否已經建立綠界物流單 AllPayLogisticsID
@@ -452,25 +440,9 @@ class Wooecpay_Order
 					$logistic_order_button = true ;
 
 					// 判斷是否為綠界物流
-					if (
-						$shipping_method_id == 'Wooecpay_Logistic_CVS_711' ||
-						$shipping_method_id == 'Wooecpay_Logistic_CVS_711_Outside' ||
-						$shipping_method_id == 'Wooecpay_Logistic_CVS_Family' ||
-						$shipping_method_id == 'Wooecpay_Logistic_CVS_Hilife' ||
-						$shipping_method_id == 'Wooecpay_Logistic_CVS_Okmart' ||
-						$shipping_method_id == 'Wooecpay_Logistic_Home_Tcat' ||
-						$shipping_method_id == 'Wooecpay_Logistic_Home_Tcat_Outside' ||
-						$shipping_method_id == 'Wooecpay_Logistic_Home_Ecan' ||
-						$shipping_method_id == 'Wooecpay_Logistic_Home_Post'
-					) {
+					if ($this->logisticHelper->is_ecpay_logistics($shipping_method_id)) {
 
-						if (
-							$shipping_method_id == 'Wooecpay_Logistic_CVS_711' ||
-							$shipping_method_id == 'Wooecpay_Logistic_CVS_711_Outside' ||
-							$shipping_method_id == 'Wooecpay_Logistic_CVS_Family' ||
-							$shipping_method_id == 'Wooecpay_Logistic_CVS_Hilife' ||
-							$shipping_method_id == 'Wooecpay_Logistic_CVS_Okmart'
-						) {
+						if ($this->logisticHelper->is_ecpay_cvs_logistics($shipping_method_id)) {
 
 							// 狀態判斷 _ecpay_logistic_cvs_store_id門市代號不存在
 							$ecpay_logistic_cvs_store_id = get_post_meta( $order->get_id(), '_ecpay_logistic_cvs_store_id', true );
@@ -510,25 +482,10 @@ class Wooecpay_Order
 				}
 
 				// 判斷是否為綠界物流
-				if (
-					$shipping_method_id == 'Wooecpay_Logistic_CVS_711' ||
-					$shipping_method_id == 'Wooecpay_Logistic_CVS_711_Outside' ||
-					$shipping_method_id == 'Wooecpay_Logistic_CVS_Family' ||
-					$shipping_method_id == 'Wooecpay_Logistic_CVS_Hilife' ||
-					$shipping_method_id == 'Wooecpay_Logistic_CVS_Okmart' ||
-					$shipping_method_id == 'Wooecpay_Logistic_Home_Tcat' ||
-					$shipping_method_id == 'Wooecpay_Logistic_Home_Tcat_Outside' ||
-					$shipping_method_id == 'Wooecpay_Logistic_Home_Ecan' ||
-					$shipping_method_id == 'Wooecpay_Logistic_Home_Post'
-				) {
+				if ($this->logisticHelper->is_ecpay_logistics($shipping_method_id)) {
 
 					// 判斷是否為超商取貨
-					if (
-						$shipping_method_id == 'Wooecpay_Logistic_CVS_711' ||
-						$shipping_method_id == 'Wooecpay_Logistic_CVS_Family' ||
-						$shipping_method_id == 'Wooecpay_Logistic_CVS_Hilife' ||
-						$shipping_method_id == 'Wooecpay_Logistic_CVS_Okmart'
-					) {
+					if ($this->logisticHelper->is_ecpay_cvs_logistics($shipping_method_id)) {
 						echo '<div class="logistic_csv_info">';
 						echo '<h3>超商資訊</h3>' ;
 						echo wp_kses_post('<p><strong>超商編號:</strong>'. get_post_meta( $order->get_id(), '_ecpay_logistic_cvs_store_id', true ) . '</p>') ;

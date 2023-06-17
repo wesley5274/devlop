@@ -37,13 +37,7 @@ class Wooecpay_Logistic_Response
                 $shipping_method_id = $shipping_method_id->get_method_id();
 
                 // 判斷是否為超商取貨
-                if (
-                    $shipping_method_id == 'Wooecpay_Logistic_CVS_711' ||
-                    $shipping_method_id == 'Wooecpay_Logistic_CVS_711_Outside' ||
-                    $shipping_method_id == 'Wooecpay_Logistic_CVS_Family' ||
-                    $shipping_method_id == 'Wooecpay_Logistic_CVS_Hilife' ||
-                    $shipping_method_id == 'Wooecpay_Logistic_CVS_Okmart'
-                ) {
+                if ($this->logisticHelper->is_ecpay_cvs_logistics($shipping_method_id)) {
                     // 是否啟用超商離島物流
                     if (in_array('Wooecpay_Logistic_CVS_711', get_option('wooecpay_enabled_logistic_outside', []))) {
 
@@ -215,13 +209,7 @@ class Wooecpay_Logistic_Response
                 $shipping_method_id = $shipping_method_id->get_method_id();
 
                 // 判斷是否為超商取貨
-                if (
-                    $shipping_method_id == 'Wooecpay_Logistic_CVS_711' ||
-                    $shipping_method_id == 'Wooecpay_Logistic_CVS_711_Outside' ||
-                    $shipping_method_id == 'Wooecpay_Logistic_CVS_Family' ||
-                    $shipping_method_id == 'Wooecpay_Logistic_CVS_Hilife' ||
-                    $shipping_method_id == 'Wooecpay_Logistic_CVS_Okmart'
-                ) {
+                if ($this->logisticHelper->is_ecpay_cvs_logistics($shipping_method_id)) {
                     $is_valid = true;
 
                     // 是否啟用超商離島物流
@@ -321,17 +309,7 @@ class Wooecpay_Logistic_Response
                     $shipping_method_id = $shipping_method_id->get_method_id();
 
                     // 判斷是否為綠界物流
-                    if (
-                        $shipping_method_id == 'Wooecpay_Logistic_CVS_711' ||
-                        $shipping_method_id == 'Wooecpay_Logistic_CVS_711_Outside' ||
-                        $shipping_method_id == 'Wooecpay_Logistic_CVS_Family' ||
-                        $shipping_method_id == 'Wooecpay_Logistic_CVS_Hilife' ||
-                        $shipping_method_id == 'Wooecpay_Logistic_CVS_Okmart' ||
-                        $shipping_method_id == 'Wooecpay_Logistic_Home_Tcat' ||
-                        $shipping_method_id == 'Wooecpay_Logistic_Home_Tcat_Outside' ||
-                        $shipping_method_id == 'Wooecpay_Logistic_Home_Ecan' ||
-                        $shipping_method_id == 'Wooecpay_Logistic_Home_Post'
-                    ) {
+                    if ($this->logisticHelper->is_ecpay_logistics($shipping_method_id)) {
 
                         $RtnMsg  = sanitize_text_field($_POST['RtnMsg']);
                         $RtnCode = sanitize_text_field($_POST['RtnCode']);

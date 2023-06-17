@@ -42,13 +42,7 @@ class Wooecpay_Gateway_Base extends WC_Payment_Gateway
                 $shippping_tag = true ;
             }
 
-            if(
-                $shippping_tag  && ($shipping_method_id == 'Wooecpay_Logistic_CVS_711' ||
-                $shipping_method_id == 'Wooecpay_Logistic_CVS_711_Outside' ||
-                $shipping_method_id == 'Wooecpay_Logistic_CVS_Family' ||
-                $shipping_method_id == 'Wooecpay_Logistic_CVS_Hilife' ||
-                $shipping_method_id == 'Wooecpay_Logistic_CVS_Okmart')
-            ){
+            if ($shippping_tag  && $this->logisticHelper->is_ecpay_cvs_logistics($shipping_method_id)) {
 
                 // 執行地圖選擇
 
