@@ -33,6 +33,10 @@ class Wooecpay_Order
 
 				add_action( 'woocommerce_process_shop_order_meta', array( $this, 'order_update_sync_shipping_phone' ), 60 );
 
+				if (in_array('Wooecpay_Logistic_Home_Tcat', get_option('wooecpay_enabled_logistic_outside'))) {
+					add_action('pre_post_update', array($this, 'ecpay_validate_logistic_fields'), 10, 2);
+				}
+
 			}
 
 			if ('yes' === get_option('wooecpay_enabled_invoice', 'yes')) {
@@ -374,6 +378,29 @@ class Wooecpay_Order
 	{
 		$shipping_phone = get_post_meta($post_id, '_shipping_phone', true);
 		update_post_meta($post_id, 'wooecpay_shipping_phone', $shipping_phone);
+	}
+
+	public function ecpay_validate_logistic_fields($post_id, $data)
+	{
+		if ($order = wc_get_order($post_id)) {
+			// 取得物流方式
+			$shipping_method_id = $order->get_items('shipping');
+			$shipping_method_id = reset($shipping_method_id);
+			$shipping_method_id = $shipping_method_id->get_method_id();
+
+			// 驗證運送方式的縣/市欄位
+			$shipping_state = $_POST['_shipping_state'];
+
+			// 宅配黑貓
+			if (in_array($shipping_method_id, ['Wooecpay_Logistic_Home_Tcat', 'Wooecpay_Logistic_Home_Tcat_Outside'])) {
+				// 比對運送方式與地址
+				$result = $this->logisticHelper->is_available_state_home_tcat($shipping_method_id, $shipping_state);
+				if (!$result) {
+					// Todo: Display an error message and stop execution(等文案)
+					wp_die(__('訂單更新失敗，黑貓地址檢查錯誤訊息。'), 'Order Save Error', array('response' => 400));
+				}
+			}
+		}
 	}
 
 	/**
