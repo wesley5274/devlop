@@ -668,22 +668,24 @@ class Wooecpay_Order
 
 					    $postService = $factory->create('PostWithAesJsonResponseService');
 
-					    $items = [] ;
+					    $Items = [] ;
 
 					    foreach ( $order->get_items() as $item_id => $item ) {
 
+							$item_price  = round(($item->get_total() + $item->get_total_tax()) / $item->get_quantity(), 4);
+							$item_amount = round($item_price * $item->get_quantity(), 2);
 					    	$Items[] = [
 								'ItemName' 		=> mb_substr($item->get_name(), 0, 100),
 								'ItemCount' 	=> $item->get_quantity(),
 								'ItemWord' 		=> '批',
-								'ItemPrice' 	=>  round($item->get_total() / $item->get_quantity(), 4),
+								'ItemPrice' 	=> $item_price,
 								'ItemTaxType' 	=> '1',
-								'ItemAmount' 	=> round($item->get_total(), 2),
+								'ItemAmount' 	=> $item_amount,
 					    	] ;
 					    }
 
 					    // 物流費用
-					    $shipping_fee = $order->get_shipping_total();
+					    $shipping_fee = $order->get_shipping_total() + $order->get_shipping_tax();
 						if ($shipping_fee != 0) {
 
 							$Items[] = [
