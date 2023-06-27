@@ -93,7 +93,7 @@ return [
         'type' => 'multiselect',
         'class' => 'wc-enhanced-select',
         'default' => '',
-        'desc' => '離島物流注意事項：<br>1. 啟用後才會在「運送方式」出現選項<br>2. 若未啟用「超商取貨 7-ELEVEN」離島物流，則不分本島離島，共用物流設定<br>3. 若啟用「超商取貨 7-ELEVEN」離島物流，選擇門市後會檢查所選門市是否與所選物流方式相符<br>4. 若未啟用「宅配 黑貓」離島物流，則不分本島離島，共用物流設定<br>5. 若啟用「宅配 黑貓」離島物流，結帳前會檢查運送地點是否與所選務流方式相符',
+        'desc' => __('Notice：<br>1. The option will only appear in the 「Shipping Method」 after activation.<br>2. If 「Ecpay CVS 7-11」 outlying islands shipping is not enabled, there will be no distinction between outlying island and main island shipments; shipping settings will be shared.<br>3. If 「Ecpay CVS 7-11」 outlying islands shipping is enabled, after selecting a store, it will verify if the chosen store aligns with the selected shipping method.<br>4. If 「Ecpay Home Tcat」 outlying islands shipping is not enabled, there will be no distinction between outlying island and main island shipments; shipping settings will be shared.<br>5. If 「Ecpay Home Tcat」 outlying islands shipping is enabled, it will verify before checkout whether the shipping destination matches the selected shipping method.', 'ecpay-ecommerce-for-woocommerce'),
         'options' => [
             'Wooecpay_Logistic_CVS_711'   => __('Ecpay CVS 7-11', 'ecpay-ecommerce-for-woocommerce'),
             'Wooecpay_Logistic_Home_Tcat' => __('Ecpay Home Tcat', 'ecpay-ecommerce-for-woocommerce'),
@@ -116,7 +116,7 @@ return [
         'name'     => __( 'ECPay sandbox', 'ecpay-ecommerce-for-woocommerce'),
         'type'     => 'checkbox',
         'desc'     => __( 'ECPay sandbox', 'ecpay-ecommerce-for-woocommerce'),
-        'id'       => 'wooecpay_enabled_logistic_stage', 
+        'id'       => 'wooecpay_enabled_logistic_stage',
         'default'  => 'no',
         'desc' => __('ECPay sandbox', 'ecpay-ecommerce-for-woocommerce')
     ],

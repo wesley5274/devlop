@@ -44,12 +44,13 @@ class Wooecpay_Logistic_Response
                         // 門市檢查
                         $is_valid = $this->logisticHelper->check_cvs_is_valid($shipping_method_id, $_POST['CVSOutSide']);
                         if (!$is_valid) {
+                            $confirm_msg = __('The selected store does not match the chosen shipping method (Outlying Island/Main Island). Please select a different store or cancel the transaction and place a new order.', 'ecpay-ecommerce-for-woocommerce');
                             $encryption_order_id = $this->logisticHelper->encrypt_order_id($order_id);
                             $url = WC()->api_request_url('wooecpay_logistic_redirect_map', true) . '&id=' . $encryption_order_id;
 
-                            // Todo: 提示訊息等文案
+                            // 提示訊息
                             echo '<script>';
-                            echo '    if (confirm("請確認選取門市是否正確，將重新轉導電子地圖，或取消重新下單 (' . $order_id . ')")) {';
+                            echo '    if (confirm("' . $confirm_msg . '")) {';
                             echo '        window.location.href = "' . $url . '"; ';
                             echo '    } else {';
                             echo '        window.location.href = "' . wc_get_page_permalink('checkout') . '"; ';
@@ -276,7 +277,7 @@ class Wooecpay_Logistic_Response
 
                         echo '</form>';
                         echo $form_map;
-						echo '<p>物流與超商門市地點不符，若要重選門市請點擊「變更門市」按鈕。</p>';
+						echo '<p>選擇門市地點與運送方式不符(離島/本島)，若要重選門市請點擊「變更門市」按鈕。</p>';
 						echo '<input class=\'button\' type=\'button\' onclick=\'document.getElementById("ecpay-form").submit();\' value=\'變更門市\' />&nbsp;&nbsp;';
                     }
                 }

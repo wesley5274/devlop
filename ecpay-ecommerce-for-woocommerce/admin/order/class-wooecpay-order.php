@@ -396,8 +396,8 @@ class Wooecpay_Order
 				// 比對運送方式與地址
 				$result = $this->logisticHelper->is_available_state_home_tcat($shipping_method_id, $shipping_state);
 				if (!$result) {
-					// Todo: Display an error message and stop execution(等文案)
-					wp_die(__('訂單更新失敗，黑貓地址檢查錯誤訊息。'), 'Order Save Error', array('response' => 400));
+					// 比對失敗，中斷執行程序不更新訂單
+					wp_die(__('The order update failed as the selected store does not match the chosen shipping method (Outlying Island/Main Island).', 'ecpay-ecommerce-for-woocommerce'), __('Order Save Error', 'ecpay-ecommerce-for-woocommerce'), array('response' => 400));
 				}
 			}
 		}

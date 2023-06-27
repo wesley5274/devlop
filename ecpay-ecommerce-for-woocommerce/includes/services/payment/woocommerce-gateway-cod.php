@@ -149,13 +149,14 @@ class Wooecpay_Gateway_Cod extends Wooecpay_Gateway_Base
                         }
                     } else {
                         // 重導地圖API
+                        $confirm_msg = __('The selected store does not match the chosen shipping method (Outlying Island/Main Island). Please select a different store or cancel the transaction and place a new order.', 'ecpay-ecommerce-for-woocommerce');
                         $encryption_order_id = $this->logisticHelper->encrypt_order_id($order_id);
                         $redirect_cvs_map_url = WC()->api_request_url('wooecpay_logistic_redirect_cvs_map_cod', true) . '&id=' . $encryption_order_id;
                         $canceled_url = WC()->api_request_url('wooecpay_logistic_cancel_order_cod', true) . '&id=' . $encryption_order_id;
 
-                        // Todo: 提示訊息等文案
+                        // 提示訊息
                         echo '<script> ';
-                        echo '    if (confirm("請確認選取門市是否正確，將重新轉導電子地圖，或取消重新下單 (' . $order_id . ')")) {';
+                        echo '    if (confirm("' . $confirm_msg . '")) {';
                         echo '        window.location.href = "' . $redirect_cvs_map_url . '"; ';
                         echo '    } else {';
                         echo '        window.location.href = "' . $canceled_url . '"; ';
@@ -211,8 +212,8 @@ class Wooecpay_Gateway_Cod extends Wooecpay_Gateway_Base
         if ($order->get_status() !== 'failed') {
             // 更新訂單狀態及備註
             $order->update_status('failed');
-            // Todo: 提示文字文案
-            $order->add_order_note('綠界物流與門市比對不成功');
+            // 提示文字
+            $order->add_order_note(__('The selected store does not match the chosen shipping method (Outlying Island/Main Island).', 'ecpay-ecommerce-for-woocommerce'));
         }
 
         // 錯誤提示畫面

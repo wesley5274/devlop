@@ -173,8 +173,8 @@ class Wooecpay_Logistic
 			// 比對運送方式與地址
 			$result = $this->logisticHelper->is_available_state_home_tcat($chosen_shipping, $data['shipping_state']);
 			if (!$result) {
-				// Todo: 比對失敗，顯示錯誤訊息(等文案)
-				$errors->add('validation', __('黑貓地址檢查錯誤訊息。'));
+				// 比對失敗，顯示錯誤訊息
+				$errors->add('validation', __('The selected shipping method does not match the shipping address. Please choose again.', 'ecpay-ecommerce-for-woocommerce'));
 			}
 		}
 	}
