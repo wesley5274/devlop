@@ -217,9 +217,7 @@ class Wooecpay_Gateway_Cod extends Wooecpay_Gateway_Base
 
         // 錯誤提示畫面
         $template_file = 'logistic/cvs_map_error.php';
-        $css_url = WOOECPAY_PLUGIN_URL . 'public/css/cvs_map_error.css';
-        echo '<link rel="stylesheet" href="' . $css_url . '">';
-        wc_get_template($template_file, [], '', WOOECPAY_PLUGIN_INCLUDE_DIR . '/templates/');
+        wc_get_template($template_file, ['back_url' => home_url()], '', WOOECPAY_PLUGIN_INCLUDE_DIR . '/templates/');
 
         exit;
     }
