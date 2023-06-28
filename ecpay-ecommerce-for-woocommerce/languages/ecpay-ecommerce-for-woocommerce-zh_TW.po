@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ECPay Ecommerce for WooCommerce\n"
 "POT-Creation-Date: 2023-05-25 09:52+0800\n"
-"PO-Revision-Date: 2023-06-28 10:01+0800\n"
+"PO-Revision-Date: 2023-06-28 13:25+0800\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: zh_TW\n"
@@ -532,6 +532,10 @@ msgstr "請確認輸入的手機條碼載具是否正確，或選擇其他載具
 msgid "Ecpay CVS 7-11"
 msgstr "綠界物流 超商取貨 7-ELEVEN"
 
+#: includes/services/logistic/ecpay-logistic-cvs-711-outside.php:12
+msgid "Ecpay CVS 7-11 Outside"
+msgstr "綠界物流 超商取貨 7-ELEVEN 離島"
+
 #: includes/services/logistic/ecpay-logistic-cvs-family.php:9
 msgid "Ecpay CVS Family"
 msgstr "綠界物流 超商取貨 全家便利店"
@@ -555,6 +559,10 @@ msgstr "綠界物流 宅配 中華郵政"
 #: includes/services/logistic/ecpay-logistic-home-tcat.php:9
 msgid "Ecpay Home Tcat"
 msgstr "綠界物流 宅配 黑貓"
+
+#: includes/services/logistic/ecpay-logistic-home-tcat-outside.php:9
+msgid "Ecpay Home Tcat Outside"
+msgstr "綠界物流 宅配 黑貓 離島"
 
 #: includes/services/logistic/ecpay-logistic-response.php:79
 #, php-format
