@@ -25,7 +25,7 @@ class Wooecpay_Logistic
 
 		add_action('woocommerce_checkout_update_order_meta', array($this, 'save_weight_order'));
 
-		if (in_array('Wooecpay_Logistic_Home_Tcat', get_option('wooecpay_enabled_logistic_outside'))) {
+		if (in_array('Wooecpay_Logistic_Home_Tcat', get_option('wooecpay_enabled_logistic_outside', []))) {
 			// 前台結帳頁欄位檢查 Hook
 			add_action('woocommerce_after_checkout_validation', array($this, 'wooecpay_check_logistic_home_tcat_fields'), 10, 2);
 		}

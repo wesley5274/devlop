@@ -33,7 +33,7 @@ class Wooecpay_Order
 
 				add_action( 'woocommerce_process_shop_order_meta', array( $this, 'order_update_sync_shipping_phone' ), 60 );
 
-				if (in_array('Wooecpay_Logistic_Home_Tcat', get_option('wooecpay_enabled_logistic_outside'))) {
+				if (in_array('Wooecpay_Logistic_Home_Tcat', get_option('wooecpay_enabled_logistic_outside', []))) {
 					add_action('pre_post_update', array($this, 'ecpay_validate_logistic_fields'), 10, 2);
 				}
 
