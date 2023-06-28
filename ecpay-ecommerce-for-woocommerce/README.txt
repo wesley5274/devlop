@@ -4,17 +4,17 @@ Tags: ecommerce, e-commerce, store, sales, sell, shop, cart, checkout, payment, 
 Requires at least: 6.0
 Tested up to: 6.0
 Requires PHP: 7.4
-Stable tag: 1.0.2305230
+Stable tag: 1.0.2306280
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-== Frequently Asked Questions == 
+== Frequently Asked Questions ==
 = 系統需求 =
 
 - PHP version 7.4
 - MySQL version 5.7 or greater
 
-= 其它問題 = 
+= 其它問題 =
 請來信詢問綠界技術服務信箱: techsupport@ecpay.com.tw
 
 == Changelog ==
@@ -33,11 +33,15 @@ v1.0.2304120
 v1.0.2305230
 修正前綴詞長度設定過長會造成訂單重覆問題
 
+v1.0.2306280
+修正稅金啟用發票開立失敗問題
+新增黑貓、7-11離島物流設定
+
  == Upgrade Notice ==
 
-Upgrade Notice 請使用https://github.com/ECPay/Woocommerce_ECPAY  
+Upgrade Notice 請使用https://github.com/ECPay/Woocommerce_ECPAY
 
-== Screenshots == 
+== Screenshots ==
 
 
 
@@ -110,6 +114,7 @@ Upgrade Notice 請使用https://github.com/ECPay/Woocommerce_ECPAY
     - 寄件人手機
     - 寄件人郵遞區號
     - 寄件人地址
+    - 啟用離島物流
     - 啟用測試模式
     - 商店代號(Merchant ID)
     - 金鑰(Hash Key)
