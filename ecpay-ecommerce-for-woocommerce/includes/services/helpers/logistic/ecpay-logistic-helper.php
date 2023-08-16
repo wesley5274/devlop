@@ -98,7 +98,7 @@ class Wooecpay_Logistic_Helper
                         $inputLogisticOrder = [
                             'MerchantID'            => $api_logistic_info['merchant_id'],
                             'MerchantTradeNo'       => $MerchantTradeNo,
-                            'MerchantTradeDate'     => date('Y/m/d H:i:s'),
+                            'MerchantTradeDate'     => date_i18n('Y/m/d H:i:s'),
                             'LogisticsType'         => $LogisticsType['type'],
                             'LogisticsSubType'      => $LogisticsType['sub_type'],
                             'GoodsAmount'           => $order->get_total(),
@@ -125,7 +125,7 @@ class Wooecpay_Logistic_Helper
                         $inputLogisticOrder = [
                             'MerchantID'            => $api_logistic_info['merchant_id'],
                             'MerchantTradeNo'       => $MerchantTradeNo,
-                            'MerchantTradeDate'     => date('Y/m/d H:i:s'),
+                            'MerchantTradeDate'     => date_i18n('Y/m/d H:i:s'),
                             'LogisticsType'         => $LogisticsType['type'],
                             'LogisticsSubType'      => $LogisticsType['sub_type'],
                             'GoodsAmount'           => $order->get_total(),

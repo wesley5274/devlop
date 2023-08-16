@@ -116,7 +116,7 @@ class Wooecpay_Gateway_Base extends WC_Payment_Gateway
                     $input = [
                         'MerchantID'        => $api_payment_info['merchant_id'],
                         'MerchantTradeNo'   => $merchant_trade_no ,
-                        'MerchantTradeDate' => date('Y/m/d H:i:s'),
+                        'MerchantTradeDate' => date_i18n('Y/m/d H:i:s'),
                         'PaymentType'       => 'aio',
                         'TotalAmount'       => (int) ceil($order->get_total()),
                         'TradeDesc'         => 'woocommerce_v2',
