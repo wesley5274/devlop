@@ -4,7 +4,7 @@ Tags: ecommerce, e-commerce, store, sales, sell, shop, cart, checkout, payment, 
 Requires at least: 6.0
 Tested up to: 6.0
 Requires PHP: 7.4
-Stable tag: 1.0.2306280
+Stable tag: 1.0.2308160
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -37,7 +37,10 @@ v1.0.2306280
 修正稅金啟用發票開立失敗問題
 新增黑貓、7-11離島物流設定
 
- == Upgrade Notice ==
+v1.0.2308160
+調整建立綠界金流訂單及綠界物流訂單，帶入綠界的時間參數(MerchantTradeDate)，改用 WordPress function date_i18n() 取得時間
+
+== Upgrade Notice ==
 
 Upgrade Notice 請使用https://github.com/ECPay/Woocommerce_ECPAY
 
