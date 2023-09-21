@@ -151,8 +151,14 @@ class Wooecpay_Gateway_Cod extends Wooecpay_Gateway_Base
                         // 重導地圖API
                         $confirm_msg = __('The selected store does not match the chosen shipping method (Outlying Island/Main Island). Please select a different store or cancel the transaction and place a new order.', 'ecpay-ecommerce-for-woocommerce');
                         $encryption_order_id = $this->logisticHelper->encrypt_order_id($order_id);
-                        $redirect_cvs_map_url = WC()->api_request_url('wooecpay_logistic_redirect_cvs_map_cod', true) . '&id=' . $encryption_order_id;
-                        $canceled_url = WC()->api_request_url('wooecpay_logistic_cancel_order_cod', true) . '&id=' . $encryption_order_id;
+
+                        // 產生符合永久連結格式的API URL
+                        $symbol = strpos(WC()->api_request_url('wooecpay_logistic_redirect_cvs_map_cod', true), "?") === false ? '?' : '&';
+                        $redirect_cvs_map_url = WC()->api_request_url('wooecpay_logistic_redirect_cvs_map_cod', true) . $symbol . 'id=' . $encryption_order_id;
+
+                        // 產生符合永久連結格式的API URL
+                        $symbol = strpos(WC()->api_request_url('wooecpay_logistic_cancel_order_cod', true), "?") === false ? '?' : '&';
+                        $canceled_url = WC()->api_request_url('wooecpay_logistic_cancel_order_cod', true) . $symbol . 'id=' . $encryption_order_id;
 
                         // 提示訊息
                         echo '<script> ';
