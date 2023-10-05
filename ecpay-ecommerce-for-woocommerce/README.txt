@@ -4,7 +4,7 @@ Tags: ecommerce, e-commerce, store, sales, sell, shop, cart, checkout, payment, 
 Requires at least: 6.0
 Tested up to: 6.0
 Requires PHP: 7.4
-Stable tag: 1.0.2309210
+Stable tag: 1.0.2310050
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -42,6 +42,9 @@ v1.0.2309210
 
 v1.0.2309210
 調整API URL符合永久連結設定
+
+v1.0.2310050
+新增定期定額付款方式
 
 == Upgrade Notice ==
 

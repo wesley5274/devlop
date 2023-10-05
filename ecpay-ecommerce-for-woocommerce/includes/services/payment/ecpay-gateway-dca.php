@@ -95,9 +95,6 @@ class Wooecpay_Gateway_Dca extends Wooecpay_Gateway_Base
             );
             echo $this->show_ecpay_dca_payment_fields($data);
         } 
-        else {
-            echo __('Duplicate payment is not supported, please try to place the order once again.', 'ecpay-ecommerce-for-woocommerce');
-        }
     }
 
     /**
@@ -264,7 +261,7 @@ class Wooecpay_Gateway_Dca extends Wooecpay_Gateway_Base
                         </tr>
                     </tfoot>
                 </table>
-                <p class="description"><?php echo __('Don\'t forget to save modify.', 'ecpay-ecommerce-for-woocommerce'); ?></p>
+                <p class="description"><?php echo __('Don\'t forget to save modify', 'ecpay-ecommerce-for-woocommerce'); ?></p>
                 <p id="fieldsNotification" style="display: none;">
                     <?php echo __('ECPay paid automatically details has been repeatedly, please confirm again.', 'ecpay-ecommerce-for-woocommerce'); ?>
                 </p>
