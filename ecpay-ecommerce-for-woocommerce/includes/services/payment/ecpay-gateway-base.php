@@ -14,12 +14,12 @@ class Wooecpay_Gateway_Base extends WC_Payment_Gateway
         $this->logisticHelper = new Wooecpay_Logistic_Helper;
 
         if ($this->enabled) {
-            add_action('woocommerce_receipt_' . $this->id, array( $this, 'receipt_page' ));
-            add_action('woocommerce_api_wooecpay_logistic_redirect_map',array( $this, 'redirect_map'));
+            add_action('woocommerce_receipt_' . $this->id, array($this, 'receipt_page'));
+            add_action('woocommerce_api_wooecpay_logistic_redirect_map',array($this, 'redirect_map'));
         }
 
         // 感謝頁
-        add_action( 'woocommerce_thankyou_' . $this->id, array( $this, 'thankyou_page' ));
+        add_action('woocommerce_thankyou_' . $this->id, array($this, 'thankyou_page'));
 
     }
 
@@ -74,7 +74,7 @@ class Wooecpay_Gateway_Base extends WC_Payment_Gateway
                     echo $form_map ;
 
                 } catch (RtnException $e) {
-                    echo wp_kses_post( '(' . $e->getCode() . ')' . $e->getMessage() ) . PHP_EOL;
+                    echo wp_kses_post('(' . $e->getCode() . ')' . $e->getMessage()) . PHP_EOL;
                 }
 
 
@@ -96,9 +96,9 @@ class Wooecpay_Gateway_Base extends WC_Payment_Gateway
                 $client_back_url = $this->get_return_url($order);
 
                 // 紀錄訂單其他資訊
-                $order->update_meta_data( '_wooecpay_payment_order_prefix', get_option('wooecpay_payment_order_prefix') ); // 前綴
-                $order->update_meta_data( '_wooecpay_payment_merchant_trade_no', $merchant_trade_no ); //MerchantTradeNo
-                $order->update_meta_data( '_wooecpay_query_trade_tag', 0);
+                $order->update_meta_data('_wooecpay_payment_order_prefix', get_option('wooecpay_payment_order_prefix')); // 前綴
+                $order->update_meta_data('_wooecpay_payment_merchant_trade_no', $merchant_trade_no); //MerchantTradeNo
+                $order->update_meta_data('_wooecpay_query_trade_tag', 0);
 
                 $order->add_order_note(sprintf(__('Ecpay Payment Merchant Trade No %s', 'ecpay-ecommerce-for-woocommerce'), $merchant_trade_no));
 
@@ -124,6 +124,7 @@ class Wooecpay_Gateway_Base extends WC_Payment_Gateway
                         'ChoosePayment'     => $this->payment_type,
                         'EncryptType'       => 1,
                         'ReturnURL'         => $return_url,
+                        'OrderResultURL'    => $return_url,
                         'ClientBackURL'     => $client_back_url,
                         'PaymentInfoURL'    => $return_url,
                         'NeedExtraPaidInfo' => 'Y',
@@ -159,7 +160,7 @@ class Wooecpay_Gateway_Base extends WC_Payment_Gateway
                     echo $generateForm ;
 
                 } catch (RtnException $e) {
-                    echo wp_kses_post( '(' . $e->getCode() . ')' . $e->getMessage() ) . PHP_EOL;
+                    echo wp_kses_post('(' . $e->getCode() . ')' . $e->getMessage()) . PHP_EOL;
                 }
 
                 WC()->cart->empty_cart();
@@ -213,7 +214,7 @@ class Wooecpay_Gateway_Base extends WC_Payment_Gateway
         if (isset($template_file)) {
             $args = array(
                 'order' => $order
-            );
+           );
 
             wc_get_template($template_file, $args, '', WOOECPAY_PLUGIN_INCLUDE_DIR . '/templates/');
         }
@@ -223,7 +224,7 @@ class Wooecpay_Gateway_Base extends WC_Payment_Gateway
     {
         $item_name = '';
 
-        if ( count($order->get_items()) ) {
+        if (count($order->get_items())) {
             foreach ($order->get_items() as $item) {
                 $item_name .= str_replace('#', '', trim($item->get_name())) . '#';
             }
@@ -278,14 +279,24 @@ class Wooecpay_Gateway_Base extends WC_Payment_Gateway
         switch ($this->payment_type) {
 
             case 'Credit':
-
+                // 信用卡分期
                 $number_of_periods = (int) $order->get_meta('_ecpay_payment_number_of_periods', true);
                 if (in_array($number_of_periods, [3, 6, 12, 18, 24, 30])) {
-
-                    $input['CreditInstallment'] = ( $number_of_periods == 30 ) ? '30N' : $number_of_periods;
+                    $input['CreditInstallment'] = ($number_of_periods == 30) ? '30N' : $number_of_periods;
                     $order->add_order_note(sprintf(__('Credit installment to %d', 'ecpay-ecommerce-for-woocommerce'), $number_of_periods));
 
                     $order->save();
+                }
+
+                // 定期定額
+                $dca = $order->get_meta('_ecpay_payment_dca');
+                $dcaInfo = explode('_', $dca);
+                if (count($dcaInfo) > 0) {
+                    $input['PeriodAmount'] = $input['TotalAmount'];
+                    $input['PeriodType'] = $dcaInfo[0];
+                    $input['Frequency'] = (int)$dcaInfo[1];
+                    $input['ExecTimes'] = (int)$dcaInfo[2];
+                    $input['PeriodReturnURL'] = $input['ReturnURL'];
                 }
 
                 break;
@@ -293,7 +304,7 @@ class Wooecpay_Gateway_Base extends WC_Payment_Gateway
             case 'ATM':
 
                 $input['ExpireDate'] = $this->expire_date;
-                $order->update_meta_data( '_wooecpay_payment_expire_date', $this->expire_date );
+                $order->update_meta_data('_wooecpay_payment_expire_date', $this->expire_date);
                 $order->save();
 
                 break;
@@ -302,7 +313,7 @@ class Wooecpay_Gateway_Base extends WC_Payment_Gateway
             case 'CVS':
 
                 $input['StoreExpireDate'] = $this->expire_date;
-                $order->update_meta_data( '_wooecpay_payment_expire_date', $this->expire_date );
+                $order->update_meta_data('_wooecpay_payment_expire_date', $this->expire_date);
                 $order->save();
 
                 break;

@@ -21,7 +21,7 @@ class Wooecpay_Gateway_Response
     public function check_callback()
     {
         $api_info = $this->get_ecpay_payment_api_info();
-
+        
         try {
             $factory = new Factory([
                 'hashKey'   => $api_info['hashKey'],
@@ -33,27 +33,30 @@ class Wooecpay_Gateway_Response
 
             // 解析訂單編號
             $order_id = $this->get_order_id($info) ;
-
+            
             // 取出訂單資訊
             if ($order = wc_get_order($order_id)) {
-
+                
                 // 取出訂單金額
                 $order_total = $order->get_total();
 
                 // 金額比對
-                if($info['TradeAmt'] == $order_total ){
+                if($info['TradeAmt'] == $order_total){
 
                     // 判斷狀態
                     switch ($info['RtnCode']) {
                         
                         // 付款完成
                         case 1:
-                            
                             if(isset($info['SimulatePaid']) && $info['SimulatePaid'] == 0){
+                                // 定期定額付款回傳(非第一次)
+                                if ($info['PeriodType'] == 'Y' && $info['TotalSuccessTimes'] > 1) {
+                                    $order = $this->create_cda_new_order($info, $order_id);
+                                }
 
                                 // 判斷付款完成旗標，如果旗標不存或為0則執行 僅允許綠界一次作動
-                                $payment_complete_flag = get_post_meta( $order->get_id(), '_payment_complete_flag', true );
- 
+                                $payment_complete_flag = get_post_meta($order->get_id(), '_payment_complete_flag', true);
+                                
                                 if(empty($payment_complete_flag)){
 
                                     $order->add_order_note(__('Payment completed', 'ecpay-ecommerce-for-woocommerce'));
@@ -67,10 +70,10 @@ class Wooecpay_Gateway_Response
                                     if ('yes' === get_option('wooecpay_enable_logistic_auto', 'yes')) {
 
                                         // 是否已經開立
-                                        $wooecpay_logistic_AllPayLogisticsID = get_post_meta( $order->get_id(), '_wooecpay_logistic_AllPayLogisticsID', true );
+                                        $wooecpay_logistic_AllPayLogisticsID = get_post_meta($order->get_id(), '_wooecpay_logistic_AllPayLogisticsID', true);
 
                                         if(empty($wooecpay_logistic_AllPayLogisticsID)){
-                                            $this->logisticHelper->send_logistic_order_action($order_id, false);
+                                            $this->logisticHelper->send_logistic_order_action($order->get_id(), false);
                                         }
                                     }
 
@@ -78,7 +81,6 @@ class Wooecpay_Gateway_Response
                                     $order->update_meta_data('_payment_complete_flag', 1);
                                     $order->save_meta_data();
                                 }
-
                             } else {
 
                                 // 模擬付款 僅執行備註寫入
@@ -155,8 +157,80 @@ class Wooecpay_Gateway_Response
             }
 
         } catch (RtnException $e) {
-            echo wp_kses_post( '(' . $e->getCode() . ')' . $e->getMessage() ) . PHP_EOL;
+            echo wp_kses_post('(' . $e->getCode() . ')' . $e->getMessage()) . PHP_EOL;
         }
+    }
+
+    public function create_cda_new_order($info, $order_id) 
+    {
+        // 原始訂單
+        $source_order = wc_get_order($order_id);
+        if (!$source_order) {
+            return; 
+        }
+        // 取得原始訂單設定data
+        $source_meta_data = $source_order->get_meta_data();
+
+        // 建立新訂單
+        $new_order = wc_create_order([
+            'customer_id' => $source_order->get_customer_id(),
+            'status' => 'pending',
+        ]);
+
+        // 新訂單加入meta data
+        $invoice_keys = ['_wooecpay_invoice_type', '_wooecpay_invoice_carruer_type', '_wooecpay_invoice_carruer_num', '_wooecpay_invoice_love_code', '_wooecpay_invoice_customer_identifier'];
+        $shipping_keys = ['is_vat_exempt', '_cart_weight'];
+        $payment_keys = ['_ecpay_payment_dca', '_wooecpay_payment_order_prefix', '_wooecpay_query_trade_tag'];
+        foreach ($source_meta_data as $meta_data) {
+            if (in_array($meta_data->key, $invoice_keys) 
+                || in_array($meta_data->key, $shipping_keys)
+                || in_array($meta_data->key, $payment_keys)) {
+                $new_order->update_meta_data($meta_data->key, $meta_data->value);
+            }
+        }
+        
+        // 加入產品
+        foreach ($source_order->get_items() as $item) {
+            $new_order->add_product(
+                $item->get_product(),
+                $item->get_quantity(),
+                [
+                    'subtotal' => $item->get_subtotal(),
+                    'total' => $item->get_total(),
+                ]
+        );
+        }
+
+        // 加入帳單、運送地址
+        $new_order->set_address($source_order->get_address('billing'), 'billing');
+        $new_order->set_address($source_order->get_address('shipping'), 'shipping');
+        
+        // 加入付款方式
+        $new_order->set_payment_method($source_order->get_payment_method());
+        $new_order->set_payment_method_title($source_order->get_payment_method_title());
+        
+        // 加入總額
+        $new_order->set_total($source_order->get_total());
+        
+        // 加入運送內容
+        $shipping_items = new WC_Order_Item_Shipping();
+        foreach($source_order->get_items('shipping') as $item){
+            $shipping_items->set_method_title($item->get_method_title());
+            $shipping_items->set_method_id($item->get_method_id());
+            $shipping_items->set_total($item->get_total());
+        }
+        $new_order->add_item($shipping_items);
+        
+        // 寫入新訂單備註
+        $new_order->add_order_note('定期定額付款第' . $info['TotalSuccessTimes'] . '次繳費成功，原始訂單編號: ' . $order_id);
+        $new_order->update_status('processing');
+        $new_order->save();
+        
+        // 寫入舊訂單備註
+        $source_order->add_order_note('定期定額付款第' . $info['TotalSuccessTimes'] . '次繳費成功，新訂單號: ' . $new_order->get_id());
+        $source_order->save();
+
+        return $new_order;
     }
 
     protected function get_order_id($info)
