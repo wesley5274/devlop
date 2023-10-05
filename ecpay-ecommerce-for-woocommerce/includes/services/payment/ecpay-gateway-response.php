@@ -220,6 +220,14 @@ class Wooecpay_Gateway_Response
             $shipping_items->set_total($item->get_total());
         }
         $new_order->add_item($shipping_items);
+
+        // 設定超商資訊
+        if (!empty($source_order->get_meta('_ecpay_logistic_cvs_store_id'))) {
+            $new_order->update_meta_data('_ecpay_logistic_cvs_store_id', $source_order->get_meta('_ecpay_logistic_cvs_store_id'));
+            $new_order->update_meta_data('_ecpay_logistic_cvs_store_name', $source_order->get_meta('_ecpay_logistic_cvs_store_name'));
+            $new_order->update_meta_data('_ecpay_logistic_cvs_store_address', $source_order->get_meta('_ecpay_logistic_cvs_store_address'));
+            $new_order->update_meta_data('_ecpay_logistic_cvs_store_telephone', $source_order->get_meta('_ecpay_logistic_cvs_store_telephone'));
+        }
         
         // 寫入新訂單備註
         $new_order->add_order_note('定期定額付款第' . $info['TotalSuccessTimes'] . '次繳費成功，原始訂單編號: ' . $order_id);
