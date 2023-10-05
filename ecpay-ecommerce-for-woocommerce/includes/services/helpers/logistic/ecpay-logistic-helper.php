@@ -120,7 +120,8 @@ class Wooecpay_Logistic_Helper
                             'ServerReplyURL'        => $serverReplyURL,
                         ];
 
-                    } else if ($LogisticsType['type'] == 'CVS') {
+                    } 
+                    else if ($LogisticsType['type'] == 'CVS') {
 
                         $inputLogisticOrder = [
                             'MerchantID'            => $api_logistic_info['merchant_id'],
@@ -151,10 +152,8 @@ class Wooecpay_Logistic_Helper
                         $postService = $factory->create('PostWithCmvEncodedStrResponseService');
                         $response = $postService->post($inputLogisticOrder, $api_logistic_info['action']);
 
-                        if (
-                            isset($response['RtnCode']) &&
-                            ($response['RtnCode'] == 300 || $response['RtnCode'] == 2001)
-                        ) {
+                        if (isset($response['RtnCode']) &&
+                            ($response['RtnCode'] == 300 || $response['RtnCode'] == 2001)) {
 
                             // 更新訂單
                             $order->update_meta_data('_wooecpay_logistic_merchant_trade_no', $response['MerchantTradeNo']);
@@ -174,7 +173,8 @@ class Wooecpay_Logistic_Helper
                                 'msg'   => '成功',
                             ];
 
-                        } else {
+                        } 
+                        else {
 
                             // add note
                             $order->add_order_note(print_r($response, true));
@@ -193,8 +193,8 @@ class Wooecpay_Logistic_Helper
                     ];
                 }
             }
-        }  else {
-
+        }  
+        else {
             $ajaxReturn = [
                 'code' 	=> '0001',
                 'msg'	=> '查無訂單',
@@ -207,7 +207,7 @@ class Wooecpay_Logistic_Helper
         }
     }
 
-    public function get_ecpay_logistic_api_info($action = '', $shipping_method_id = '' )
+    public function get_ecpay_logistic_api_info($action = '', $shipping_method_id = '')
     {
         $wooecpay_logistic_cvs_type = get_option('wooecpay_logistic_cvs_type');
 
@@ -237,7 +237,8 @@ class Wooecpay_Logistic_Helper
                 ];
             }
 
-        } else {
+        } 
+        else {
 
             $merchant_id = get_option('wooecpay_logistic_mid');
             $hash_key    = get_option('wooecpay_logistic_hashkey');
@@ -571,7 +572,7 @@ class Wooecpay_Logistic_Helper
 
             return $form_map;
         } catch (RtnException $e) {
-            return wp_kses_post( '(' . $e->getCode() . ')' . $e->getMessage() ) . PHP_EOL;
+            return wp_kses_post('(' . $e->getCode() . ')' . $e->getMessage()) . PHP_EOL;
         }
     }
 

@@ -73,10 +73,10 @@ class Wooecpay_Logistic_Response
                         $CVSTelephone = sanitize_text_field($_POST['CVSTelephone']);
 
                         // 驗證
-                        if (mb_strlen( $CVSStoreName, "utf-8") > 10) {
+                        if (mb_strlen($CVSStoreName, "utf-8") > 10) {
                             $CVSStoreName = mb_substr($CVSStoreName, 0, 10, "utf-8");
                         }
-                        if (mb_strlen( $CVSAddress, "utf-8") > 60) {
+                        if (mb_strlen($CVSAddress, "utf-8") > 60) {
                             $CVSAddress = mb_substr($CVSAddress , 0, 60, "utf-8");
                         }
                         if (strlen($CVSTelephone) > 20) {
@@ -93,10 +93,10 @@ class Wooecpay_Logistic_Response
                         $order->set_shipping_postcode('');
                         $order->set_shipping_address_1($CVSAddress);
 
-                        $order->update_meta_data( '_ecpay_logistic_cvs_store_id', $CVSStoreID );
-                        $order->update_meta_data( '_ecpay_logistic_cvs_store_name', $CVSStoreName );
-                        $order->update_meta_data( '_ecpay_logistic_cvs_store_address', $CVSAddress );
-                        $order->update_meta_data( '_ecpay_logistic_cvs_store_telephone', $CVSTelephone );
+                        $order->update_meta_data('_ecpay_logistic_cvs_store_id', $CVSStoreID);
+                        $order->update_meta_data('_ecpay_logistic_cvs_store_name', $CVSStoreName);
+                        $order->update_meta_data('_ecpay_logistic_cvs_store_address', $CVSAddress);
+                        $order->update_meta_data('_ecpay_logistic_cvs_store_telephone', $CVSTelephone);
 
                         $order->add_order_note(sprintf(__('CVS store %1$s (%2$s)', 'ecpay-ecommerce-for-woocommerce'), $CVSStoreName, $CVSStoreID));
 
@@ -151,6 +151,7 @@ class Wooecpay_Logistic_Response
                         'ChoosePayment'     => $this->get_ChoosePayment($order->get_payment_method()),
                         'EncryptType'       => 1,
                         'ReturnURL'         => $return_url,
+                        'OrderResultURL'    => $return_url,
                         'ClientBackURL'     => $client_back_url,
                         'PaymentInfoURL'    => $return_url,
                         'NeedExtraPaidInfo' => 'Y',
@@ -227,10 +228,10 @@ class Wooecpay_Logistic_Response
                         $CVSTelephone = sanitize_text_field($_POST['CVSTelephone']);
 
                         // 驗證
-                        if (mb_strlen( $CVSStoreName, "utf-8") > 10) {
+                        if (mb_strlen($CVSStoreName, "utf-8") > 10) {
                             $CVSStoreName = mb_substr($CVSStoreName, 0, 10, "utf-8");
                         }
-                        if (mb_strlen( $CVSAddress, "utf-8") > 60) {
+                        if (mb_strlen($CVSAddress, "utf-8") > 60) {
                             $CVSAddress = mb_substr($CVSAddress , 0, 60, "utf-8");
                         }
                         if (strlen($CVSTelephone) > 20) {
@@ -240,10 +241,10 @@ class Wooecpay_Logistic_Response
                             $CVSStoreID = substr($CVSTelephone , 0, 10);
                         }
 
-                        $order->update_meta_data( '_ecpay_logistic_cvs_store_id', $CVSStoreID );
-                        $order->update_meta_data( '_ecpay_logistic_cvs_store_name', $CVSStoreName );
-                        $order->update_meta_data( '_ecpay_logistic_cvs_store_address', $CVSAddress );
-                        $order->update_meta_data( '_ecpay_logistic_cvs_store_telephone', $CVSTelephone );
+                        $order->update_meta_data('_ecpay_logistic_cvs_store_id', $CVSStoreID);
+                        $order->update_meta_data('_ecpay_logistic_cvs_store_name', $CVSStoreName);
+                        $order->update_meta_data('_ecpay_logistic_cvs_store_address', $CVSAddress);
+                        $order->update_meta_data('_ecpay_logistic_cvs_store_telephone', $CVSTelephone);
 
                         $order->add_order_note(sprintf(__('Change store %1$s (%2$s)', 'ecpay-ecommerce-for-woocommerce'),$CVSStoreName,$CVSStoreID));
 
@@ -324,7 +325,7 @@ class Wooecpay_Logistic_Response
             }
 
         } catch (RtnException $e) {
-            echo wp_kses_post( '(' . $e->getCode() . ')' . $e->getMessage() ) . PHP_EOL;
+            echo wp_kses_post('(' . $e->getCode() . ')' . $e->getMessage()) . PHP_EOL;
         }
 
         exit;
@@ -394,13 +395,24 @@ class Wooecpay_Logistic_Response
 
             case 'Credit':
 
+                // 信用卡分期
                 $number_of_periods = (int) $order->get_meta('_ecpay_payment_number_of_periods', true);
                 if (in_array($number_of_periods, [3, 6, 12, 18, 24, 30])) {
-
-                    $input['CreditInstallment'] = ( $number_of_periods == 30 ) ? '30N' : $number_of_periods;
-                    $order->add_order_note(sprintf(__('Credit installment to %d', 'ecpay-ecommerce-for-woocommerce'),$number_of_periods));
+                    $input['CreditInstallment'] = ($number_of_periods == 30) ? '30N' : $number_of_periods;
+                    $order->add_order_note(sprintf(__('Credit installment to %d', 'ecpay-ecommerce-for-woocommerce'), $number_of_periods));
 
                     $order->save();
+                }
+
+                // 定期定額
+                $dca = $order->get_meta('_ecpay_payment_dca');
+                $dcaInfo = explode('_', $dca);
+                if (count($dcaInfo) > 0) {
+                    $input['PeriodAmount'] = $input['TotalAmount'];
+                    $input['PeriodType'] = $dcaInfo[0];
+                    $input['Frequency'] = (int)$dcaInfo[1];
+                    $input['ExecTimes'] = (int)$dcaInfo[2];
+                    $input['PeriodReturnURL'] = $input['ReturnURL'];
                 }
 
                 break;
@@ -428,7 +440,8 @@ class Wooecpay_Logistic_Response
         switch ($payment_method) {
             case 'Wooecpay_Gateway_Credit':
             case 'Wooecpay_Gateway_Credit_Installment':
-                $choose_payment = 'Credit';
+            case 'Wooecpay_Gateway_Dca':
+                    $choose_payment = 'Credit';
                 break;
             case 'Wooecpay_Gateway_Webatm':
                 $choose_payment = 'WebATM';

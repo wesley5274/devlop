@@ -130,6 +130,7 @@ class Wooecpay_Logistic
 							$key == 'Wooecpay_Gateway_Credit_Installment' ||
 							$key == 'Wooecpay_Gateway_Webatm' ||
 							$key == 'Wooecpay_Gateway_Atm' ||
+							$key == 'Wooecpay_Gateway_Dca' ||
 							$key == 'Wooecpay_Gateway_Cvs' ||
 							$key == 'Wooecpay_Gateway_Barcode' ||
 							$key == 'Wooecpay_Gateway_Applepay' ||
