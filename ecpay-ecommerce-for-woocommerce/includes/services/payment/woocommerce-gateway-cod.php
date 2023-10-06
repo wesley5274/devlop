@@ -26,9 +26,18 @@ class Wooecpay_Gateway_Cod extends Wooecpay_Gateway_Base
 
     public function redirect_url($url, $orderInfo){
 
-        $encryption_order_id = $this->logisticHelper->encrypt_order_id($orderInfo->id);
-        $redirect_cvs_map_url = WC()->api_request_url('wooecpay_logistic_redirect_map_preprocessor', true) . '&id=' . $encryption_order_id;
-        return $redirect_cvs_map_url;
+        $payment_method = $orderInfo->get_payment_method(); // 付款方式
+
+        if($payment_method == 'cod'){
+
+            $encryption_order_id = $this->logisticHelper->encrypt_order_id($orderInfo->id);
+            $redirect_cvs_map_url = WC()->api_request_url('wooecpay_logistic_redirect_map_preprocessor', true) . '&id=' . $encryption_order_id;
+            return $redirect_cvs_map_url;
+            
+        } else {
+
+            return $url;
+        }
     }
 
     public function redirect_map_preprocessor()
