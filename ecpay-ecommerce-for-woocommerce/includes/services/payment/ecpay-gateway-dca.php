@@ -2,21 +2,6 @@
 
 class Wooecpay_Gateway_Dca extends Wooecpay_Gateway_Base
 {
-    public $id;               
-    public $payment_type;       
-    public $icon;                
-    public $has_fields;        
-    public $method_title;        
-    public $method_description; 
-    public $enabled;              
-    public $title;              
-    public $description;        
-    public $min_amount;        
-    public $max_amount;        
-    public $form_fields;   
-    public $ecpay_dca_payment;
-    public $ecpay_dca_options;
-        
     public function __construct()
     {
         $this->id                   = 'Wooecpay_Gateway_Dca';
