@@ -291,7 +291,7 @@ class Wooecpay_Gateway_Base extends WC_Payment_Gateway
                 // 定期定額
                 $dca = $order->get_meta('_ecpay_payment_dca');
                 $dcaInfo = explode('_', $dca);
-                if (count($dcaInfo) > 0) {
+                if (count($dcaInfo) > 1) {
                     $input['PeriodAmount'] = $input['TotalAmount'];
                     $input['PeriodType'] = $dcaInfo[0];
                     $input['Frequency'] = (int)$dcaInfo[1];
