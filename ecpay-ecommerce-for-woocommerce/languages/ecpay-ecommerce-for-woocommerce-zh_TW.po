@@ -828,3 +828,12 @@ msgstr "執行次數錯誤"
 
 #~ msgid "shipping fee"
 #~ msgstr "物流費用"
+
+
+#: includes/services/payment/ecpay-gateway-twqr.php:14
+msgid "Ecpay TWQR"
+msgstr "綠界TWQR"
+
+#: includes/services/payment/ecpay-gateway-twqr.php:66
+msgid "Pay via ECPay TWQR"
+msgstr "透過綠界TWQR付款"

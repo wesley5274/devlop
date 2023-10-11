@@ -186,8 +186,8 @@ class Wooecpay_Order
 						$payment_method == 'Wooecpay_Gateway_Cvs' ||
 						$payment_method == 'Wooecpay_Gateway_Barcode' ||
 						$payment_method == 'Wooecpay_Gateway_Applepay' ||
-						$payment_method == 'Wooecpay_Gateway_Dca'
-						
+						$payment_method == 'Wooecpay_Gateway_Dca' ||
+						$payment_method == 'Wooecpay_Gateway_Twqr'
 				) {
 
 					// 判斷是否超過指定時間或自訂的保留時間

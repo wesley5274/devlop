@@ -457,6 +457,9 @@ class Wooecpay_Logistic_Response
             case 'Wooecpay_Gateway_Applepay':
                 $choose_payment = 'ApplePay';
                 break;
+            case 'Wooecpay_Gateway_Twqr':
+                $choose_payment = 'TWQR';
+                break;
         }
 
         return $choose_payment;
