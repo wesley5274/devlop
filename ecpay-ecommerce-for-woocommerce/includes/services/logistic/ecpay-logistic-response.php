@@ -24,7 +24,7 @@ class Wooecpay_Logistic_Response
     {
         if (isset($_POST['MerchantTradeNo'])) {
 
-            $order_id = $this->get_order_id($_POST);
+            $order_id = $this->logisticHelper->get_order_id_by_merchant_trade_no($_POST);
 
             if ($order = wc_get_order($order_id)) {
 
@@ -197,7 +197,7 @@ class Wooecpay_Logistic_Response
     {
         if (isset($_POST['MerchantTradeNo'])) {
 
-            $order_id = $this->get_order_id($_POST);
+            $order_id = $this->logisticHelper->get_order_id_by_merchant_trade_no($_POST);
 
             if ($order = wc_get_order($order_id)) {
 
@@ -288,7 +288,7 @@ class Wooecpay_Logistic_Response
 
     public function logistic_status_response()
     {
-        $api_logistic_info  = $this->get_ecpay_logistic_api_info();
+        $api_logistic_info  = $this->logisticHelper->get_ecpay_logistic_api_info();
 
         try {
             $factory = new Factory([
@@ -300,7 +300,7 @@ class Wooecpay_Logistic_Response
 
             if (isset($_POST['MerchantTradeNo'])) {
 
-                $order_id = $this->get_order_id($_POST);
+                $order_id = $this->logisticHelper->get_order_id_by_merchant_trade_no($_POST);
 
                 if ($order = wc_get_order($order_id)) {
 
@@ -460,98 +460,6 @@ class Wooecpay_Logistic_Response
         }
 
         return $choose_payment;
-    }
-
-    // logistic
-    // ---------------------------------------------------
-
-    protected function get_order_id($info)
-    {
-        $order_prefix = get_option('wooecpay_logistic_order_prefix');
-
-        if (isset($info['MerchantTradeNo'])) {
-
-            $order_id = substr($info['MerchantTradeNo'], strlen($order_prefix), strrpos($info['MerchantTradeNo'], 'SN'));
-            $order_id = (int) $order_id;
-            if ($order_id > 0) {
-                return $order_id;
-            }
-        }
-
-        return false;
-    }
-
-    protected function get_ecpay_logistic_api_info($action = '')
-    {
-        $api_info = [
-            'merchant_id'   => '',
-            'hashKey'       => '',
-            'hashIv'        => '',
-            'action'        => '',
-        ];
-
-        if ('yes' === get_option('wooecpay_enabled_logistic_stage', 'yes')) {
-
-            $wooecpay_logistic_cvs_type = get_option('wooecpay_logistic_cvs_type');
-
-            if ($wooecpay_logistic_cvs_type == 'C2C') {
-
-                $api_info = [
-                    'merchant_id'   => '2000933',
-                    'hashKey'       => 'XBERn1YOvpM9nfZc',
-                    'hashIv'        => 'h1ONHk4P4yqbl5LK',
-                ];
-
-            } else if ($wooecpay_logistic_cvs_type == 'B2C') {
-
-                $api_info = [
-                    'merchant_id'   => '2000132',
-                    'hashKey'       => '5294y06JbISpM5x9',
-                    'hashIv'        => 'v77hoKGq4kWxNNIS',
-                ];
-            }
-
-        } else {
-
-            $merchant_id = get_option('wooecpay_logistic_mid');
-            $hash_key    = get_option('wooecpay_logistic_hashkey');
-            $hash_iv     = get_option('wooecpay_logistic_hashiv');
-
-            $api_info = [
-                'merchant_id'   => $merchant_id,
-                'hashKey'       => $hash_key,
-                'hashIv'        => $hash_iv,
-            ];
-        }
-
-        if ('yes' === get_option('wooecpay_enabled_payment_stage', 'yes')) {
-
-            switch ($action) {
-                case 'map':
-                    $api_info['action'] = 'https://logistics-stage.ecpay.com.tw/Express/map';
-                    break;
-                case 'create':
-                    $api_info['action'] = 'https://logistics-stage.ecpay.com.tw/Express/Create';
-                    break;
-                default:
-                    break;
-            }
-
-        } else {
-
-            switch ($action) {
-                case 'map':
-                    $api_info['action'] = 'https://logistics.ecpay.com.tw/Express/map';
-                    break;
-                case 'create':
-                    $api_info['action'] = 'https://logistics.ecpay.com.tw/Express/Create';
-                    break;
-                default:
-                    break;
-            }
-        }
-
-        return $api_info;
     }
 }
 
