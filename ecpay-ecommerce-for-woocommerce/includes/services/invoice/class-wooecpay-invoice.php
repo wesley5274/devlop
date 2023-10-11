@@ -5,6 +5,8 @@ use Ecpay\Sdk\Exceptions\RtnException;
 
 class Wooecpay_invoice {
 
+    protected $my_custom_features_switch;
+
 	public function __construct()
 	{
         

@@ -124,7 +124,6 @@ class Wooecpay_Gateway_Base extends WC_Payment_Gateway
                         'ChoosePayment'     => $this->payment_type,
                         'EncryptType'       => 1,
                         'ReturnURL'         => $return_url,
-                        'OrderResultURL'    => $return_url,
                         'ClientBackURL'     => $client_back_url,
                         'PaymentInfoURL'    => $return_url,
                         'NeedExtraPaidInfo' => 'Y',

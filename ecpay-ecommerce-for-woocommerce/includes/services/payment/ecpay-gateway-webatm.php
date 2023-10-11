@@ -2,6 +2,8 @@
 
 class Wooecpay_Gateway_Webatm extends Wooecpay_Gateway_Base
 {
+    protected $payment_type;
+    protected $min_amount;
 
     public function __construct()
     {
