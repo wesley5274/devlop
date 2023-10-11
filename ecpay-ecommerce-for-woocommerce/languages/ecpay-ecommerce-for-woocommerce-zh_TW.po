@@ -829,11 +829,42 @@ msgstr "執行次數錯誤"
 #~ msgid "shipping fee"
 #~ msgstr "物流費用"
 
-
 #: includes/services/payment/ecpay-gateway-twqr.php:14
-msgid "Ecpay TWQR"
+msgid "ECPay TWQR"
 msgstr "綠界TWQR"
 
 #: includes/services/payment/ecpay-gateway-twqr.php:66
 msgid "Pay via ECPay TWQR"
 msgstr "透過綠界TWQR付款"
+
+#: includes/services/payment/ecpay-gateway-applepay.php:14
+msgid "ECPay ApplePay"
+msgstr "綠界ApplePay"
+
+#: includes/services/payment/ecpay-gateway-atm.php:15
+msgid "ECPay ATM"
+msgstr "綠界ATM櫃員機"
+
+#: includes/services/payment/ecpay-gateway-webatm.php:14
+msgid "ECPay WebATM"
+msgstr "綠界網路ATM"
+
+#: includes/services/payment/ecpay-gateway-barcode.php:15
+msgid "ECPay Cvs Barcode"
+msgstr "綠界超商條碼"
+
+#: includes/services/payment/ecpay-gateway-credit-installment.php:15
+msgid "ECPay Credit Installment"
+msgstr "綠界信用卡(分期)"
+
+#: includes/services/payment/ecpay-gateway-credit.php:14
+msgid "ECPay Credit"
+msgstr "綠界信用卡"
+
+#: includes/services/payment/ecpay-gateway-cvs.php:15
+msgid "ECPay Cvs"
+msgstr "綠界超商代碼"
+
+#: includes/services/payment/ecpay-gateway-dca.php:16
+msgid "ECPay DCA"
+msgstr "綠界定期定額"

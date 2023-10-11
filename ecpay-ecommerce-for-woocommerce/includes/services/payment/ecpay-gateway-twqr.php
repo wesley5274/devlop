@@ -11,7 +11,7 @@ class Wooecpay_Gateway_Twqr extends Wooecpay_Gateway_Base
         $this->payment_type         = 'TWQR';
         $this->icon                 = plugins_url('images/icon.png', dirname(dirname( __FILE__ )) );
         $this->has_fields           = false;
-        $this->method_title         = __('Ecpay TWQR', 'ecpay-ecommerce-for-woocommerce');
+        $this->method_title         = __('ECPay TWQR', 'ecpay-ecommerce-for-woocommerce');
         $this->method_description   = '使用綠界TWQR付款';
 
         $this->title                = $this->get_option('title');

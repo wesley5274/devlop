@@ -13,7 +13,7 @@ class Wooecpay_Gateway_Dca extends Wooecpay_Gateway_Base
         $this->payment_type         = 'Credit';
         $this->icon                 = plugins_url('images/icon.png', dirname(dirname( __FILE__ )));
         $this->has_fields           = true;
-        $this->method_title         = '綠界定期定額';
+        $this->method_title         = __('ECPay DCA', 'ecpay-ecommerce-for-woocommerce');
         $this->method_description   = '使用綠界定期定額付款';
 
         $this->enabled              = $this->get_option('enabled');
