@@ -4,11 +4,14 @@
 use Ecpay\Sdk\Factories\Factory;
 use Ecpay\Sdk\Exceptions\RtnException;
 use Ecpay\Sdk\Response\VerifiedArrayResponse;
+
 use Helpers\Logistic\Wooecpay_Logistic_Helper;
+use Helpers\Payment\Wooecpay_Payment_Helper;
 
 class Wooecpay_Logistic_Response
 {
     protected $logisticHelper;
+    protected $paymentHelper;
 
     public function __construct()
     {
@@ -16,8 +19,9 @@ class Wooecpay_Logistic_Response
         add_action('woocommerce_api_wooecpay_change_logistic_map_callback', array($this, 'change_map_response'));   // 後台變更門市 Response
         add_action('woocommerce_api_wooecpay_logistic_status_callback', array($this, 'logistic_status_response'));  // 貨態回傳
 
-        // 載入物流共用
+        // 載入共用
         $this->logisticHelper = new Wooecpay_Logistic_Helper;
+        $this->paymentHelper = new Wooecpay_Payment_Helper;
     }
 
     public function map_response()
@@ -107,14 +111,14 @@ class Wooecpay_Logistic_Response
                 // 金流相關程序
                 // -----------------------------------------------------------------------------------------------
 
-                $api_payment_info = $this->get_ecpay_payment_api_info();
-                $merchant_trade_no = $this->generate_trade_no($order->get_id(), get_option('wooecpay_payment_order_prefix'));
+                $api_payment_info = $this->paymentHelper->get_ecpay_payment_api_info('AioCheckOut');
+                $merchant_trade_no = $this->paymentHelper->get_merchant_trade_no($order->get_id(), get_option('wooecpay_payment_order_prefix'));
 
                 // 綠界訂單顯示商品名稱判斷
                 if ('yes' === get_option('wooecpay_enabled_payment_disp_item_name', 'yes')) {
 
                     // 取出訂單品項
-                    $item_name = $this->get_item_name($order);
+                    $item_name = $this->paymentHelper->get_item_name($order);
                 } else {
                     $item_name = '網路商品一批';
                 }
@@ -148,7 +152,7 @@ class Wooecpay_Logistic_Response
                         'TotalAmount'       => (int) ceil($order->get_total()),
                         'TradeDesc'         => 'woocommerce_v2',
                         'ItemName'          => $item_name,
-                        'ChoosePayment'     => $this->get_ChoosePayment($order->get_payment_method()),
+                        'ChoosePayment'     => $this->paymentHelper->get_ChoosePayment($order->get_payment_method()),
                         'EncryptType'       => 1,
                         'ReturnURL'         => $return_url,
                         'ClientBackURL'     => $client_back_url,
@@ -156,7 +160,7 @@ class Wooecpay_Logistic_Response
                         'NeedExtraPaidInfo' => 'Y',
                     ];
 
-                    $input = $this->add_type_info($input, $order);
+                    $input = $this->paymentHelper->add_type_info($input, $order);
 
                     switch (get_locale()) {
                         case 'zh_HK':
@@ -328,138 +332,6 @@ class Wooecpay_Logistic_Response
         }
 
         exit;
-    }
-
-    // payment
-    // ---------------------------------------------------
-
-    protected function get_item_name($order)
-    {
-        $item_name = '';
-
-        if (count($order->get_items())) {
-            foreach ($order->get_items() as $item) {
-                $item_name .= str_replace('#', '', trim($item->get_name())) . '#';
-            }
-        }
-        $item_name = rtrim($item_name, '#');
-        return $item_name;
-    }
-
-    protected function get_ecpay_payment_api_info()
-    {
-        $api_payment_info = [
-            'merchant_id'   => '',
-            'hashKey'       => '',
-            'hashIv'        => '',
-            'action'        => '',
-        ];
-
-        if ('yes' === get_option('wooecpay_enabled_payment_stage', 'yes')) {
-
-            $api_payment_info = [
-                'merchant_id'   => '3002607',
-                'hashKey'       => 'pwFHCqoQZGmho4w6',
-                'hashIv'        => 'EkRm7iFT261dpevs',
-                'action'        => 'https://payment-stage.ecpay.com.tw/Cashier/AioCheckOut/V5',
-            ];
-
-        } else {
-
-            $merchant_id    = get_option('wooecpay_payment_mid');
-            $hash_key       = get_option('wooecpay_payment_hashkey');
-            $hash_iv        = get_option('wooecpay_payment_hashiv');
-
-            $api_payment_info = [
-                'merchant_id'   => $merchant_id,
-                'hashKey'       => $hash_key,
-                'hashIv'        => $hash_iv,
-                'action'        => 'https://payment.ecpay.com.tw/Cashier/AioCheckOut/V5',
-            ];
-        }
-
-        return $api_payment_info;
-    }
-
-    protected function generate_trade_no($order_id, $order_prefix = '')
-    {
-        $trade_no = $order_prefix . substr(str_pad($order_id, 8, '0', STR_PAD_LEFT), 0, 8) . 'SN' . substr(hash('sha256', (string) time()), -5);
-        return substr($trade_no, 0, 20);
-    }
-
-    protected function add_type_info($input, $order)
-    {
-        $payment_type = $this->get_ChoosePayment($order->get_payment_method());
-        switch ($payment_type) {
-
-            case 'Credit':
-
-                // 信用卡分期
-                $number_of_periods = (int) $order->get_meta('_ecpay_payment_number_of_periods', true);
-                if (in_array($number_of_periods, [3, 6, 12, 18, 24, 30])) {
-                    $input['CreditInstallment'] = ($number_of_periods == 30) ? '30N' : $number_of_periods;
-                    $order->add_order_note(sprintf(__('Credit installment to %d', 'ecpay-ecommerce-for-woocommerce'), $number_of_periods));
-
-                    $order->save();
-                }
-
-                // 定期定額
-                $dca = $order->get_meta('_ecpay_payment_dca');
-                $dcaInfo = explode('_', $dca);
-                if (count($dcaInfo) > 1) {
-                    $input['PeriodAmount'] = $input['TotalAmount'];
-                    $input['PeriodType'] = $dcaInfo[0];
-                    $input['Frequency'] = (int)$dcaInfo[1];
-                    $input['ExecTimes'] = (int)$dcaInfo[2];
-                    $input['PeriodReturnURL'] = $input['ReturnURL'];
-                }
-
-                break;
-
-            case 'ATM':
-                $input['ExpireDate'] = get_option('_wooecpay_payment_expire_date', 3);
-                break;
-
-            case 'BARCODE':
-                $input['StoreExpireDate'] = get_option('_wooecpay_payment_expire_date', 3);
-                break;
-
-            case 'CVS':
-                $input['StoreExpireDate'] = get_option('_wooecpay_payment_expire_date', 86400);
-                break;
-        }
-
-        return $input;
-    }
-
-    protected function get_ChoosePayment($payment_method)
-    {
-        $choose_payment = '';
-
-        switch ($payment_method) {
-            case 'Wooecpay_Gateway_Credit':
-            case 'Wooecpay_Gateway_Credit_Installment':
-            case 'Wooecpay_Gateway_Dca':
-                    $choose_payment = 'Credit';
-                break;
-            case 'Wooecpay_Gateway_Webatm':
-                $choose_payment = 'WebATM';
-                break;
-            case 'Wooecpay_Gateway_Atm':
-                $choose_payment = 'ATM';
-                break;
-            case 'Wooecpay_Gateway_Cvs':
-                $choose_payment = 'CVS';
-                break;
-            case 'Wooecpay_Gateway_Barcode':
-                $choose_payment = 'BARCODE';
-                break;
-            case 'Wooecpay_Gateway_Applepay':
-                $choose_payment = 'ApplePay';
-                break;
-        }
-
-        return $choose_payment;
     }
 }
 

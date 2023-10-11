@@ -4,23 +4,27 @@ use Ecpay\Sdk\Factories\Factory;
 use Ecpay\Sdk\Services\UrlService;
 use Ecpay\Sdk\Exceptions\RtnException;
 use Ecpay\Sdk\Response\VerifiedArrayResponse;
+
 use Helpers\Logistic\Wooecpay_Logistic_Helper;
+use Helpers\Payment\Wooecpay_Payment_Helper;
 
 class Wooecpay_Gateway_Response
 {
     protected $logisticHelper;
+    protected $paymentHelper;
 
     public function __construct() {
         add_action('woocommerce_api_wooecpay_payment_callback', [$this, 'check_callback']);
 
-        //載入物流共用
+        // 載入共用
         $this->logisticHelper = new Wooecpay_Logistic_Helper;
+        $this->paymentHelper = new Wooecpay_Payment_Helper;
     }
 
     // payment response
     public function check_callback()
     {
-        $api_info = $this->get_ecpay_payment_api_info();
+        $api_info = $this->paymentHelper->get_ecpay_payment_api_info();
         
         try {
             $factory = new Factory([
@@ -32,7 +36,7 @@ class Wooecpay_Gateway_Response
             $info = $checkoutResponse->get($_POST);
 
             // 解析訂單編號
-            $order_id = $this->get_order_id($info) ;
+            $order_id = $this->paymentHelper->get_order_id_by_merchant_trade_no($info) ;
             
             // 取出訂單資訊
             if ($order = wc_get_order($order_id)) {
@@ -240,58 +244,6 @@ class Wooecpay_Gateway_Response
 
         return $new_order;
     }
-
-    protected function get_order_id($info)
-    {
-        $order_prefix = get_option('wooecpay_payment_order_prefix') ;
-
-        if (isset($info['MerchantTradeNo'])) {
-
-            $order_id = substr($info['MerchantTradeNo'], strlen($order_prefix), strrpos($info['MerchantTradeNo'], 'SN'));
-
-            $order_id = (int) $order_id;
-            if ($order_id > 0) {
-                return $order_id;
-            }
-        }
-
-        return false;
-    }
-
-    // payment 
-    // ---------------------------------------------------
-    protected function get_ecpay_payment_api_info()
-    {
-        $api_info = [
-            'merchant_id'   => '',
-            'hashKey'       => '',
-            'hashIv'        => '',
-        ] ;
-
-        if ('yes' === get_option('wooecpay_enabled_payment_stage', 'yes')) {
-
-            $api_info = [
-                'merchant_id'   => '3002607',
-                'hashKey'       => 'pwFHCqoQZGmho4w6',
-                'hashIv'        => 'EkRm7iFT261dpevs',
-            ] ;
-
-        } else {
-            
-            $merchant_id    = get_option('wooecpay_payment_mid');
-            $hash_key       = get_option('wooecpay_payment_hashkey');
-            $hash_iv        = get_option('wooecpay_payment_hashiv');
-
-            $api_info = [
-                'merchant_id'   => $merchant_id,
-                'hashKey'       => $hash_key,
-                'hashIv'        => $hash_iv,
-            ] ;
-        }
-
-        return $api_info;
-    }
-
 }
 
 return new Wooecpay_Gateway_Response();

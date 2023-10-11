@@ -2,16 +2,20 @@
 
 use Ecpay\Sdk\Factories\Factory;
 use Ecpay\Sdk\Exceptions\RtnException;
+
 use Helpers\Logistic\Wooecpay_Logistic_Helper;
+use Helpers\Payment\Wooecpay_Payment_Helper;
 
 class Wooecpay_Gateway_Base extends WC_Payment_Gateway
 {
     protected $logisticHelper;
+    protected $paymentHelper;
 
     public function __construct()
     {
-        // 載入物流共用
+        // 載入共用
         $this->logisticHelper = new Wooecpay_Logistic_Helper;
+        $this->paymentHelper = new Wooecpay_Payment_Helper;
 
         if ($this->enabled) {
             add_action('woocommerce_receipt_' . $this->id, array($this, 'receipt_page'));
@@ -20,7 +24,6 @@ class Wooecpay_Gateway_Base extends WC_Payment_Gateway
 
         // 感謝頁
         add_action('woocommerce_thankyou_' . $this->id, array($this, 'thankyou_page'));
-
     }
 
     public function receipt_page($order_id)
@@ -80,14 +83,14 @@ class Wooecpay_Gateway_Base extends WC_Payment_Gateway
 
             } else {
 
-                $api_payment_info = $this->get_ecpay_payment_api_info();
-                $merchant_trade_no = $this->generate_trade_no($order->get_id(), get_option('wooecpay_payment_order_prefix'));
+                $api_payment_info = $this->paymentHelper->get_ecpay_payment_api_info('AioCheckOut');
+                $merchant_trade_no = $this->paymentHelper->get_merchant_trade_no($order->get_id(), get_option('wooecpay_payment_order_prefix'));
 
                 // 綠界訂單顯示商品名稱判斷
                 if ('yes' === get_option('wooecpay_enabled_payment_disp_item_name', 'yes')) {
 
                     // 取出訂單品項
-                    $item_name = $this->get_item_name($order);
+                    $item_name = $this->paymentHelper->get_item_name($order);
                 } else {
                     $item_name = '網路商品一批';
                 }
@@ -179,9 +182,6 @@ class Wooecpay_Gateway_Base extends WC_Payment_Gateway
         exit;
     }
 
-    // payment
-    // ---------------------------------------------------
-
     // 感謝頁面
     public function thankyou_page($order_id)
     {
@@ -219,59 +219,8 @@ class Wooecpay_Gateway_Base extends WC_Payment_Gateway
         }
     }
 
-    protected function get_item_name($order)
-    {
-        $item_name = '';
-
-        if (count($order->get_items())) {
-            foreach ($order->get_items() as $item) {
-                $item_name .= str_replace('#', '', trim($item->get_name())) . '#';
-            }
-        }
-        $item_name = rtrim($item_name, '#');
-        return $item_name;
-    }
-
-    protected function get_ecpay_payment_api_info()
-    {
-        $api_payment_info = [
-            'merchant_id'   => '',
-            'hashKey'       => '',
-            'hashIv'        => '',
-            'action'        => '',
-        ] ;
-
-        if ('yes' === get_option('wooecpay_enabled_payment_stage', 'yes')) {
-
-            $api_payment_info = [
-                'merchant_id'   => '3002607',
-                'hashKey'       => 'pwFHCqoQZGmho4w6',
-                'hashIv'        => 'EkRm7iFT261dpevs',
-                'action'        => 'https://payment-stage.ecpay.com.tw/Cashier/AioCheckOut/V5',
-            ] ;
-
-        } else {
-
-            $merchant_id    = get_option('wooecpay_payment_mid');
-            $hash_key       = get_option('wooecpay_payment_hashkey');
-            $hash_iv        = get_option('wooecpay_payment_hashiv');
-
-            $api_payment_info = [
-                'merchant_id'   => $merchant_id,
-                'hashKey'       => $hash_key,
-                'hashIv'        => $hash_iv,
-                'action'        => 'https://payment.ecpay.com.tw/Cashier/AioCheckOut/V5',
-            ] ;
-        }
-
-        return $api_payment_info;
-    }
-
-    protected function generate_trade_no($order_id, $order_prefix = '')
-    {
-        $trade_no = $order_prefix . substr(str_pad($order_id, 8, '0', STR_PAD_LEFT), 0, 8) . 'SN' . substr(hash('sha256', (string) time()), -5) ;
-        return substr($trade_no, 0, 20);
-    }
+    // payment
+    // ---------------------------------------------------
 
     protected function add_type_info($input, $order)
     {

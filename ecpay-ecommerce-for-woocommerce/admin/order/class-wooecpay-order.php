@@ -3,16 +3,22 @@
 use Ecpay\Sdk\Factories\Factory;
 use Ecpay\Sdk\Services\UrlService;
 use Ecpay\Sdk\Exceptions\RtnException;
+
 use Helpers\Logistic\Wooecpay_Logistic_Helper;
+use Helpers\Payment\Wooecpay_Payment_Helper;
+
 class Wooecpay_Order
 {
     protected $logisticHelper;
+    protected $paymentHelper;
 
 	public function __construct()
 	{
 		if (is_admin()) {
-			// 載入物流共用
+
+			// 載入共用
         	$this->logisticHelper = new Wooecpay_Logistic_Helper;
+        	$this->paymentHelper = new Wooecpay_Payment_Helper;
 
 			// wp_enqueue_style('wooecpay_barcode_css', WOOECPAY_PLUGIN_URL . 'public/css/style.css');
 			add_action('admin_enqueue_scripts' , array($this, 'wooecpay_register_scripts'));
@@ -215,7 +221,7 @@ class Wooecpay_Order
 					// 反查綠界訂單記錄API
 					if ($date_created <= $dateCompare) {
 
-						$api_payment_query_trade_info = $this->get_ecpay_payment_api_query_trade_info();
+						$api_payment_query_trade_info = $this->paymentHelper->get_ecpay_payment_api_info('QueryTradeInfo');
 						$merchant_trade_no = get_post_meta($order->get_id(), '_wooecpay_payment_merchant_trade_no', true) ;
 
 						try {
@@ -1241,44 +1247,6 @@ class Wooecpay_Order
 		$relate_no = $order_prefix . substr(str_pad($order_id, 8, '0', STR_PAD_LEFT), 0, 8) . 'SN' . substr(hash('sha256', (string) time()), -5) ;
 		return substr($relate_no, 0, 20);
   	}
-
-	// payment
-	// ---------------------------------------------------
-	protected function get_ecpay_payment_api_query_trade_info()
-	{
-		$api_payment_info = [
-			'merchant_id'   => '',
-			'hashKey'       => '',
-			'hashIv'        => '',
-			'action'        => '',
-		] ;
-
-		if ('yes' === get_option('wooecpay_enabled_payment_stage', 'yes')) {
-
-			$api_payment_info = [
-				'merchant_id'   => '3002607',
-				'hashKey'       => 'pwFHCqoQZGmho4w6',
-				'hashIv'        => 'EkRm7iFT261dpevs',
-				'action'        => 'https://payment-stage.ecpay.com.tw/Cashier/QueryTradeInfo/V5',
-			] ;
-
-		} else {
-
-			$merchant_id    = get_option('wooecpay_payment_mid');
-			$hash_key       = get_option('wooecpay_payment_hashkey');
-			$hash_iv        = get_option('wooecpay_payment_hashiv');
-
-			$api_payment_info = [
-				'merchant_id'   => $merchant_id,
-				'hashKey'       => $hash_key,
-				'hashIv'        => $hash_iv,
-				'action'        => 'https://payment.ecpay.com.tw/Cashier/QueryTradeInfo/V5',
-			] ;
-		}
-
-		return $api_payment_info;
-	}
-
 }
 
 
