@@ -2,6 +2,9 @@
 
 class Wooecpay_Gateway_Cvs extends Wooecpay_Gateway_Base
 {
+    protected $payment_type;
+    protected $expire_date;
+    protected $min_amount;
 
     public function __construct()
     {

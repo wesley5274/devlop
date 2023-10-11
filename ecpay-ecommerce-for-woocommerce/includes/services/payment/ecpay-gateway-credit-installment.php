@@ -2,6 +2,9 @@
 
 class Wooecpay_Gateway_Credit_Installment extends Wooecpay_Gateway_Base
 {
+    protected $payment_type;
+    protected $min_amount;
+    protected $number_of_periods;
 
     public function __construct()
     {
