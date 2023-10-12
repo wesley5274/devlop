@@ -6,7 +6,7 @@ class Wooecpay_Gateway_Dca extends Wooecpay_Gateway_Base
     protected $min_amount;
     protected $ecpay_dca_payment;
     protected $ecpay_dca_options;
-    
+
     public function __construct()
     {
         $this->id                   = 'Wooecpay_Gateway_Dca';
@@ -69,7 +69,7 @@ class Wooecpay_Gateway_Dca extends Wooecpay_Gateway_Base
 
         return parent::is_available();
     }
-    
+
     /**
      * 前台 - 顯示定期定額付款方式select
      */
@@ -84,7 +84,7 @@ class Wooecpay_Gateway_Dca extends Wooecpay_Gateway_Base
                 'cart_total' => $total
             );
             echo $this->show_ecpay_dca_payment_fields($data);
-        } 
+        }
     }
 
     /**
@@ -169,7 +169,7 @@ class Wooecpay_Gateway_Dca extends Wooecpay_Gateway_Base
      *
      * @return void
      */
-    public function wooecpay_register_scripts() 
+    public function wooecpay_register_scripts()
     {
         wp_register_script(
             'wooecpay_dca',
@@ -253,7 +253,7 @@ class Wooecpay_Gateway_Dca extends Wooecpay_Gateway_Base
                 </table>
                 <p class="description"><?php echo __('Don\'t forget to save modify', 'ecpay-ecommerce-for-woocommerce'); ?></p>
                 <p id="fieldsNotification" style="display: none;">
-                    <?php echo __('ECPay paid automatically details has been repeatedly, please confirm again.', 'ecpay-ecommerce-for-woocommerce'); ?>
+                    <?php echo __('ECPay paid automatically details has been repeatedly, please confirm again', 'ecpay-ecommerce-for-woocommerce'); ?>
                 </p>
             </td>
         </tr>

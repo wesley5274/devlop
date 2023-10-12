@@ -135,6 +135,7 @@ class Wooecpay_Logistic
 							$key == 'Wooecpay_Gateway_Barcode' ||
 							$key == 'Wooecpay_Gateway_Applepay' ||
 							$key == 'Wooecpay_Gateway_Twqr' ||
+							$key == 'Wooecpay_Gateway_Bnpl' ||
 							$key == 'cod'
 						) {
 

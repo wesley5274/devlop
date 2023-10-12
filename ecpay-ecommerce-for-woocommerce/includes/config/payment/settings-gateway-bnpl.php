@@ -23,11 +23,10 @@ return [
     'min_amount' => [
         'title' => __('A minimum order amount', 'ecpay-ecommerce-for-woocommerce'),
         'type' => 'number',
-        'default' => 0,
-        'placeholder' => 0,
-        'description' => __('0 to disable minimum amount limit.', 'ecpay-ecommerce-for-woocommerce'),
+        'default' => 3000,
+        'description' => __('The transaction amount must be at least NT$3,000.', 'ecpay-ecommerce-for-woocommerce'),
         'custom_attributes' => [
-            'min' => 0,
+            'min' => 3000,
             'step' => 1
         ]
     ],
