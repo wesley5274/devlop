@@ -10,8 +10,8 @@ class Wooecpay_invoice {
 	public function __construct()
 	{
         
-        add_filter('woocommerce_checkout_fields', array($this, 'wooecpay_show_invoice_fields' ), 10 ,1);		// 前台統一編號 載具資訊填寫
-        add_action('woocommerce_checkout_process', array($this,'wooecpay_check_invoice_fields' ));				// 欄位後端檢查
+        add_filter('woocommerce_checkout_fields', array($this, 'wooecpay_show_invoice_fields'), 10 ,1);		// 前台統一編號 載具資訊填寫
+        add_action('woocommerce_checkout_process', array($this,'wooecpay_check_invoice_fields'));				// 欄位後端檢查
         add_action('woocommerce_checkout_create_order', array($this, 'wooecpay_save_invoice_fields'), 10, 2); 
 
 
@@ -19,7 +19,7 @@ class Wooecpay_invoice {
         $this->my_custom_features_switch = array(
             'billing_love_code_api_check' 	=> false,
             'billing_carruer_num_api_check' => false
-        );
+       );
 	}
 
 	/**
@@ -40,11 +40,11 @@ class Wooecpay_invoice {
 
         $translation_array = array(
             'wooecpay_invoice_donate' => $wooecpay_invoice_donate
-        );
-        wp_localize_script( 'wooecpay_invoice', 'wooecpay_invoice_script_var', $translation_array );
+       );
+        wp_localize_script('wooecpay_invoice', 'wooecpay_invoice_script_var', $translation_array);
 
 
-       	wp_enqueue_script( 'wooecpay_invoice');
+       	wp_enqueue_script('wooecpay_invoice');
 
         // 載具資訊
         $fields['billing']['wooecpay_invoice_carruer_type'] = [
@@ -79,6 +79,13 @@ class Wooecpay_invoice {
             'priority'      => 220,
         ];
 
+        $fields['billing']['wooecpay_invoice_customer_company'] = [
+            'type'          => 'text',
+            'label'         => '公司行號',
+            'required'      => false,
+            'priority'      => 220,
+        ];
+
         $fields['billing']['wooecpay_invoice_love_code'] = [
             'type'          => 'text',
             'label'         => '捐贈碼',
@@ -102,71 +109,72 @@ class Wooecpay_invoice {
      */
     public function wooecpay_check_invoice_fields()
     {
-        if( 
+        if(
         	isset($_POST['wooecpay_invoice_type']) &&
          	sanitize_text_field($_POST['wooecpay_invoice_type']) == 'c' &&
-         	sanitize_text_field($_POST['wooecpay_invoice_customer_identifier']) == '' )
+         	sanitize_text_field($_POST['wooecpay_invoice_customer_identifier']) == '')
         {
-            wc_add_notice( __( 'Please input Unified Business NO', 'ecpay-ecommerce-for-woocommerce' ), 'error');
+            wc_add_notice(__('Please input Unified Business NO', 'ecpay-ecommerce-for-woocommerce'), 'error');
         }
 
         if(
          	isset($_POST['billing_invoice_type']) &&
           	sanitize_text_field($_POST['billing_invoice_type']) == 'c' &&
-           	sanitize_text_field($_POST['billing_company']) == '' ) 
+            sanitize_text_field($_POST['wooecpay_invoice_carruer_type']) == '0' &&
+           	sanitize_text_field($_POST['wooecpay_invoice_customer_company']) == '') 
         {
-            wc_add_notice( __( 'Please input the company name', 'ecpay-ecommerce-for-woocommerce' ), 'error');
+            wc_add_notice(__('Please input the company name', 'ecpay-ecommerce-for-woocommerce'), 'error');
         }
 
-        if( 
+        if(
         	isset($_POST['wooecpay_invoice_type']) && 
         	sanitize_text_field($_POST['wooecpay_invoice_type']) == 'd' && 
-        	sanitize_text_field($_POST['wooecpay_invoice_love_code']) == '' )
+        	sanitize_text_field($_POST['wooecpay_invoice_love_code']) == '')
         {
-            wc_add_notice( __( 'Please input Donate number', 'ecpay-ecommerce-for-woocommerce' ), 'error');
+            wc_add_notice(__('Please input Donate number', 'ecpay-ecommerce-for-woocommerce'), 'error');
         }
 
-        if( 
+        if(
         	isset($_POST['wooecpay_invoice_carruer_type']) && 
         	sanitize_text_field($_POST['wooecpay_invoice_carruer_type']) == '2' && 
-        	sanitize_text_field($_POST['wooecpay_invoice_carruer_num']) == '' )
+        	sanitize_text_field($_POST['wooecpay_invoice_carruer_num']) == '')
         {
-            wc_add_notice( __( 'Please input Citizen Digital Certificate', 'ecpay-ecommerce-for-woocommerce'), 'error' );
+            wc_add_notice(__('Please input Citizen Digital Certificate', 'ecpay-ecommerce-for-woocommerce'), 'error');
         }
 
-        if( 
+        if(
         	isset($_POST['wooecpay_invoice_carruer_type']) &&
         	sanitize_text_field($_POST['wooecpay_invoice_carruer_type']) == '3' &&
-        	sanitize_text_field($_POST['wooecpay_invoice_carruer_num']) == '' )
+        	sanitize_text_field($_POST['wooecpay_invoice_carruer_num']) == '')
         {
-            wc_add_notice( __( 'Please input phone barcode', 'ecpay-ecommerce-for-woocommerce'), 'error' );
+            wc_add_notice(__('Please input phone barcode', 'ecpay-ecommerce-for-woocommerce'), 'error');
         }
 
         // 統一編號格式判斷
-        if( 
+        if(
         	isset($_POST['wooecpay_invoice_type']) &&
         	sanitize_text_field($_POST['wooecpay_invoice_type']) == 'c' &&
-        	sanitize_text_field($_POST['wooecpay_invoice_customer_identifier']) != '' )
+        	sanitize_text_field($_POST['wooecpay_invoice_customer_identifier']) != '')
         {
 
-            if( !preg_match('/^[0-9]{8}$/', sanitize_text_field($_POST['wooecpay_invoice_customer_identifier'])) ) {
-                wc_add_notice( __( 'Invalid tax ID number', 'ecpay-ecommerce-for-woocommerce'), 'error' );
+            if(!preg_match('/^[0-9]{8}$/', sanitize_text_field($_POST['wooecpay_invoice_customer_identifier']))) {
+                wc_add_notice(__('Invalid tax ID number', 'ecpay-ecommerce-for-woocommerce'), 'error');
             }
 
-            if(empty(sanitize_text_field($_POST['billing_company']))){
-            	wc_add_notice( __( 'Please input the company name', 'ecpay-ecommerce-for-woocommerce'), 'error' );
+            if(sanitize_text_field($_POST['wooecpay_invoice_carruer_type']) == '0' && empty(sanitize_text_field($_POST['wooecpay_invoice_customer_company']))){
+            	wc_add_notice(__('Please input the company name', 'ecpay-ecommerce-for-woocommerce'), 'error');
             }
         }
 
         // 捐贈碼格式判斷
-        if( 
+        if(
         	isset($_POST['wooecpay_invoice_type']) &&
         	sanitize_text_field($_POST['wooecpay_invoice_type']) == 'd' &&
-        	sanitize_text_field($_POST['wooecpay_invoice_love_code']) != '' ) 
+        	sanitize_text_field($_POST['wooecpay_invoice_love_code']) != '') 
         {
 
-            if( !preg_match('/^([xX]{1}[0-9]{2,6}|[0-9]{3,7})$/', sanitize_text_field($_POST['wooecpay_invoice_love_code'])) ) {
-                wc_add_notice( __( 'Invalid Donate number', 'ecpay-ecommerce-for-woocommerce'), 'error' );
+            if(!preg_match('/^([xX]{1}[0-9]{2,6}|[0-9]{3,7})$/', sanitize_text_field($_POST['wooecpay_invoice_love_code']))) {
+                wc_add_notice(__('Invalid Donate number', 'ecpay-ecommerce-for-woocommerce'), 'error');
 
             } else {
 
@@ -200,37 +208,37 @@ class Wooecpay_invoice {
 					    // var_dump($response);
 
 					    if(!isset($response['RtnCode']) || $response['RtnCode'] != 1 || $response['IsExist'] == 'N') {
-	                        wc_add_notice( __( 'Please Check Donate number', 'ecpay-ecommerce-for-woocommerce'), 'error' );
+	                        wc_add_notice(__('Please Check Donate number', 'ecpay-ecommerce-for-woocommerce'), 'error');
 	                    }
 
 					} catch (RtnException $e) {
-					    echo wp_kses_post( '(' . $e->getCode() . ')' . $e->getMessage() ) . PHP_EOL;
+					    echo wp_kses_post('(' . $e->getCode() . ')' . $e->getMessage()) . PHP_EOL;
 					}
 				}
             }
         }
 
         // 自然人憑證格式判斷
-        if( 
+        if(
         	isset($_POST['wooecpay_invoice_carruer_type']) &&
         	sanitize_text_field($_POST['wooecpay_invoice_carruer_type']) == '2' &&
-        	sanitize_text_field($_POST['wooecpay_invoice_carruer_num']) != '' )
+        	sanitize_text_field($_POST['wooecpay_invoice_carruer_num']) != '')
         {
 
-            if( !preg_match('/^[a-zA-Z]{2}\d{14}$/', sanitize_text_field($_POST['wooecpay_invoice_carruer_num'])) ) {
-                wc_add_notice( __( 'Invalid Citizen Digital Certificate', 'ecpay-ecommerce-for-woocommerce'), 'error' );
+            if(!preg_match('/^[a-zA-Z]{2}\d{14}$/', sanitize_text_field($_POST['wooecpay_invoice_carruer_num']))) {
+                wc_add_notice(__('Invalid Citizen Digital Certificate', 'ecpay-ecommerce-for-woocommerce'), 'error');
             }
         }
 
         // 手機載具格式判斷
-        if( 
+        if(
         	isset($_POST['wooecpay_invoice_carruer_type']) &&
         	sanitize_text_field($_POST['wooecpay_invoice_carruer_type']) == '3' &&
-        	sanitize_text_field($_POST['wooecpay_invoice_carruer_num']) != '' )
+        	sanitize_text_field($_POST['wooecpay_invoice_carruer_num']) != '')
         {
 
-            if( !preg_match('/^\/{1}[0-9a-zA-Z+-.]{7}$/', sanitize_text_field($_POST['wooecpay_invoice_carruer_num'])) ) {
-                wc_add_notice( __( 'Invalid phone barcode', 'ecpay-ecommerce-for-woocommerce'), 'error' );
+            if(!preg_match('/^\/{1}[0-9a-zA-Z+-.]{7}$/', sanitize_text_field($_POST['wooecpay_invoice_carruer_num']))) {
+                wc_add_notice(__('Invalid phone barcode', 'ecpay-ecommerce-for-woocommerce'), 'error');
 
             } else {
 
@@ -268,12 +276,12 @@ class Wooecpay_invoice {
 					    	!isset($response['RtnCode']) ||
 					    	$response['RtnCode'] != 1 ||
 					    	$response['IsExist'] == 'N'
-					    ) {
-	                    	wc_add_notice( __( 'Please Check phone barcode', 'ecpay-ecommerce-for-woocommerce'), 'error' );
+					   ) {
+	                    	wc_add_notice(__('Please Check phone barcode', 'ecpay-ecommerce-for-woocommerce'), 'error');
 	                    }
 
 					} catch (RtnException $e) {
-					    echo wp_kses_post( '(' . $e->getCode() . ')' . $e->getMessage() ) . PHP_EOL;
+					    echo wp_kses_post('(' . $e->getCode() . ')' . $e->getMessage()) . PHP_EOL;
 					}
 				}
             }
@@ -287,6 +295,7 @@ class Wooecpay_invoice {
         $order->update_meta_data('_wooecpay_invoice_carruer_num', isset($data['wooecpay_invoice_carruer_num']) ? $data['wooecpay_invoice_carruer_num'] : '');
         $order->update_meta_data('_wooecpay_invoice_love_code', isset($data['wooecpay_invoice_love_code']) ? $data['wooecpay_invoice_love_code'] : '');
         $order->update_meta_data('_wooecpay_invoice_customer_identifier', isset($data['wooecpay_invoice_customer_identifier']) ? $data['wooecpay_invoice_customer_identifier'] : '');
+        $order->update_meta_data('_wooecpay_invoice_customer_company', isset($data['wooecpay_invoice_customer_company']) ? $data['wooecpay_invoice_customer_company'] : '');
     }
 
 

@@ -193,7 +193,7 @@ class Wooecpay_Gateway_Response
         ]);
 
         // 新訂單加入meta data
-        $invoice_keys = ['_wooecpay_invoice_type', '_wooecpay_invoice_carruer_type', '_wooecpay_invoice_carruer_num', '_wooecpay_invoice_love_code', '_wooecpay_invoice_customer_identifier'];
+        $invoice_keys = ['_wooecpay_invoice_type', '_wooecpay_invoice_carruer_type', '_wooecpay_invoice_carruer_num', '_wooecpay_invoice_love_code', '_wooecpay_invoice_customer_identifier', '_wooecpay_invoice_customer_company'];
         $shipping_keys = ['is_vat_exempt', '_cart_weight'];
         $payment_keys = ['_ecpay_payment_dca', '_wooecpay_payment_order_prefix', '_wooecpay_query_trade_tag'];
         foreach ($source_meta_data as $meta_data) {
