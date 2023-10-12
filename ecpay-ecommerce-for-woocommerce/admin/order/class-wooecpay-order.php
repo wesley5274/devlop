@@ -153,6 +153,10 @@ class Wooecpay_Order
 
 			break;
 
+			case 'Wooecpay_Gateway_Twqr':
+				echo wp_kses_post('<p><strong>'.__('TWQR trade no', 'ecpay-ecommerce-for-woocommerce').':&nbsp;</strong>'. get_post_meta($order->get_id(), '_ecpay_twqr_trad_no', true) . '</p>') ;
+			break;
+
 			default:
 			break;
 		}
@@ -186,8 +190,8 @@ class Wooecpay_Order
 						$payment_method == 'Wooecpay_Gateway_Cvs' ||
 						$payment_method == 'Wooecpay_Gateway_Barcode' ||
 						$payment_method == 'Wooecpay_Gateway_Applepay' ||
-						$payment_method == 'Wooecpay_Gateway_Dca'
-						
+						$payment_method == 'Wooecpay_Gateway_Dca' ||
+						$payment_method == 'Wooecpay_Gateway_Twqr'
 				) {
 
 					// 判斷是否超過指定時間或自訂的保留時間

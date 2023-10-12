@@ -64,6 +64,12 @@ class Wooecpay_Gateway_Response
 
                                     $order->update_meta_data('_ecpay_card6no', $info['card6no']);
                                     $order->update_meta_data('_ecpay_card4no', $info['card4no']);
+
+                                    // 加入TWQR參數
+                                    if (isset($info['TWQRTradeNo'])) {
+                                        $order->update_meta_data('_ecpay_twqr_trad_no', $info['TWQRTradeNo']);
+                                    }
+                                    
                                     $order->save_meta_data();
 
                                     // 產生物流訂單
