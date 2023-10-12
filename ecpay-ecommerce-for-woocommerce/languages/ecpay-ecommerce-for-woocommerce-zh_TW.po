@@ -837,6 +837,10 @@ msgstr "綠界TWQR"
 msgid "Pay via ECPay TWQR"
 msgstr "透過綠界TWQR付款"
 
+#: admin/order/class-wooecpay-order.php:157
+msgid "TWQR trade no"
+msgstr "綠界TWQR訂單編號"
+
 #: includes/services/payment/ecpay-gateway-applepay.php:14
 msgid "ECPay ApplePay"
 msgstr "綠界ApplePay"

@@ -153,6 +153,10 @@ class Wooecpay_Order
 
 			break;
 
+			case 'Wooecpay_Gateway_Twqr':
+				echo wp_kses_post('<p><strong>'.__('TWQR trade no', 'ecpay-ecommerce-for-woocommerce').':&nbsp;</strong>'. get_post_meta($order->get_id(), '_ecpay_twqr_trad_no', true) . '</p>') ;
+			break;
+
 			default:
 			break;
 		}
