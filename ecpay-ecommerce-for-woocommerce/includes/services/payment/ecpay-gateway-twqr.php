@@ -63,13 +63,13 @@ class Wooecpay_Gateway_Twqr extends Wooecpay_Gateway_Base
     public function process_payment($order_id)
     {
         $order = wc_get_order($order_id);
-        $order->add_order_note(__('Pay via ECPay Web TWQR', 'ecpay-ecommerce-for-woocommerce'));
+        $order->add_order_note(__('Pay via ECPay TWQR', 'ecpay-ecommerce-for-woocommerce'));
         wc_maybe_reduce_stock_levels($order_id);
         wc_release_stock_for_order($order);
 
         return [
             'result'   => 'success',
             'redirect' => $order->get_checkout_payment_url(true),
-        ]; 
+        ];
     }
 }

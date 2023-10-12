@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ECPay Ecommerce for WooCommerce\n"
 "POT-Creation-Date: 2023-05-25 09:52+0800\n"
-"PO-Revision-Date: 2023-10-12 14:24+0800\n"
+"PO-Revision-Date: 2023-10-12 14:26+0800\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: zh_TW\n"
@@ -257,7 +257,7 @@ msgstr "一個有效的免運費折價卷"
 #: includes/config/payment/settings-gateway-cvs.php:25
 #: includes/config/payment/settings-gateway-webatm.php:25
 msgid "A minimum order amount"
-msgstr "一個最低訂單金額"
+msgstr "訂單最低金額"
 
 #: includes/config/logistic/settings-logistic-base.php:35
 #: includes/config/logistic/settings-logistic-post.php:56
@@ -423,9 +423,15 @@ msgid "0 to disable minimum amount limit."
 msgstr "0 代表停用最小訂單金額限制。"
 
 #: includes/config/payment/settings-gateway-atm.php:35
-#: includes/config/payment/settings-gateway-barcode.php:36
+#: includes/config/payment/settings-gateway-barcode.php:34
+#: includes/config/payment/settings-gateway-bnpl.php:36
 #: includes/config/payment/settings-gateway-cvs.php:36
+#: includes/config/payment/settings-gateway-dca.php:36
+#: includes/config/payment/settings-gateway-twqr.php:35
 #: includes/config/payment/settings-gateway-webatm.php:36
+msgid "A maximum order amount"
+msgstr "訂單最高金額"
+
 msgid "Maximum order amount"
 msgstr "訂單最高金額"
 
@@ -889,6 +895,10 @@ msgstr "申請交易編號"
 #: admin/order/class-wooecpay-order.php:159
 msgid "BNPL Installment"
 msgstr "分期期數"
+
+#: includes/config/logistic/settings.php:102
+msgid "Ecpay shipping methods"
+msgstr "綠界物流"
 
 #~ msgid "shipping fee"
 #~ msgstr "物流費用"
