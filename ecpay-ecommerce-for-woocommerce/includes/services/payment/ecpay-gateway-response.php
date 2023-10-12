@@ -25,34 +25,34 @@ class Wooecpay_Gateway_Response
     public function check_callback()
     {
         $api_info = $this->paymentHelper->get_ecpay_payment_api_info();
-        
+
         try {
             $factory = new Factory([
                 'hashKey'   => $api_info['hashKey'],
                 'hashIv'    => $api_info['hashIv'],
             ]);
-            
+
             $checkoutResponse = $factory->create(VerifiedArrayResponse::class);
             $info = $checkoutResponse->get($_POST);
 
             // 解析訂單編號
             $order_id = $this->paymentHelper->get_order_id_by_merchant_trade_no($info) ;
-            
+
             // 取出訂單資訊
             if ($order = wc_get_order($order_id)) {
-                
+
                 // 取出訂單金額
                 $order_total = $order->get_total();
 
                 // 金額比對
-                if($info['TradeAmt'] == $order_total){
+                if ($info['TradeAmt'] == $order_total) {
 
                     // 判斷狀態
                     switch ($info['RtnCode']) {
-                        
+
                         // 付款完成
                         case 1:
-                            if(isset($info['SimulatePaid']) && $info['SimulatePaid'] == 0){
+                            if (isset($info['SimulatePaid']) && $info['SimulatePaid'] == 0) {
                                 // 定期定額付款回傳(非第一次)
                                 if ($info['PeriodType'] == 'Y' && $info['TotalSuccessTimes'] > 1) {
                                     $order = $this->create_cda_new_order($info, $order_id);
@@ -60,8 +60,8 @@ class Wooecpay_Gateway_Response
 
                                 // 判斷付款完成旗標，如果旗標不存或為0則執行 僅允許綠界一次作動
                                 $payment_complete_flag = get_post_meta($order->get_id(), '_payment_complete_flag', true);
-                                
-                                if(empty($payment_complete_flag)){
+
+                                if (empty($payment_complete_flag)) {
 
                                     $order->add_order_note(__('Payment completed', 'ecpay-ecommerce-for-woocommerce'));
                                     $order->payment_complete();
@@ -73,7 +73,7 @@ class Wooecpay_Gateway_Response
                                     if (isset($info['TWQRTradeNo'])) {
                                         $order->update_meta_data('_ecpay_twqr_trad_no', $info['TWQRTradeNo']);
                                     }
-                                    
+
                                     $order->save_meta_data();
 
                                     // 產生物流訂單
@@ -82,7 +82,7 @@ class Wooecpay_Gateway_Response
                                         // 是否已經開立
                                         $wooecpay_logistic_AllPayLogisticsID = get_post_meta($order->get_id(), '_wooecpay_logistic_AllPayLogisticsID', true);
 
-                                        if(empty($wooecpay_logistic_AllPayLogisticsID)){
+                                        if (empty($wooecpay_logistic_AllPayLogisticsID)) {
                                             $this->logisticHelper->send_logistic_order_action($order->get_id(), false);
                                         }
                                     }
@@ -92,35 +92,40 @@ class Wooecpay_Gateway_Response
                                     $order->save_meta_data();
                                 }
                             } else {
-
                                 // 模擬付款 僅執行備註寫入
                                 $note = print_r($info, true);
                                 $order->add_order_note('模擬付款/回傳參數：'. $note);
                             }
 
-                        break;
-                        
-                        // ATM匯款帳號回傳
+                            break;
+
+                        // ATM匯款帳號回傳、無卡分期申請回傳
                         case 2:
 
                             if (!$order->is_paid()) {
 
-                                $expireDate = new DateTime($info['ExpireDate'], new DateTimeZone('Asia/Taipei'));
+                                if ($info['PaymentType'] == 'BNPL_URICH') {
+                                    $order->update_meta_data('_ecpay_bnpl_BNPLTradeNo', $info['BNPLTradeNo']);
+                                    $order->update_meta_data('_ecpay_bnpl_BNPLInstallment', $info['BNPLInstallment']);
+                                } else {
+                                    $expireDate = new DateTime($info['ExpireDate'], new DateTimeZone('Asia/Taipei'));
 
-                                $order->update_meta_data('_ecpay_atm_BankCode', $info['BankCode']);
-                                $order->update_meta_data('_ecpay_atm_vAccount', $info['vAccount']);
-                                $order->update_meta_data('_ecpay_atm_ExpireDate', $expireDate->format(DATE_ATOM));
+                                    $order->update_meta_data('_ecpay_atm_BankCode', $info['BankCode']);
+                                    $order->update_meta_data('_ecpay_atm_vAccount', $info['vAccount']);
+                                    $order->update_meta_data('_ecpay_atm_ExpireDate', $expireDate->format(DATE_ATOM));
+                                }
+
                                 $order->save_meta_data();
 
                                 $order->update_status('on-hold');
                             }
-                        break;
+                            break;
 
                         // 超商條代碼資訊回傳
                         case 10100073:
 
                             if (!$order->is_paid()) {
-                                
+
                                 $expireDate = new DateTime($info['ExpireDate'], new DateTimeZone('Asia/Taipei'));
 
                                 if ($info['PaymentType'] == 'CVS_CVS') {
@@ -140,7 +145,7 @@ class Wooecpay_Gateway_Response
                                 $order->update_status('on-hold');
                             }
 
-                        break;
+                            break;
 
                         // 付款失敗
                         case 10100058:
@@ -154,11 +159,11 @@ class Wooecpay_Gateway_Response
                                 $order->update_status('failed');
                             }
 
-                        break;
+                            break;
 
                         default:
 
-                        break;
+                            break;
                     }
 
                     echo '1|OK';
@@ -171,12 +176,12 @@ class Wooecpay_Gateway_Response
         }
     }
 
-    public function create_cda_new_order($info, $order_id) 
+    public function create_cda_new_order($info, $order_id)
     {
         // 原始訂單
         $source_order = wc_get_order($order_id);
         if (!$source_order) {
-            return; 
+            return;
         }
         // 取得原始訂單設定data
         $source_meta_data = $source_order->get_meta_data();
@@ -192,13 +197,13 @@ class Wooecpay_Gateway_Response
         $shipping_keys = ['is_vat_exempt', '_cart_weight'];
         $payment_keys = ['_ecpay_payment_dca', '_wooecpay_payment_order_prefix', '_wooecpay_query_trade_tag'];
         foreach ($source_meta_data as $meta_data) {
-            if (in_array($meta_data->key, $invoice_keys) 
+            if (in_array($meta_data->key, $invoice_keys)
                 || in_array($meta_data->key, $shipping_keys)
                 || in_array($meta_data->key, $payment_keys)) {
                 $new_order->update_meta_data($meta_data->key, $meta_data->value);
             }
         }
-        
+
         // 加入產品
         foreach ($source_order->get_items() as $item) {
             $new_order->add_product(
@@ -214,14 +219,14 @@ class Wooecpay_Gateway_Response
         // 加入帳單、運送地址
         $new_order->set_address($source_order->get_address('billing'), 'billing');
         $new_order->set_address($source_order->get_address('shipping'), 'shipping');
-        
+
         // 加入付款方式
         $new_order->set_payment_method($source_order->get_payment_method());
         $new_order->set_payment_method_title($source_order->get_payment_method_title());
-        
+
         // 加入總額
         $new_order->set_total($source_order->get_total());
-        
+
         // 加入運送內容
         $shipping_items = new WC_Order_Item_Shipping();
         foreach($source_order->get_items('shipping') as $item){
@@ -238,12 +243,12 @@ class Wooecpay_Gateway_Response
             $new_order->update_meta_data('_ecpay_logistic_cvs_store_address', $source_order->get_meta('_ecpay_logistic_cvs_store_address'));
             $new_order->update_meta_data('_ecpay_logistic_cvs_store_telephone', $source_order->get_meta('_ecpay_logistic_cvs_store_telephone'));
         }
-        
+
         // 寫入新訂單備註
         $new_order->add_order_note('定期定額付款第' . $info['TotalSuccessTimes'] . '次繳費成功，原始訂單編號: ' . $order_id);
         $new_order->update_status('processing');
         $new_order->save();
-        
+
         // 寫入舊訂單備註
         $source_order->add_order_note('定期定額付款第' . $info['TotalSuccessTimes'] . '次繳費成功，新訂單號: ' . $new_order->get_id());
         $source_order->save();

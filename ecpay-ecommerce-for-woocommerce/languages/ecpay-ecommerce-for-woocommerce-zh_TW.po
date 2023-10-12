@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ECPay Ecommerce for WooCommerce\n"
 "POT-Creation-Date: 2023-05-25 09:52+0800\n"
-"PO-Revision-Date: 2023-10-05 10:42+0800\n"
+"PO-Revision-Date: 2023-10-12 14:24+0800\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: zh_TW\n"
@@ -826,9 +826,6 @@ msgstr "執行頻率錯誤"
 msgid "Invalid Execute Times"
 msgstr "執行次數錯誤"
 
-#~ msgid "shipping fee"
-#~ msgstr "物流費用"
-
 #: includes/services/payment/ecpay-gateway-twqr.php:14
 msgid "ECPay TWQR"
 msgstr "綠界TWQR"
@@ -872,3 +869,26 @@ msgstr "綠界超商代碼"
 #: includes/services/payment/ecpay-gateway-dca.php:16
 msgid "ECPay DCA"
 msgstr "綠界定期定額"
+
+#: includes/config/payment/settings-gateway-bnpl.php:28
+msgid "The transaction amount must be at least NT$3,000."
+msgstr "交易金額最低需達新台幣3,000元。"
+
+#: includes/services/payment/ecpay-gateway-bnpl.php:14
+msgid "ECPay BNPL"
+msgstr "綠界無卡分期"
+
+#: includes/services/payment/ecpay-gateway-bnpl.php:52
+msgid "Pay via ECPay BNPL"
+msgstr "透過綠界無卡分期付款"
+
+#: admin/order/class-wooecpay-order.php:158
+msgid "BNPL Trade No"
+msgstr "申請交易編號"
+
+#: admin/order/class-wooecpay-order.php:159
+msgid "BNPL Installment"
+msgstr "分期期數"
+
+#~ msgid "shipping fee"
+#~ msgstr "物流費用"

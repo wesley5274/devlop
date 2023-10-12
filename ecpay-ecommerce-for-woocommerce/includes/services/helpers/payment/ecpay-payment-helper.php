@@ -115,7 +115,7 @@ class Wooecpay_Payment_Helper
     public function add_type_info($input, $order)
     {
         $payment_type = $this->get_ChoosePayment($order->get_payment_method());
-        
+
         switch ($payment_type) {
 
             case 'Credit':
@@ -212,6 +212,12 @@ class Wooecpay_Payment_Helper
                 break;
             case 'Wooecpay_Gateway_Applepay':
                 $choose_payment = 'ApplePay';
+                break;
+            case 'Wooecpay_Gateway_Twqr':
+                $choose_payment = 'TWQR';
+                break;
+            case 'Wooecpay_Gateway_Bnpl':
+                $choose_payment = 'BNPL';
                 break;
         }
 
