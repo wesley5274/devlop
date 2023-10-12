@@ -42,6 +42,7 @@ class Wooecpay_Logistic_Response
 
                 // 判斷是否為超商取貨
                 if ($this->logisticHelper->is_ecpay_cvs_logistics($shipping_method_id)) {
+
                     // 是否啟用超商離島物流
                     if (in_array('Wooecpay_Logistic_CVS_711', get_option('wooecpay_enabled_logistic_outside', []))) {
 
@@ -126,6 +127,7 @@ class Wooecpay_Logistic_Response
                 $return_url = WC()->api_request_url('wooecpay_payment_callback', true);
                 $client_back_url = $order->get_checkout_order_received_url();
 
+
                 // 紀錄訂單其他資訊
                 $order->update_meta_data('_wooecpay_payment_order_prefix', get_option('wooecpay_payment_order_prefix')); // 前綴
                 $order->update_meta_data('_wooecpay_payment_merchant_trade_no', $merchant_trade_no); // MerchantTradeNo
@@ -165,23 +167,23 @@ class Wooecpay_Logistic_Response
                     switch (get_locale()) {
                         case 'zh_HK':
                         case 'zh_TW':
-                            break;
+                        break;
                         case 'ko_KR':
                             $input['Language'] = 'KOR';
-                            break;
+                        break;
                         case 'ja':
                             $input['Language'] = 'JPN';
-                            break;
+                        break;
                         case 'zh_CN':
                             $input['Language'] = 'CHI';
-                            break;
+                        break;
                         case 'en_US':
                         case 'en_AU':
                         case 'en_CA':
                         case 'en_GB':
                         default:
                             $input['Language'] = 'ENG';
-                            break;
+                        break;
                     }
 
                     $generateForm = $autoSubmitFormService->generate($input, $api_payment_info['action']);
@@ -195,6 +197,8 @@ class Wooecpay_Logistic_Response
                 WC()->cart->empty_cart();
             }
         }
+
+        exit;
     }
 
     public function change_map_response()

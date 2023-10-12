@@ -132,7 +132,7 @@ class Wooecpay_Gateway_Base extends WC_Payment_Gateway
                         'NeedExtraPaidInfo' => 'Y',
                     ];
 
-                    $input = $this->add_type_info($input, $order) ;
+                    $input = $this->paymentHelper->add_type_info($input, $order) ;
 
                     switch (get_locale()) {
                         case 'zh_HK':
@@ -217,56 +217,5 @@ class Wooecpay_Gateway_Base extends WC_Payment_Gateway
 
             wc_get_template($template_file, $args, '', WOOECPAY_PLUGIN_INCLUDE_DIR . '/templates/');
         }
-    }
-
-    // payment
-    // ---------------------------------------------------
-
-    protected function add_type_info($input, $order)
-    {
-        switch ($this->payment_type) {
-
-            case 'Credit':
-                // 信用卡分期
-                $number_of_periods = (int) $order->get_meta('_ecpay_payment_number_of_periods', true);
-                if (in_array($number_of_periods, [3, 6, 12, 18, 24, 30])) {
-                    $input['CreditInstallment'] = ($number_of_periods == 30) ? '30N' : $number_of_periods;
-                    $order->add_order_note(sprintf(__('Credit installment to %d', 'ecpay-ecommerce-for-woocommerce'), $number_of_periods));
-
-                    $order->save();
-                }
-
-                // 定期定額
-                $dca = $order->get_meta('_ecpay_payment_dca');
-                $dcaInfo = explode('_', $dca);
-                if (count($dcaInfo) > 1) {
-                    $input['PeriodAmount'] = $input['TotalAmount'];
-                    $input['PeriodType'] = $dcaInfo[0];
-                    $input['Frequency'] = (int)$dcaInfo[1];
-                    $input['ExecTimes'] = (int)$dcaInfo[2];
-                    $input['PeriodReturnURL'] = $input['ReturnURL'];
-                }
-
-                break;
-
-            case 'ATM':
-
-                $input['ExpireDate'] = $this->expire_date;
-                $order->update_meta_data('_wooecpay_payment_expire_date', $this->expire_date);
-                $order->save();
-
-                break;
-
-            case 'BARCODE':
-            case 'CVS':
-
-                $input['StoreExpireDate'] = $this->expire_date;
-                $order->update_meta_data('_wooecpay_payment_expire_date', $this->expire_date);
-                $order->save();
-
-                break;
-        }
-
-        return $input;
     }
 }

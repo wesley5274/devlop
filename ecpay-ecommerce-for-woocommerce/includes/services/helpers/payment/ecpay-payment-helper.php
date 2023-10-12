@@ -65,11 +65,11 @@ class Wooecpay_Payment_Helper
             switch ($action) {
 
                 case 'QueryTradeInfo':
-                    $api_info['action'] = 'https://payment-stage.ecpay.com.tw/Cashier/QueryTradeInfo/V5';
+                    $api_payment_info['action'] = 'https://payment-stage.ecpay.com.tw/Cashier/QueryTradeInfo/V5';
                     break;
 
                 case 'AioCheckOut':
-                    $api_info['action'] = 'https://payment-stage.ecpay.com.tw/Cashier/AioCheckOut/V5';
+                    $api_payment_info['action'] = 'https://payment-stage.ecpay.com.tw/Cashier/AioCheckOut/V5';
                     break;
 
                 default:
@@ -81,11 +81,11 @@ class Wooecpay_Payment_Helper
             switch ($action) {
 
                 case 'QueryTradeInfo':
-                    $api_info['action'] = 'https://payment.ecpay.com.tw/Cashier/QueryTradeInfo/V5';
+                    $api_payment_info['action'] = 'https://payment.ecpay.com.tw/Cashier/QueryTradeInfo/V5';
                     break;
 
                 case 'AioCheckOut':
-                    $api_info['action'] = 'https://payment.ecpay.com.tw/Cashier/AioCheckOut/V5';
+                    $api_payment_info['action'] = 'https://payment.ecpay.com.tw/Cashier/AioCheckOut/V5';
                     break;
 
                 default:
@@ -143,16 +143,46 @@ class Wooecpay_Payment_Helper
                 break;
 
             case 'ATM':
-                $input['ExpireDate'] = get_option('_wooecpay_payment_expire_date', 3);
-                break;
+
+                $settings = get_option('woocommerce_Wooecpay_Gateway_Atm_settings', false);
+
+                if(isset($settings['expire_date'])){
+                    $expire_date = (int)$settings['expire_date'];
+                } else {
+                    $expire_date = 3;
+                }
+
+                $input['ExpireDate'] = $expire_date;
+
+            break;
 
             case 'BARCODE':
-                $input['StoreExpireDate'] = get_option('_wooecpay_payment_expire_date', 3);
-                break;
+
+                $settings = get_option('woocommerce_Wooecpay_Gateway_Barcode_settings', false);
+
+                if(isset($settings['expire_date'])){
+                    $expire_date = (int)$settings['expire_date'];
+                } else {
+                    $expire_date = 3;
+                }
+
+                $input['StoreExpireDate'] = $expire_date;
+
+            break;
 
             case 'CVS':
-                $input['StoreExpireDate'] = get_option('_wooecpay_payment_expire_date', 86400);
-                break;
+
+                $settings = get_option('woocommerce_Wooecpay_Gateway_Cvs_settings', false);
+
+                if(isset($settings['expire_date'])){
+                    $expire_date = (int)$settings['expire_date'];
+                } else {
+                    $expire_date = 10080;
+                }
+
+                $input['StoreExpireDate'] = $expire_date;
+
+            break;
         }
 
         return $input;
