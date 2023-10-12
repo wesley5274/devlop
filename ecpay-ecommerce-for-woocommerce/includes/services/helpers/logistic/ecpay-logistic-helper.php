@@ -522,6 +522,23 @@ class Wooecpay_Logistic_Helper
         return substr($trade_no, 0, 20);
     }
 
+    public function get_order_id_by_merchant_trade_no($info)
+    {
+        $order_prefix = get_option('wooecpay_logistic_order_prefix');
+
+        if (isset($info['MerchantTradeNo'])){
+
+            $order_id = substr($info['MerchantTradeNo'], strlen($order_prefix), strrpos($info['MerchantTradeNo'], 'SN'));
+            $order_id = (int) $order_id;
+            if ($order_id > 0) {
+                return $order_id;
+            }
+        }
+
+        return false;
+    }
+
+
     public function get_item_name($order)
     {
         $item_name = '';
@@ -650,4 +667,6 @@ class Wooecpay_Logistic_Helper
 
         return $encryption_order_id;
     }
+
+
 }
