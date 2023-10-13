@@ -265,8 +265,8 @@ class Wooecpay_Order
 
 			$wooecpay_invoice_carruer_type 				= get_post_meta($order->get_id(), '_wooecpay_invoice_carruer_type', true) ;
 			$wooecpay_invoice_type 						= get_post_meta($order->get_id(), '_wooecpay_invoice_type', true) ;
-			$billing_company 							= get_post_meta($order->get_id(), '_billing_company', true) ;
 			$wooecpay_invoice_customer_identifier 		= get_post_meta($order->get_id(), '_wooecpay_invoice_customer_identifier', true) ;
+			$wooecpay_invoice_customer_company 			= get_post_meta($order->get_id(), '_wooecpay_invoice_customer_company', true) ;
 			$wooecpay_invoice_love_code 				= get_post_meta($order->get_id(), '_wooecpay_invoice_love_code', true) ;
 			$wooecpay_invoice_carruer_num 				= get_post_meta($order->get_id(), '_wooecpay_invoice_carruer_num', true) ;
 
@@ -349,7 +349,7 @@ class Wooecpay_Order
 				break;
 
 				case 'c':
-					echo wp_kses_post('<p><strong>公司名稱:</strong>'. $billing_company . '</p>') ;
+					echo wp_kses_post('<p><strong>公司行號:</strong>'. $wooecpay_invoice_customer_company . '</p>') ;
 					echo wp_kses_post('<p><strong>統一編號:</strong>'. $wooecpay_invoice_customer_identifier . '</p>') ;
 				break;
 
@@ -755,7 +755,7 @@ class Wooecpay_Order
 							case 'c':
 								$data['Print'] = '1';
 								$data['CustomerIdentifier'] = get_post_meta($order->get_id(), '_wooecpay_invoice_customer_identifier', true);
-								$company = $order->get_billing_company();
+								$company = get_post_meta($order->get_id(), '_wooecpay_invoice_customer_company', true);
 								if ($company) {
 									$data['CustomerName'] = $company;
 								}
@@ -924,7 +924,7 @@ class Wooecpay_Order
 							case 'c':
 								$data['Print'] = '1';
 								$data['CustomerIdentifier'] = get_post_meta($order->get_id(), '_wooecpay_invoice_customer_identifier', true);
-								$company = $order->get_billing_company();
+								$company = get_post_meta($order->get_id(), '_wooecpay_invoice_customer_company', true);
 								if ($company) {
 									$data['CustomerName'] = $company;
 								}
