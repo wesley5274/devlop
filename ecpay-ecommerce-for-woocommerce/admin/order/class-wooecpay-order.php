@@ -1,30 +1,29 @@
 <?php
 
 use Ecpay\Sdk\Factories\Factory;
-use Ecpay\Sdk\Services\UrlService;
 use Ecpay\Sdk\Exceptions\RtnException;
 
 use Helpers\Logistic\Wooecpay_Logistic_Helper;
 use Helpers\Payment\Wooecpay_Payment_Helper;
+use Helpers\Invoice\Wooecpay_Invoice_Helper;
 
 class Wooecpay_Order
 {
     protected $logisticHelper;
     protected $paymentHelper;
+    protected $invoiceHelper;
 
 	public function __construct()
 	{
+		// 載入共用
+		$this->logisticHelper = new Wooecpay_Logistic_Helper;
+		$this->paymentHelper = new Wooecpay_Payment_Helper;
+		$this->invoiceHelper = new Wooecpay_Invoice_Helper;
+
 		if (is_admin()) {
-
-			// 載入共用
-        	$this->logisticHelper = new Wooecpay_Logistic_Helper;
-        	$this->paymentHelper = new Wooecpay_Payment_Helper;
-
-			// wp_enqueue_style('wooecpay_barcode_css', WOOECPAY_PLUGIN_URL . 'public/css/style.css');
 			add_action('admin_enqueue_scripts' , array($this, 'wooecpay_register_scripts'));
 
 			if ('yes' === get_option('wooecpay_enabled_payment', 'yes')) {
-
 				add_action('woocommerce_admin_billing_fields', array($this,'custom_order_meta'), 10, 1);
 				add_action('woocommerce_admin_order_data_after_billing_address', array($this,'add_address_meta'), 10, 1);
 
@@ -33,7 +32,6 @@ class Wooecpay_Order
 			}
 
 			if ('yes' === get_option('wooecpay_enabled_logistic', 'yes')) {
-
 				add_action('woocommerce_admin_order_data_after_shipping_address', array($this,'logistic_button_display'));
 				add_action('wp_ajax_send_logistic_order_action', array($this, 'ajax_send_logistic_order_action'));
 
@@ -42,11 +40,9 @@ class Wooecpay_Order
 				if (in_array('Wooecpay_Logistic_Home_Tcat', get_option('wooecpay_enabled_logistic_outside', []))) {
 					add_action('pre_post_update', array($this, 'ecpay_validate_logistic_fields'), 10, 2);
 				}
-
 			}
 
 			if ('yes' === get_option('wooecpay_enabled_invoice', 'yes')) {
-
 				add_action('woocommerce_admin_order_data_after_billing_address', array($this,'add_invoice_meta'), 11, 1);
 
 				// 手動開立
@@ -57,18 +53,16 @@ class Wooecpay_Order
 
 				// 自動作廢
 				if ('auto_cancel' === get_option('wooecpay_enabled_cancel_invoice_auto', 'auto_cancel')) {
-
-					add_action('woocommerce_order_status_cancelled', array($this, 'invoice_invalid'));
-					add_action('woocommerce_order_status_refunded', array($this, 'invoice_invalid'));
+					add_action('woocommerce_order_status_cancelled', array($this, 'auto_invoice_invalid'));
+					add_action('woocommerce_order_status_refunded', array($this, 'auto_invoice_invalid'));
 				}
 			}
 		}
 
     	if ('yes' === get_option('wooecpay_enabled_invoice', 'yes')) {
-
 			// 自動開立
 			if ('auto_paid' === get_option('wooecpay_enabled_invoice_auto', 'auto_paid')) {
-				add_action('woocommerce_order_status_processing', array($this, 'invoice_create'));
+				add_action('woocommerce_order_status_processing', array($this, 'auto_invoice_create'));
 			}
 		}
 	}
@@ -76,8 +70,7 @@ class Wooecpay_Order
 	/**
 	 * 訂單頁面新增完整地址
 	 */
-	public function custom_order_meta($fields)
-	{
+	public function custom_order_meta($fields) {
 		$fields['full-address'] = array(
 			'label'         => __('Full address', 'ecpay-ecommerce-for-woocommerce'),
 			'show'          => true,
@@ -121,7 +114,6 @@ class Wooecpay_Order
 		echo wp_kses_post('<p><strong>' . __('Payment Type', 'ecpay-ecommerce-for-woocommerce') . ':&nbsp;</strong>' . get_post_meta($order->get_id(), '_payment_method_title', true) . '</p>') ;
 
 		switch ($payment_method) {
-
 			case 'Wooecpay_Gateway_Credit':
 				echo wp_kses_post('<p><strong>信用卡前六碼:&nbsp;</strong>' . get_post_meta($order->get_id(), '_ecpay_card6no', true) . '</p>') ;
 				echo wp_kses_post('<p><strong>信用卡後四碼:&nbsp;</strong>' . get_post_meta($order->get_id(), '_ecpay_card4no', true) . '</p>') ;
@@ -166,7 +158,6 @@ class Wooecpay_Order
 		$query_trade_tag = get_post_meta($order->get_id(), '_wooecpay_query_trade_tag', true) ;
 
 		if ($query_trade_tag == 0) {
-
 			// 判斷訂單狀態
 			$order_status = $order->get_status();
 			if (
@@ -178,17 +169,16 @@ class Wooecpay_Order
 				$payment_method = get_post_meta($order->get_id(), '_payment_method', true) ;
 				if (
 					$payment_method == 'Wooecpay_Gateway_Credit' ||
-						$payment_method == 'Wooecpay_Gateway_Credit_Installment' ||
-						$payment_method == 'Wooecpay_Gateway_Webatm' ||
-						$payment_method == 'Wooecpay_Gateway_Atm' ||
-						$payment_method == 'Wooecpay_Gateway_Cvs' ||
-						$payment_method == 'Wooecpay_Gateway_Barcode' ||
-						$payment_method == 'Wooecpay_Gateway_Applepay' ||
-						$payment_method == 'Wooecpay_Gateway_Dca' ||
-						$payment_method == 'Wooecpay_Gateway_Twqr' ||
-						$payment_method == 'Wooecpay_Gateway_Bnpl'
+					$payment_method == 'Wooecpay_Gateway_Credit_Installment' ||
+					$payment_method == 'Wooecpay_Gateway_Webatm' ||
+					$payment_method == 'Wooecpay_Gateway_Atm' ||
+					$payment_method == 'Wooecpay_Gateway_Cvs' ||
+					$payment_method == 'Wooecpay_Gateway_Barcode' ||
+					$payment_method == 'Wooecpay_Gateway_Applepay' ||
+					$payment_method == 'Wooecpay_Gateway_Dca' ||
+					$payment_method == 'Wooecpay_Gateway_Twqr' ||
+					$payment_method == 'Wooecpay_Gateway_Bnpl'
 				) {
-
 					// 判斷是否超過指定時間或自訂的保留時間
 
 					// 計算訂單建立時間是否超過指定時間
@@ -233,7 +223,6 @@ class Wooecpay_Order
 							];
 
 							$response = $postService->post($input, $api_payment_query_trade_info['action']);
-							// var_dump($response);
 
 							// 逾期交易失敗
 							if (isset($response['TradeStatus']) && $response['TradeStatus'] == 10200095) {
@@ -246,7 +235,6 @@ class Wooecpay_Order
 
 								$order->save();
 							}
-
 						} catch (RtnException $e) {
 							echo '(' . $e->getCode() . ')' . $e->getMessage() . PHP_EOL;
 						}
@@ -262,7 +250,6 @@ class Wooecpay_Order
 	public function add_invoice_meta($order)
 	{
 		if ($order) {
-
 			$wooecpay_invoice_carruer_type 				= get_post_meta($order->get_id(), '_wooecpay_invoice_carruer_type', true) ;
 			$wooecpay_invoice_type 						= get_post_meta($order->get_id(), '_wooecpay_invoice_type', true) ;
 			$wooecpay_invoice_customer_identifier 		= get_post_meta($order->get_id(), '_wooecpay_invoice_customer_identifier', true) ;
@@ -298,19 +285,6 @@ class Wooecpay_Order
 			}
 
 			// 顯示
-			$invoiceType = [
-				'p'	=> '個人',
-				'c'	=> '公司',
-				'd'	=> '捐贈',
-			] ;
-
-			$invoiceCarruerType = [
-				'0'	=> '索取紙本',
-				'1'	=> '雲端發票(中獎寄送紙本)',
-				'2'	=> '自然人憑證',
-				'3'	=> '手機條碼',
-			] ;
-
 			echo '<div class="logistic_button_display">';
 			echo '<h3>發票資訊</h3>';
 			echo wp_kses_post('<p><strong>發票號碼:</strong>'. $wooecpay_invoice_no . '</p>') ;
@@ -318,7 +292,6 @@ class Wooecpay_Order
 			echo wp_kses_post('<p><strong>隨機碼:</strong>'. $wooecpay_invoice_random_number . '</p>') ;
 
 			switch ($wooecpay_invoice_issue_type) {
-
 				case '1':
 					$wooecpay_invoice_issue_type_dsp = '一般開立發票';
 					echo wp_kses_post('<p><strong>開立方式:</strong>'. $wooecpay_invoice_issue_type_dsp . '</p>') ;
@@ -333,27 +306,27 @@ class Wooecpay_Order
 					break;
 			}
 
-			if (isset($invoiceCarruerType[$wooecpay_invoice_carruer_type])) {
-				echo wp_kses_post('<p><strong>開立類型:</strong>'. $invoiceCarruerType[$wooecpay_invoice_carruer_type] . '</p>') ;
+			if (isset($this->invoiceHelper->invoiceCarruerType[$wooecpay_invoice_carruer_type])) {
+				echo wp_kses_post('<p><strong>開立類型:</strong>'. $this->invoiceHelper->invoiceCarruerType[$wooecpay_invoice_carruer_type] . '</p>') ;
 			}
 
-			if (isset($invoiceType[$wooecpay_invoice_type])) {
-				echo wp_kses_post('<p><strong>發票開立:</strong>'. $invoiceType[$wooecpay_invoice_type] . '</p>') ;
+			if (isset($this->invoiceHelper->invoiceType[$wooecpay_invoice_type])) {
+				echo wp_kses_post('<p><strong>發票開立:</strong>'. $this->invoiceHelper->invoiceType[$wooecpay_invoice_type] . '</p>') ;
 			}
 
 			switch ($wooecpay_invoice_type) {
-				case 'p':
+				case Wooecpay_Invoice_Helper::INVOICE_TYPE_PERSONAL:
 					if (!empty($wooecpay_invoice_carruer_num)) {
 						echo wp_kses_post('<p><strong>載具編號:</strong>'. $wooecpay_invoice_carruer_num . '</p>') ;
 					}
 				break;
 
-				case 'c':
+				case Wooecpay_Invoice_Helper::INVOICE_TYPE_COMPANY:
 					echo wp_kses_post('<p><strong>公司行號:</strong>'. $wooecpay_invoice_customer_company . '</p>') ;
 					echo wp_kses_post('<p><strong>統一編號:</strong>'. $wooecpay_invoice_customer_identifier . '</p>') ;
 				break;
 
-				case 'd':
+				case Wooecpay_Invoice_Helper::INVOICE_TYPE_DONATE:
 					echo wp_kses_post('<p><strong>愛心碼:</strong>'. $wooecpay_invoice_love_code . '</p>') ;
 				break;
 			}
@@ -428,14 +401,10 @@ class Wooecpay_Order
 	{
 		if ($order) {
 
-			// 取得訂單資訊
-			// $order_data = $order->get_data();
-
 			// 取得物流方式
 			$shipping_method_id = $order->get_items('shipping') ;
 
 			if ($shipping_method_id) {
-
 				$shipping_method_id = reset($shipping_method_id);
 				$shipping_method_id = $shipping_method_id->get_method_id() ;
 
@@ -443,7 +412,6 @@ class Wooecpay_Order
 
 				// 地圖按鈕顯示判斷
 				if (true) {
-
 					// 按鈕顯示旗標
 					$map_button = false ;
 
@@ -452,7 +420,6 @@ class Wooecpay_Order
 						($order_status == 'on-hold' || $order_status == 'processing') &&
 						$this->logisticHelper->is_ecpay_cvs_logistics($shipping_method_id)
 					) {
-
 						// 狀態判斷是否已經建立綠界物流單 AllPayLogisticsID
 						$ecpay_logistic_AllPayLogisticsID = get_post_meta($order->get_id(), '_wooecpay_logistic_AllPayLogisticsID', true);
 
@@ -464,14 +431,11 @@ class Wooecpay_Order
 
 				// 物流訂單按鈕判斷
 				if (true) {
-
 					$logistic_order_button = true ;
 
 					// 判斷是否為綠界物流
 					if ($this->logisticHelper->is_ecpay_logistics($shipping_method_id)) {
-
 						if ($this->logisticHelper->is_ecpay_cvs_logistics($shipping_method_id)) {
-
 							// 狀態判斷 _ecpay_logistic_cvs_store_id門市代號不存在
 							$ecpay_logistic_cvs_store_id = get_post_meta($order->get_id(), '_ecpay_logistic_cvs_store_id', true);
 
@@ -481,7 +445,7 @@ class Wooecpay_Order
 						}
 
 					} else {
-							$logistic_order_button = false ;
+						$logistic_order_button = false ;
 					}
 
 					// 已經存在AllPayLogisticsID 關閉按鈕
@@ -498,7 +462,6 @@ class Wooecpay_Order
 
 				// 列印訂單按鈕判斷
 				if (true) {
-
 					$logistic_print_button = false ;
 
 					// 已經存在AllPayLogisticsID 關閉按鈕
@@ -511,7 +474,6 @@ class Wooecpay_Order
 
 				// 判斷是否為綠界物流
 				if ($this->logisticHelper->is_ecpay_logistics($shipping_method_id)) {
-
 					// 判斷是否為超商取貨
 					if ($this->logisticHelper->is_ecpay_cvs_logistics($shipping_method_id)) {
 						echo '<div class="logistic_csv_info">';
@@ -537,7 +499,6 @@ class Wooecpay_Order
 
 					// 產生地圖按鈕兒
 					if ($map_button) {
-
 						// 組合地圖FORM
 						$form_map = $this->logisticHelper->generate_ecpay_map_form($shipping_method_id, $order->get_id());
 						$form_map =  str_replace('<!DOCTYPE html><html><head><meta charset="utf-8"></head><body>', '', $form_map) ;
@@ -556,7 +517,6 @@ class Wooecpay_Order
 
 					// 列印訂單按鈕判斷
 					if ($logistic_print_button) {
-
 						$api_logistic_info  = $this->logisticHelper->get_ecpay_logistic_api_info('print', $shipping_method_id);
 
 						$AllPayLogisticsID	= get_post_meta($order->get_id(), '_wooecpay_logistic_AllPayLogisticsID', true);
@@ -592,7 +552,6 @@ class Wooecpay_Order
 						}
 
 						try {
-
 							$factory = new Factory([
 								'hashKey'       => $api_logistic_info['hashKey'],
 								'hashIv'        => $api_logistic_info['hashIv'],
@@ -631,616 +590,48 @@ class Wooecpay_Order
 	}
 
 	/**
-	 * 開立發票
+	 * 手動開立發票
 	 */
 	public function ajax_send_invoice_create()
 	{
-		$order_id = isset($_POST['order_id'])	? sanitize_text_field($_POST['order_id'])	: '' ;
-		$this->invoice_create($order_id);
-	}
+		$order_id = isset($_POST['order_id']) ? sanitize_text_field($_POST['order_id']) : '' ;
 
-	/**
-	 * 開立發票程序
-	 */
-	public function invoice_create($order_id)
-	{
 		if ($order = wc_get_order($order_id)) {
-			// 判斷發票是否存在 不存在則開立
-
-			$wooecpay_invoice_process = get_post_meta($order->get_id(), '_wooecpay_invoice_process', true) ;
-
-			if (empty($wooecpay_invoice_process)) {
-
-				$wooecpay_invoice_dalay_date = get_option('wooecpay_invoice_dalay_date') ;
-				$wooecpay_invoice_dalay_date = (int) $wooecpay_invoice_dalay_date ;
-
-				if (empty($wooecpay_invoice_dalay_date)) {
-
-					// 立即開立
-					$api_payment_info 	= $this->get_ecpay_invoice_api_info('issue');
-					$RelateNumber 		= $this->get_relate_number($order->get_id(), get_option('wooecpay_invoice_prefix'));
-
-					try {
-					    $factory = new Factory([
-					        'hashKey' 	=> $api_payment_info['hashKey'],
-					        'hashIv' 	=> $api_payment_info['hashIv'],
-					    ]);
-
-					    $postService = $factory->create('PostWithAesJsonResponseService');
-
-					    $Items = [] ;
-					    foreach ($order->get_items() as $item) {
-
-							$item_price  = round(($item->get_total() + $item->get_total_tax()) / $item->get_quantity(), 4);
-							$item_amount = round($item_price * $item->get_quantity(), 2);
-					    	$Items[] = [
-								'ItemName' 		=> mb_substr($item->get_name(), 0, 100),
-								'ItemCount' 	=> $item->get_quantity(),
-								'ItemWord' 		=> '批',
-								'ItemPrice' 	=> $item_price,
-								'ItemTaxType' 	=> '1',
-								'ItemAmount' 	=> $item_amount,
-					    	] ;
-					    }
-
-					    // 物流費用
-					    $shipping_fee = $order->get_shipping_total() + $order->get_shipping_tax();
-						if ($shipping_fee != 0) {
-
-							$Items[] = [
-								'ItemName'    => __('Shipping fee', 'ecpay-ecommerce-for-woocommerce'),
-								'ItemCount'   => 1,
-								'ItemWord' 	  => '批',
-								'ItemPrice'   => $shipping_fee,
-								'ItemTaxType' => '1',
-								'ItemAmount'  => $shipping_fee,
-							] ;
-						}
-
-						$country = $order->get_billing_country();
-						$countries = WC()->countries->get_countries();
-						$full_country = ($country && isset($countries[$country])) ? $countries[$country] : $country;
-
-						$state = $order->get_billing_state();
-						$states = WC()->countries->get_states($country);
-						$full_state = ($state && isset($states[$state])) ? $states[$state] : $state;
-
-				    	$data = [
-							'MerchantID'    => $api_payment_info['merchant_id'],
-							'RelateNumber'  => $RelateNumber,
-							'CustomerID'    => '',
-							'CustomerName'  => $order->get_billing_last_name() . $order->get_billing_first_name(),
-							'CustomerAddr'  => $full_country . $full_state . $order->get_billing_city() . $order->get_billing_address_1() . $order->get_billing_address_2(),
-							'CustomerPhone' => $order->get_billing_phone(),
-							'CustomerEmail' => $order->get_billing_email(),
-							'Print'         => '0',
-							'Donation'      => '0',
-							'LoveCode'      => '',
-							'CarrierType'   => '',
-							'CarrierNum'    => '',
-							'TaxType'       => '1',
-							'SalesAmount'   => intval(round($order->get_total(), 0)),
-							'Items'         => $Items,
-							'InvType'       => '07'
-					   ];
-
-						$wooecpay_invoice_type 			= get_post_meta($order->get_id(), '_wooecpay_invoice_type', true);
-						$wooecpay_invoice_carruer_type 	= get_post_meta($order->get_id(), '_wooecpay_invoice_carruer_type', true);
-
-						switch ($wooecpay_invoice_type) {
-
-							case 'p':
-								switch ($wooecpay_invoice_carruer_type) {
-
-									case '1':
-										$data['CarrierType'] = '1';
-										break;
-
-									case '2':
-										$data['CarrierType'] = '2';
-										$data['CarrierNum'] = get_post_meta($order->get_id(), '_wooecpay_invoice_carruer_num', true);
-										break;
-
-									case '3':
-										$data['CarrierType'] = '3';
-										$data['CarrierNum'] = get_post_meta($order->get_id(), '_wooecpay_invoice_carruer_num', true);
-										break;
-
-									default:
-										$data['Print'] = '1';
-										break;
-								}
-								break;
-
-							case 'c':
-								$data['Print'] = '1';
-								$data['CustomerIdentifier'] = get_post_meta($order->get_id(), '_wooecpay_invoice_customer_identifier', true);
-								$company = get_post_meta($order->get_id(), '_wooecpay_invoice_customer_company', true);
-								if ($company) {
-									$data['CustomerName'] = $company;
-								}
-								break;
-
-							case 'd':
-								$data['Donation'] = '1';
-								$data['LoveCode'] = get_post_meta($order->get_id(), '_wooecpay_invoice_love_code', true);
-								break;
-
-			      		}
-
-						$input = [
-							'MerchantID' => $api_payment_info['merchant_id'],
-							'RqHeader' => [
-							'Timestamp' => time(),
-								'Revision' => '3.0.0',
-							],
-							'Data' => $data,
-						];
-
-						$response = $postService->post($input, $api_payment_info['action']);
-
-						if ($response['TransCode'] == 1) {
-
-							if ($response['Data']['RtnCode'] == 1) {
-
-								// 更新訂單
-								$order->update_meta_data('_wooecpay_invoice_relate_number', $RelateNumber);
-								$order->update_meta_data('_wooecpay_invoice_RtnCode', $response['Data']['RtnCode']);
-								$order->update_meta_data('_wooecpay_invoice_RtnMsg', $response['Data']['RtnMsg']);
-								$order->update_meta_data('_wooecpay_invoice_no', $response['Data']['InvoiceNo']);
-								$order->update_meta_data('_wooecpay_invoice_date', $response['Data']['InvoiceDate']);
-								$order->update_meta_data('_wooecpay_invoice_random_number', $response['Data']['RandomNumber']);
-
-								$order->update_meta_data('_wooecpay_invoice_process', 1); // 執行開立完成
-								$order->update_meta_data('_wooecpay_invoice_issue_type', 1); // 開立類型 1.立即開立 2.延遲開立
-
-								$order->add_order_note('發票開立成功:狀態:' . $response['Data']['RtnMsg'] . '(' . $response['Data']['RtnCode'] . ')');
-								$order->save();
-
-							} else {
-
-								$order->add_order_note('發票開立失敗:狀態:' . $response['Data']['RtnMsg'] . '(' . $response['Data']['RtnCode'] . ')');
-								$order->save();
-							}
-
-						} else {
-
-							$order->add_order_note('發票開立失敗:狀態:' . $response['TransMsg'] . '(' . $response['TransCode'] . ')');
-							$order->save();
-						}
-
-				    	$ajaxReturn = [
-							'code' 	=> '9999',
-							'msg'	=> '成功',
-						];
-
-					} catch (RtnException $e) {
-					    echo wp_kses_post('(' . $e->getCode() . ')' . $e->getMessage()) . PHP_EOL;
-					}
-
-				} else {
-
-					// 延遲開立
-					$api_payment_info = $this->get_ecpay_invoice_api_info('delay_issue');
-					$RelateNumber = $this->get_relate_number($order->get_id(), get_option('wooecpay_invoice_prefix'));
-
-					try {
-
-						$factory = new Factory([
-							'hashKey' 	=> $api_payment_info['hashKey'],
-							'hashIv' 	=> $api_payment_info['hashIv'],
-						]);
-
-						$postService = $factory->create('PostWithAesJsonResponseService');
-
-						$items = [];
-
-						foreach ($order->get_items() as $item) {
-
-							$Items[] = [
-								'ItemName' 		=> mb_substr($item->get_name(), 0, 100),
-								'ItemCount' 	=> $item->get_quantity(),
-								'ItemWord' 		=> '批',
-								'ItemPrice' 	=>  round($item->get_total() / $item->get_quantity(), 4),
-								'ItemTaxType'	=> '1',
-								'ItemAmount' 	=> round($item->get_total(), 2),
-							] ;
-						}
-
-						// 物流費用
-						$shipping_fee = $order->get_shipping_total();
-						if ($shipping_fee != 0) {
-
-							$Items[] = [
-								'ItemName' 		=> __('Shipping fee', 'ecpay-ecommerce-for-woocommerce'),
-								'ItemCount' 	=> 1,
-								'ItemWord' 		=> '批',
-								'ItemPrice' 	=> $shipping_fee,
-								'ItemTaxType'   => '1',
-								'ItemAmount' 	=> $shipping_fee,
-							] ;
-						}
-
-						$country = $order->get_billing_country();
-						$countries = WC()->countries->get_countries();
-						$full_country = ($country && isset($countries[$country])) ? $countries[$country] : $country;
-
-						$state = $order->get_billing_state();
-						$states = WC()->countries->get_states($country);
-						$full_state = ($state && isset($states[$state])) ? $states[$state] : $state;
-
-						$data = [
-								'MerchantID' 		=> $api_payment_info['merchant_id'],
-								'RelateNumber' 		=> $RelateNumber,
-								'CustomerID' 		=> '',
-								'CustomerName' 		=> $order->get_billing_last_name() . $order->get_billing_first_name(),
-								'CustomerAddr' 		=> $full_country . $full_state . $order->get_billing_city() . $order->get_billing_address_1() . $order->get_billing_address_2(),
-								'CustomerPhone' 	=> $order->get_billing_phone(),
-								'CustomerEmail' 	=> $order->get_billing_email(),
-								'Print' 			=> '0',
-								'Donation' 			=> '0',
-								'LoveCode' 			=> '',
-								'CarrierType' 		=> '',
-								'CarrierNum' 		=> '',
-								'TaxType' 			=> '1',
-								'SalesAmount' 		=> intval(round($order->get_total(), 0)),
-								'Items' 			=> $Items,
-								'InvType' 			=> '07',
-
-								'DelayFlag' 		=> '1',
-								'DelayDay' 			=> $wooecpay_invoice_dalay_date,
-								'Tsr' 				=> $RelateNumber,
-								'PayType' 			=> '2',
-								'PayAct' 			=> 'ECPAY',
-								'NotifyURL' 		=> WC()->api_request_url('wooecpay_invoice_delay_issue_callback', true),
-						];
-
-						$wooecpay_invoice_type 			= get_post_meta($order->get_id(), '_wooecpay_invoice_type', true);
-						$wooecpay_invoice_carruer_type 	= get_post_meta($order->get_id(), '_wooecpay_invoice_carruer_type', true);
-
-						switch ($wooecpay_invoice_type) {
-
-							case 'p':
-
-								switch ($wooecpay_invoice_carruer_type) {
-									case '1':
-										$data['CarrierType'] = '1';
-										break;
-									case '2':
-										$data['CarrierType'] = '2';
-										$data['CarrierNum']  = get_post_meta($order->get_id(), '_wooecpay_invoice_carruer_num', true);
-										break;
-									case '3':
-										$data['CarrierType'] = '3';
-										$data['CarrierNum']  = get_post_meta($order->get_id(), '_wooecpay_invoice_carruer_num', true);
-										break;
-									default:
-										$data['Print'] = '1';
-										break;
-								}
-
-								break;
-
-							case 'c':
-								$data['Print'] = '1';
-								$data['CustomerIdentifier'] = get_post_meta($order->get_id(), '_wooecpay_invoice_customer_identifier', true);
-								$company = get_post_meta($order->get_id(), '_wooecpay_invoice_customer_company', true);
-								if ($company) {
-									$data['CustomerName'] = $company;
-								}
-								break;
-
-							case 'd':
-								$data['Donation'] = '1';
-								$data['LoveCode'] = get_post_meta($order->get_id(), '_wooecpay_invoice_love_code', true);
-								break;
-						}
-
-						$input = [
-							'MerchantID' => $api_payment_info['merchant_id'],
-							'RqHeader' => [
-								'Timestamp' => time(),
-								'Revision' => '3.0.0',
-							],
-							'Data' => $data,
-						];
-
-				    	$response = $postService->post($input, $api_payment_info['action']);
-
-						if ($response['TransCode'] == 1) {
-
-							if ($response['Data']['RtnCode'] == 1) {
-
-								// 更新訂單
-								$order->update_meta_data('_wooecpay_invoice_relate_number', $RelateNumber);
-								$order->update_meta_data('_wooecpay_invoice_RtnCode', $response['Data']['RtnCode']);
-								$order->update_meta_data('_wooecpay_invoice_RtnMsg', $response['Data']['RtnMsg']);
-
-								$order->update_meta_data('_wooecpay_invoice_process', 1); // 執行開立完成
-								$order->update_meta_data('_wooecpay_invoice_issue_type', 2); // 開立類型 1.立即開立 2.延遲開立
-								$order->update_meta_data('_wooecpay_invoice_tsr', $RelateNumber); // 交易單號
-
-								$order->add_order_note('發票開立成功:狀態:' . $response['Data']['RtnMsg'] . '('. $response['Data']['RtnCode'] . ')');
-								$order->save();
-
-							} else {
-
-								$order->add_order_note('發票開立失敗:狀態:' . $response['Data']['RtnMsg'] . '('. $response['Data']['RtnCode'] . ')');
-								$order->save();
-							}
-
-						} else {
-
-							$order->add_order_note('發票開立失敗:狀態:' . $response['TransMsg'] . '('. $response['TransCode'] . ')');
-							$order->save();
-						}
-
-					    $ajaxReturn = [
-							'code' 	=> '9999',
-							'msg'	=> '成功',
-						];
-
-					} catch (RtnException $e) {
-						echo wp_kses_post('(' . $e->getCode() . ')' . $e->getMessage()) . PHP_EOL;
-					}
-				}
-			}
+			$this->invoiceHelper->invoice_create($order);
 		}
 	}
 
 	/**
-	 * 作廢發票
+	 * 自動開立發票
+	 */
+	public function auto_invoice_create($order_id)
+	{
+		if ($order = wc_get_order($order_id)) {
+			$this->invoiceHelper->invoice_create($order);
+		}
+
+	}
+
+	/**
+	 * 手動作廢發票
 	 */
 	public function ajax_send_invoice_invalid()
 	{
-		$order_id = isset($_POST['order_id'])	? sanitize_text_field($_POST['order_id'])	: '' ;
-		$this->invoice_invalid($order_id);
+		$order_id = isset($_POST['order_id'])	? sanitize_text_field($_POST['order_id']) : '';
+
+		if ($order = wc_get_order($order_id)) {
+			$this->invoiceHelper->invoice_invalid($order);
+		}
 	}
 
 	/**
-	 * 作廢發票程序
+	 * 自動作廢發票
 	 */
-	public function invoice_invalid($order_id)
+	public function auto_invoice_invalid($order_id)
 	{
 		if ($order = wc_get_order($order_id)) {
-
-			// 判斷發票是否存在 存在則才可以執行作廢
-			$wooecpay_invoice_process = get_post_meta($order->get_id(), '_wooecpay_invoice_process', true) ;
-
-			if ($wooecpay_invoice_process == 1) {
-
-				$wooecpay_invoice_issue_type = get_post_meta($order->get_id(), '_wooecpay_invoice_issue_type', true) ;
-
-				if ($wooecpay_invoice_issue_type == 1) {
-
-					$api_payment_info 	= $this->get_ecpay_invoice_api_info('invalid');
-
-					$wooecpay_invoice_no = get_post_meta($order->get_id(), '_wooecpay_invoice_no', true) ;
-					$wooecpay_invoice_date = get_post_meta($order->get_id(), '_wooecpay_invoice_date', true) ;
-
-					// 作廢發票
-					try {
-
-						$factory = new Factory([
-							'hashKey' 	=> $api_payment_info['hashKey'],
-							'hashIv' 	=> $api_payment_info['hashIv'],
-						]);
-
-						$postService = $factory->create('PostWithAesJsonResponseService');
-
-						$data = [
-							'MerchantID'	=> $api_payment_info['merchant_id'],
-							'InvoiceNo' 	=> $wooecpay_invoice_no,
-							'InvoiceDate'	=> $wooecpay_invoice_date,
-							'Reason'			=> __('Invalid invoice', 'ecpay-ecommerce-for-woocommerce'),
-						];
-
-						$input = [
-							'MerchantID' => $api_payment_info['merchant_id'],
-							'RqHeader' => [
-								'Timestamp' => time(),
-								'Revision' => '3.0.0',
-							],
-							'Data' => $data,
-						];
-
-						$response = $postService->post($input, $api_payment_info['action']);
-
-						// var_dump($response);
-						if ($response['Data']['RtnCode'] == 1 || $response['Data']['RtnCode'] == 5070453) {
-
-							// 更新訂單
-							$order->update_meta_data('_wooecpay_invoice_relate_number', '');
-							$order->update_meta_data('_wooecpay_invoice_RtnCode', '');
-							$order->update_meta_data('_wooecpay_invoice_RtnMsg', '');
-							$order->update_meta_data('_wooecpay_invoice_no', '');
-							$order->update_meta_data('_wooecpay_invoice_date', '');
-							$order->update_meta_data('_wooecpay_invoice_random_number', '');
-
-							$order->update_meta_data('_wooecpay_invoice_process', 0); // 執行開立完成
-							$order->update_meta_data('_wooecpay_invoice_issue_type', ''); // 開立類型 1.立即開立 2.延遲開立
-
-							$order->add_order_note('發票作廢成功: 發票號碼:' .$wooecpay_invoice_no . ' 狀態:' . $response['Data']['RtnMsg'] . '('. $response['Data']['RtnCode'] . ')');
-							$order->save();
-
-						} else {
-
-							$order->add_order_note('發票作廢失敗:狀態:' . $response['Data']['RtnMsg'] . '('. $response['Data']['RtnCode'] . ')');
-							$order->save();
-						}
-
-					} catch (RtnException $e) {
-					    echo wp_kses_post('(' . $e->getCode() . ')' . $e->getMessage()) . PHP_EOL;
-					}
-
-				} else if ($wooecpay_invoice_issue_type == 2) {
-
-					$api_payment_info 	= $this->get_ecpay_invoice_api_info('cancel_delay_issue');
-					$wooecpay_invoice_tsr = get_post_meta($order->get_id(), '_wooecpay_invoice_tsr', true) ;
-
-					try {
-
-						$factory = new Factory([
-							'hashKey' 	=> $api_payment_info['hashKey'],
-							'hashIv' 	=> $api_payment_info['hashIv'],
-						]);
-
-						$postService = $factory->create('PostWithAesJsonResponseService');
-						$data = [
-							'MerchantID' => $api_payment_info['merchant_id'],
-							'Tsr' => $wooecpay_invoice_tsr,
-						];
-
-						$input = [
-							'MerchantID' => $api_payment_info['merchant_id'],
-							'RqHeader' => [
-								'Timestamp' => time(),
-								'Revision' => '3.0.0',
-							],
-							'Data' => $data,
-						];
-
-						$response = $postService->post($input, $api_payment_info['action']);
-
-						if ($response['Data']['RtnCode'] == 1) {
-
-							// 更新訂單
-							$order->update_meta_data('_wooecpay_invoice_relate_number', '');
-							$order->update_meta_data('_wooecpay_invoice_RtnCode', '');
-							$order->update_meta_data('_wooecpay_invoice_RtnMsg', '');
-							$order->update_meta_data('_wooecpay_invoice_no', '');
-							$order->update_meta_data('_wooecpay_invoice_date', '');
-							$order->update_meta_data('_wooecpay_invoice_random_number', '');
-							$order->update_meta_data('_wooecpay_invoice_tsr', ''); // 交易單號
-
-							$order->update_meta_data('_wooecpay_invoice_process', 0); // 執行開立完成
-							$order->update_meta_data('_wooecpay_invoice_issue_type', ''); // 開立類型 1.立即開立 2.延遲開立
-
-							$order->add_order_note('發票作廢成功: 交易單號:' .$wooecpay_invoice_tsr . ' 狀態:' . $response['Data']['RtnMsg'] . '('. $response['Data']['RtnCode'] . ')');
-
-							$order->save();
-
-							} else {
-
-							$order->add_order_note('發票作廢失敗:狀態:' . $response['Data']['RtnMsg'] . '('. $response['Data']['RtnCode'] . ')');
-							$order->save();
-						}
-
-					} catch (RtnException $e) {
-						echo wp_kses_post('(' . $e->getCode() . ')' . $e->getMessage()) . PHP_EOL;
-					}
-				}
-			}
+			$this->invoiceHelper->invoice_invalid($order);
 		}
+
 	}
-
-	// invoice
-	// ---------------------------------------------------
-
-	protected function get_ecpay_invoice_api_info($action = '')
-  	{
-		$api_info = [
-			'merchant_id'   => '',
-			'hashKey'       => '',
-			'hashIv'        => '',
-			'action'        => '',
-		] ;
-
-		if ('yes' === get_option('wooecpay_enabled_invoice_stage', 'yes')) {
-
-			$api_info = [
-				'merchant_id'   => '2000132',
-				'hashKey'       => 'ejCk326UnaZWKisg ',
-				'hashIv'        => 'q9jcZX8Ib9LM8wYk',
-			] ;
-
-		} else {
-
-			$merchant_id = get_option('wooecpay_invoice_mid');
-			$hash_key    = get_option('wooecpay_invoice_hashkey');
-			$hash_iv     = get_option('wooecpay_invoice_hashiv');
-
-			$api_info = [
-				'merchant_id'   => $merchant_id,
-				'hashKey'       => $hash_key,
-				'hashIv'        => $hash_iv,
-			] ;
-		}
-
-		if ('yes' === get_option('wooecpay_enabled_invoice_stage', 'yes')) {
-
-			switch ($action) {
-
-				case 'check_Love_code':
-					$api_info['action'] = 'https://einvoice-stage.ecpay.com.tw/B2CInvoice/CheckLoveCode' ;
-					break;
-
-				case 'check_barcode':
-					$api_info['action'] = 'https://einvoice-stage.ecpay.com.tw/B2CInvoice/CheckBarcode' ;
-					break;
-
-				case 'issue':
-					$api_info['action'] = 'https://einvoice-stage.ecpay.com.tw/B2CInvoice/Issue' ;
-					break;
-
-				case 'delay_issue':
-					$api_info['action'] = 'https://einvoice-stage.ecpay.com.tw/B2CInvoice/DelayIssue' ;
-					break;
-
-				case 'invalid':
-					$api_info['action'] = 'https://einvoice-stage.ecpay.com.tw/B2CInvoice/Invalid' ;
-					break;
-
-				case 'cancel_delay_issue':
-					$api_info['action'] = 'https://einvoice-stage.ecpay.com.tw/B2CInvoice/CancelDelayIssue' ;
-					break;
-
-				default:
-					break;
-			}
-
-		} else {
-
-			switch ($action) {
-
-				case 'check_Love_code':
-					$api_info['action'] = 'https://einvoice.ecpay.com.tw/B2CInvoice/CheckLoveCode' ;
-					break;
-
-				case 'check_barcode':
-					$api_info['action'] = 'https://einvoice.ecpay.com.tw/B2CInvoice/CheckBarcode' ;
-					break;
-
-				case 'issue':
-					$api_info['action'] = 'https://einvoice.ecpay.com.tw/B2CInvoice/Issue' ;
-					break;
-
-				case 'delay_issue':
-					$api_info['action'] = 'https://einvoice.ecpay.com.tw/B2CInvoice/DelayIssue' ;
-					break;
-
-				case 'invalid':
-					$api_info['action'] = 'https://einvoice.ecpay.com.tw/B2CInvoice/Invalid' ;
-					break;
-
-				case 'cancel_delay_issue':
-					$api_info['action'] = 'https://einvoice.ecpay.com.tw/B2CInvoice/CancelDelayIssue' ;
-					break;
-
-				default:
-					break;
-			}
-		}
-
-		return $api_info;
-  	}
-
-	protected function get_relate_number($order_id, $order_prefix = '')
-  	{
-		$relate_no = $order_prefix . substr(str_pad($order_id, 8, '0', STR_PAD_LEFT), 0, 8) . 'SN' . substr(hash('sha256', (string) time()), -5) ;
-		return substr($relate_no, 0, 20);
-  	}
 }
-
-
-

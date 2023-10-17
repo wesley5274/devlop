@@ -39,6 +39,9 @@ require plugin_dir_path( __FILE__ ) . 'includes/services/helpers/logistic/ecpay-
 // 載入金流共用 helper
 require plugin_dir_path( __FILE__ ) . 'includes/services/helpers/payment/ecpay-payment-helper.php';
 
+// 載入發票共用 helper
+require plugin_dir_path( __FILE__ ) . 'includes/services/helpers/invoice/ecpay-invoice-helper.php';
+
 $plugin_main        = new Wooecpay_Setting();
 $plugin_order       = new Wooecpay_Order();
 
