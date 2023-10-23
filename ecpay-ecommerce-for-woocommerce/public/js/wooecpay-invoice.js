@@ -60,6 +60,18 @@ function refreshFields(id = null) {
         slideField(['wooecpay_invoice_carruer_type_field'], 'down');
     }
 
+    if ($('#wooecpay_invoice_type').val() == 'c') {
+        $.each($('#wooecpay_invoice_carruer_type option'), function(i, el) {
+            if ($(el).text() == '自然人憑證') $(el).hide();
+            else $(el).show();
+        });
+    }
+    else {
+        $.each($('#wooecpay_invoice_carruer_type option'), function(i, el) {
+            $(el).show();
+        });
+    }
+
     // 發票類別變動時，載具類別刷新
     if (id == 'wooecpay_invoice_type') $('#wooecpay_invoice_carruer_type').val('0');
 
@@ -67,7 +79,7 @@ function refreshFields(id = null) {
     $('#wooecpay_love_code').val('');                           // 捐贈碼
     $('#wooecpay_invoice_customer_company').val('');            // 公司行號
     $('#wooecpay_invoice_customer_identifier').val('');         // 統一編號
-    $('#wooecpay_invoice_carruer_num').val('');                 // 載具編號        
+    $('#wooecpay_invoice_carruer_num').val('');                 // 載具編號   
 }
 
 // 調整欄位顯示狀態

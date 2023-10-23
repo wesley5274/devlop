@@ -560,6 +560,15 @@ class Wooecpay_Invoice_Helper
                             if ($company) {
                                 $data['CustomerName'] = $company;
                             }
+                            switch ($wooecpay_invoice_carruer_type) {
+                                case self::INVOICE_CARRUER_TYPE_CLOUD:
+                                    $data['CarrierType'] = self::INVOICE_CARRUER_TYPE_CLOUD;
+                                    break;
+                                case self::INVOICE_CARRUER_TYPE_MOBILE_BARCODE:
+                                    $data['CarrierType'] = self::INVOICE_CARRUER_TYPE_MOBILE_BARCODE;
+                                    $data['CarrierNum'] = get_post_meta($order->get_id(), '_wooecpay_invoice_carruer_num', true);
+                                    break;
+                            }
                             break;
                         case self::INVOICE_TYPE_DONATE:
                             $data['Donation'] = '1';

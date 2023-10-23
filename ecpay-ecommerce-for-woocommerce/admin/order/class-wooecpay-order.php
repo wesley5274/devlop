@@ -324,6 +324,11 @@ class Wooecpay_Order
 				case Wooecpay_Invoice_Helper::INVOICE_TYPE_COMPANY:
 					echo wp_kses_post('<p><strong>公司行號:</strong>'. $wooecpay_invoice_customer_company . '</p>') ;
 					echo wp_kses_post('<p><strong>統一編號:</strong>'. $wooecpay_invoice_customer_identifier . '</p>') ;
+
+					// 公司發票存入載具
+					if (isset($this->invoiceHelper->invoiceCarruerType[$wooecpay_invoice_carruer_type]) && $this->invoiceHelper->invoiceCarruerType[$wooecpay_invoice_carruer_type] == '手機條碼') {
+						echo wp_kses_post('<p><strong>載具編號:</strong>'. $wooecpay_invoice_carruer_num  . '</p>') ;
+					}
 				break;
 
 				case Wooecpay_Invoice_Helper::INVOICE_TYPE_DONATE:
