@@ -240,17 +240,19 @@ class Wooecpay_Payment_Helper
 
         // Table 存在才能新增資料
         if ($isTableExists) {
-            $insert = [
-                'order_id'          => $order_id,
-                'merchant_trade_no' => $info['MerchantTradeNo']
-            ];
+            if (!$this->is_order_ecpay_paid_merchant_trade_no_exist($order_id, $info['MerchantTradeNo'])) {
+                $insert = [
+                    'order_id'          => $order_id,
+                    'merchant_trade_no' => $info['MerchantTradeNo']
+                ];
 
-            $format = [
-                '%d',
-                '%s'
-            ];
+                $format = [
+                    '%d',
+                    '%s'
+                ];
 
-            $wpdb->insert($table_name, $insert, $format);
+                $wpdb->insert($table_name, $insert, $format);
+            }
         }
     }
 
@@ -278,6 +280,29 @@ class Wooecpay_Payment_Helper
     }
 
     /**
+     * 取得訂單已付款且沒有處理過的綠界金流特店交易編號
+     *
+     * @param  string $order_id
+     * @param  string $merchant_trade_no
+     * @return bool
+     */
+    public function is_order_ecpay_paid_merchant_trade_no_exist($order_id, $merchant_trade_no) {
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'ecpay_paid_merchant_trade_no';
+
+        $count = (int) $wpdb->get_var(
+            $wpdb->prepare(
+                "SELECT COUNT(merchant_trade_no)
+                FROM $table_name
+                WHERE order_id = %d AND merchant_trade_no = %s",
+                $order_id, $merchant_trade_no
+            )
+        );
+
+        return ($count > 0);
+    }
+
+    /**
      * 更新訂單已付款的綠界金流特店交易編號為已處理
      *
      * @param  string            $order_id
@@ -298,6 +323,7 @@ class Wooecpay_Payment_Helper
 
         return $result;
     }
+
 
     /**
      * 取得綠界金流

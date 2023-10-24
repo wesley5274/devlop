@@ -7,7 +7,7 @@ final class Wooecpay_Db_Process
      *
      * @var string
      */
-    public static $ecpay_db_version = '1.6';
+    public static $ecpay_db_version = '1.7';
 
     /**
      * 資料庫處理程序
@@ -39,7 +39,8 @@ final class Wooecpay_Db_Process
             is_completed_duplicate  int(1)        NOT NULL,
             updated_at              timestamp     NOT NULL DEFAULT CURRENT_TIMESTAMP,
             created_at              timestamp     NOT NULL DEFAULT CURRENT_TIMESTAMP,
-            PRIMARY KEY (id)
+            PRIMARY KEY (id),
+            UNIQUE KEY merchant_trade_no (merchant_trade_no)
         )";
 
         self::modify_db_table($table_name, $sql);

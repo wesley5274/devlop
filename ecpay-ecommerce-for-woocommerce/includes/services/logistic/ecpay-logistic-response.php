@@ -157,10 +157,10 @@ class Wooecpay_Logistic_Response
                         'ChoosePayment'     => $this->paymentHelper->get_ChoosePayment($order->get_payment_method()),
                         'EncryptType'       => 1,
                         'ReturnURL'         => $return_url,
-                        'OrderResultURL'    => $return_url,
+                        // 'OrderResultURL'    => $return_url,
                         'ClientBackURL'     => $client_back_url,
                         'PaymentInfoURL'    => $return_url,
-                        'ClientRedirectURL' => $return_url,
+                        // 'ClientRedirectURL' => $return_url,
                         'NeedExtraPaidInfo' => 'Y',
                     ];
 
