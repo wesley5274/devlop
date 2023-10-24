@@ -64,10 +64,11 @@ class Wooecpay_Gateway_Response
                                 if (empty($payment_complete_flag)) {
 
                                     $order->add_order_note(__('Payment completed', 'ecpay-ecommerce-for-woocommerce'));
-                                    $order->payment_complete();
 
                                     $order->update_meta_data('_ecpay_card6no', $info['card6no']);
                                     $order->update_meta_data('_ecpay_card4no', $info['card4no']);
+
+                                    $order->payment_complete();
 
                                     // 加入TWQR參數
                                     if (isset($info['TWQRTradeNo'])) {

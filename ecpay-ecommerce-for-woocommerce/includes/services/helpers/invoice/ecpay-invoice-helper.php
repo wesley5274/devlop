@@ -462,6 +462,9 @@ class Wooecpay_Invoice_Helper
             $wooecpay_invoice_dalay_date = get_option('wooecpay_invoice_dalay_date');
             $wooecpay_invoice_dalay_date = (int) $wooecpay_invoice_dalay_date;
 
+            // 取得付款方式，判斷是否紀錄發票備註
+            $payment_method = get_post_meta($order->get_id(), '_payment_method', true);
+
             if (empty($wooecpay_invoice_dalay_date)) {
                 // 立即開立
                 $api_payment_info 	= $this->get_ecpay_invoice_api_info('issue');
@@ -530,6 +533,11 @@ class Wooecpay_Invoice_Helper
                         'Items'         => $items,
                         'InvType'       => '07'
                     ];
+
+                    // 記錄發票備註，卡號末四碼
+                    if (in_array($payment_method, array('Wooecpay_Gateway_Credit_Installment', 'Wooecpay_Gateway_Credit', 'Wooecpay_Gateway_Dca'))) {
+                        $data['InvoiceRemark'] = '信用卡末四碼' . get_post_meta($order->get_id(), '_ecpay_card4no', true);
+                    }
 
                     $wooecpay_invoice_type 			= get_post_meta($order->get_id(), '_wooecpay_invoice_type', true);
                     $wooecpay_invoice_carruer_type 	= get_post_meta($order->get_id(), '_wooecpay_invoice_carruer_type', true);
@@ -686,6 +694,11 @@ class Wooecpay_Invoice_Helper
                         'PayAct' 			=> 'ECPAY',
                         'NotifyURL' 		=> WC()->api_request_url('wooecpay_invoice_delay_issue_callback', true),
                     ];
+
+                    // 記錄發票備註，卡號末四碼
+                    if (in_array($payment_method, array('Wooecpay_Gateway_Credit_Installment', 'Wooecpay_Gateway_Credit', 'Wooecpay_Gateway_Dca'))) {
+                        $data['InvoiceRemark'] = '信用卡末四碼' . get_post_meta($order->get_id(), '_ecpay_card4no', true);
+                    }
 
                     $wooecpay_invoice_type 			= get_post_meta($order->get_id(), '_wooecpay_invoice_type', true);
                     $wooecpay_invoice_carruer_type 	= get_post_meta($order->get_id(), '_wooecpay_invoice_carruer_type', true);
