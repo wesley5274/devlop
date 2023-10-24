@@ -80,7 +80,7 @@ class Wooecpay_Gateway_Dca extends Wooecpay_Gateway_Base
 
         if (is_checkout() && !is_wc_endpoint_url('order-pay') ) {
             $data = array(
-                'ecpay_dca_options'  => get_option('woocommerce_ecpay_dca'),
+                'ecpay_dca_options'  => get_option('woocommerce_ecpay_dca', []),
                 'cart_total' => $total
             );
             echo $this->show_ecpay_dca_payment_fields($data);
