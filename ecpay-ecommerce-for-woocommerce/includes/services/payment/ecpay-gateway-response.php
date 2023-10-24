@@ -58,6 +58,9 @@ class Wooecpay_Gateway_Response
                                     $order = $this->create_cda_new_order($info, $order_id);
                                 }
 
+                                // 紀錄已付款的綠界金流特店交易編號
+                                $this->paymentHelper->insert_ecpay_paid_merchant_trade_no($order_id, $info);
+
                                 // 判斷付款完成旗標，如果旗標不存或為0則執行 僅允許綠界一次作動
                                 $payment_complete_flag = get_post_meta($order->get_id(), '_payment_complete_flag', true);
 

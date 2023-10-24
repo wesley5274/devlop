@@ -72,3 +72,22 @@ function wooecpayInvalidInvoice(order_id) {
         jQuery.unblockUI()
     });
 }
+
+// (金流)標示綠界重複付款訂單已處理
+function wooecpayDuplicatePaymentComplete(order_id) {
+
+    query = {
+        action: 'duplicate_payment_complete',
+        order_id: order_id
+    };
+
+    jQuery.blockUI({ message: null });
+
+    jQuery.post(ajaxurl, query, function(response) {
+
+        var response_info = jQuery.parseJSON(response);
+        window.location.reload();
+
+        jQuery.unblockUI()
+    });
+}

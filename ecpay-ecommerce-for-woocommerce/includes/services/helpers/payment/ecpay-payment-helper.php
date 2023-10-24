@@ -223,4 +223,143 @@ class Wooecpay_Payment_Helper
 
         return $choose_payment;
     }
+
+    /**
+     * 新增已付款的綠界金流特店交易編號
+     *
+     * @param  string $order_id
+     * @param  array  $info
+     * @return void
+     */
+    public function insert_ecpay_paid_merchant_trade_no($order_id, $info)
+    {
+        global $wpdb;
+
+        $table_name      = $wpdb->prefix . 'ecpay_paid_merchant_trade_no';
+        $isTableExists   = $wpdb->get_var( "SHOW TABLES LIKE '$table_name'" ) === $table_name;
+
+        // Table 存在才能新增資料
+        if ($isTableExists) {
+            $insert = [
+                'order_id'          => $order_id,
+                'merchant_trade_no' => $info['MerchantTradeNo']
+            ];
+
+            $format = [
+                '%d',
+                '%s'
+            ];
+
+            $wpdb->insert($table_name, $insert, $format);
+        }
+    }
+
+    /**
+     * 取得訂單已付款且沒有處理過的綠界金流特店交易編號
+     *
+     * @param  string            $order_id
+     * @return array|object|null
+     */
+    public function get_order_ecpay_paid_merchant_trade_no($order_id) {
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'ecpay_paid_merchant_trade_no';
+
+        $ecpay_paid_merchant_trade_no = $wpdb->get_results(
+            $wpdb->prepare(
+                "SELECT merchant_trade_no
+                FROM $table_name
+                WHERE order_id = %d AND is_completed_duplicate = 0
+                ORDER BY id DESC",
+                $order_id
+            )
+        );
+
+        return $ecpay_paid_merchant_trade_no;
+    }
+
+    /**
+     * 更新訂單已付款的綠界金流特店交易編號為已處理
+     *
+     * @param  string            $order_id
+     * @return array|object|null
+     */
+    public function set_order_ecpay_paid_merchant_trade_no_complete($order_id) {
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'ecpay_paid_merchant_trade_no';
+
+        $result = $wpdb->get_results(
+            $wpdb->prepare(
+                "UPDATE $table_name
+                SET is_completed_duplicate = 1, updated_at = CURRENT_TIMESTAMP
+                WHERE order_id = %d AND is_completed_duplicate = 0",
+                $order_id
+            )
+        );
+
+        return $result;
+    }
+
+    /**
+     * 取得綠界金流
+     *
+     * @return array
+     */
+    public function get_ecpay_payment_method()
+    {
+        return [
+            'Wooecpay_Gateway_Credit',
+			'Wooecpay_Gateway_Credit_Installment',
+			'Wooecpay_Gateway_Webatm',
+			'Wooecpay_Gateway_Atm',
+			'Wooecpay_Gateway_Cvs',
+			'Wooecpay_Gateway_Barcode',
+			'Wooecpay_Gateway_Applepay',
+			'Wooecpay_Gateway_Dca',
+			'Wooecpay_Gateway_Twqr',
+			'Wooecpay_Gateway_Bnpl'
+        ];
+    }
+
+    /**
+     * 判斷是否為綠界金流
+     *
+     * @param  string $payment_method
+     * @return bool
+     */
+    public function is_ecpay_payment_method($payment_method)
+    {
+        return in_array($payment_method, $this->get_ecpay_payment_method());
+    }
+
+    /**
+	 * 檢查訂單是否重複付款
+	 *
+     * @param  WC_Order $order
+	 * @return array
+	 */
+	public function check_order_is_duplicate_payment($order)
+	{
+        $duplicate_payment = 0; // 0:不是異常訂單、1:是異常訂單
+        $ecpay_paid_merchant_trade_no = [];
+
+		// 取得訂單付款方式
+		$payment_method = get_post_meta($order->get_id(), '_payment_method', true);
+
+        // 檢查訂單當前是否使用綠界金流
+		if ($this->is_ecpay_payment_method($payment_method)) {
+            // 取得已付款的訂單
+            $ecpay_paid_merchant_trade_no = $this->get_order_ecpay_paid_merchant_trade_no($order->get_id());
+            $count_ecpay_paid_merchant_trade_no = count($ecpay_paid_merchant_trade_no);
+
+			// 超過 1 筆已付款的綠界訂單
+			if ($count_ecpay_paid_merchant_trade_no > 1) {
+				$duplicate_payment = 1;
+			}
+		}
+
+        return [
+            'code' => $duplicate_payment,
+            'merchant_trade_no'  => $ecpay_paid_merchant_trade_no
+        ];
+	}
 }

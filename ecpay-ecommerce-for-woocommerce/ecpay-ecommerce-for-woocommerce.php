@@ -42,6 +42,15 @@ require plugin_dir_path( __FILE__ ) . 'includes/services/helpers/payment/ecpay-p
 // 載入發票共用 helper
 require plugin_dir_path( __FILE__ ) . 'includes/services/helpers/invoice/ecpay-invoice-helper.php';
 
+// 資料庫處理程序
+// register_activation_hook: 手動啟用外掛時觸發
+// upgrader_process_complete: 更新外掛時觸發
+// plugins_loaded: 用於版本檢查，以防 upgrader_process_complete 抓到舊版本程式的問題
+require_once WOOECPAY_PLUGIN_DIR . 'includes/services/database/ecpay-db-process.php';
+register_activation_hook( __FILE__, array('Wooecpay_Db_Process', 'ecpay_db_process') );
+add_action('upgrader_process_complete', array('Wooecpay_Db_Process', 'ecpay_db_process'));
+add_action('plugins_loaded', array('Wooecpay_Db_Process', 'ecpay_db_process'));
+
 $plugin_main        = new Wooecpay_Setting();
 $plugin_order       = new Wooecpay_Order();
 
@@ -59,5 +68,3 @@ if ('yes' === get_option('wooecpay_enabled_invoice', 'yes')) {
     require plugin_dir_path( __FILE__ ) . 'includes/services/invoice/class-wooecpay-invoice.php';
     $plugin_invoice     = new Wooecpay_invoice();
 }
-
-

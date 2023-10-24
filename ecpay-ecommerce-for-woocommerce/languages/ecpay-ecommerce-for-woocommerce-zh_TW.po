@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ECPay Ecommerce for WooCommerce\n"
 "POT-Creation-Date: 2023-10-12 14:28+0800\n"
-"PO-Revision-Date: 2023-10-30 13:52+0800\n"
+"PO-Revision-Date: 2023-11-03 17:50+0800\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: zh_TW\n"
@@ -335,12 +335,12 @@ msgid ""
 "verify if the chosen store aligns with the selected shipping method.<br>4. If 「Ecpay Home Tcat」 outlying islands shipping is "
 "not enabled, there will be no distinction between outlying island and main island shipments; shipping settings will be shared."
 "<br>5. If 「Ecpay Home Tcat」 outlying islands shipping is enabled, it will verify before checkout whether the shipping "
-"destination matches the selected shipping method"
+"destination matches the selected shipping method."
 msgstr ""
 "離島物流注意事項：<br>1. 啟用後才會在「運送方式」出現選項<br>2. 若未啟用「綠界物流 超商取貨 7-ELEVEN」離島物流，則不分本島離島，共"
 "用物流設定<br>3. 若啟用「綠界物流 超商取貨 7-ELEVEN」離島物流，選擇門市後會檢查所選門市是否與所選物流方式相符<br>4. 若未啟用「綠界"
 "物流 宅配 黑貓」離島物流，則不分本島離島，共用物流設定<br>5. 若啟用「綠界物流 宅配 黑貓」離島物流，結帳前會檢查運送地點是否與所選"
-"務流方式相符"
+"物流方式相符"
 
 #: includes/config/logistic/settings.php:98 includes/services/logistic/ecpay-logistic-cvs-711.php:12
 msgid "Ecpay CVS 7-11"
@@ -827,6 +827,7 @@ msgstr "Ecpay Plug for WooCommerce"
 msgid "ECPay Green World FinTech Service Co., Ltd."
 msgstr "綠界科技."
 
+#: includes/services/helpers/invoice/ecpay-invoice-helper.php:332 includes/services/helpers/invoice/ecpay-invoice-helper.php:431
 msgid "Ministry of Finance system is currently under maintenance, unable to verify the carrier. Please choose another invoice mode."
 msgstr "財政部系統目前維護中，無法驗證載具，請選擇其他發票開立方式"
 
@@ -853,6 +854,18 @@ msgstr "姓名包含不支援的ASCII碼"
 #: includes/services/helpers/logistic/ecpay-logistic-helper.php:703
 msgid "No special symbols are allowed in the phone number, it must be ten digits long and start with 09"
 msgstr "電話號碼不允許使用特殊符號，長度必須為十碼且為09開頭"
+
+#: admin/order/class-wooecpay-order.php:671
+msgid "Please confirm the order. The system has detected that there may be duplicate payments for ecpay orders."
+msgstr "請確認訂單狀況，系統偵測到該可能有綠界訂單重複付款的情形"
+
+#: admin/order/class-wooecpay-order.php:672
+msgid "Abnormal ecpay merchant trade no"
+msgstr "異常綠界金流特店交易編號"
+
+#: admin/order/class-wooecpay-order.php:691
+msgid "Duplicate payments for ecpay orders are marked as processed."
+msgstr "綠界訂單重複付款提示標示為已處理"
 
 #~ msgid "Maximum order amount"
 #~ msgstr "訂單最高金額"
