@@ -209,7 +209,7 @@ class Wooecpay_Logistic_Helper
 
     public function get_ecpay_logistic_api_info($action = '', $shipping_method_id = '')
     {
-        $wooecpay_logistic_cvs_type = get_option('wooecpay_logistic_cvs_type');
+        $wooecpay_logistic_cvs_type = get_option('wooecpay_logistic_cvs_type', 'C2C');
 
         $api_info = [
             'merchant_id'   => '',
@@ -441,7 +441,7 @@ class Wooecpay_Logistic_Helper
 
     public function get_logistics_sub_type($shipping_method_id)
     {
-        $wooecpay_logistic_cvs_type = get_option('wooecpay_logistic_cvs_type');
+        $wooecpay_logistic_cvs_type = get_option('wooecpay_logistic_cvs_type', 'C2C');
 
         $logisticsType = [
             'type'      => '',
