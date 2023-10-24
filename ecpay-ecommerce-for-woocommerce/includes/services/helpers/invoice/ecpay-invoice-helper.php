@@ -535,7 +535,7 @@ class Wooecpay_Invoice_Helper
                     ];
 
                     // 記錄發票備註，卡號末四碼
-                    if (in_array($payment_method, array('Wooecpay_Gateway_Credit_Installment', 'Wooecpay_Gateway_Credit'))) {
+                    if (in_array($payment_method, array('Wooecpay_Gateway_Credit_Installment', 'Wooecpay_Gateway_Credit', 'Wooecpay_Gateway_Dca'))) {
                         $data['InvoiceRemark'] = '信用卡末四碼' . get_post_meta($order->get_id(), '_ecpay_card4no', true);
                     }
 
@@ -696,7 +696,7 @@ class Wooecpay_Invoice_Helper
                     ];
 
                     // 記錄發票備註，卡號末四碼
-                    if (in_array($payment_method, array('Wooecpay_Gateway_Credit_Installment', 'Wooecpay_Gateway_Credit'))) {
+                    if (in_array($payment_method, array('Wooecpay_Gateway_Credit_Installment', 'Wooecpay_Gateway_Credit', 'Wooecpay_Gateway_Dca'))) {
                         $data['InvoiceRemark'] = '信用卡末四碼' . get_post_meta($order->get_id(), '_ecpay_card4no', true);
                     }
 
