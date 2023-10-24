@@ -108,16 +108,21 @@ class Wooecpay_Gateway_Dca extends Wooecpay_Gateway_Base
         $szHtml  = '';
         $szHtml .= '<select id="ecpay_dca_payment" name="ecpay_dca_payment">';
         $szHtml .= '<option>------</option>';
-        foreach ($ecpay_dca_options as $dca_option) {
-            $option = sprintf(
-                __('NT$ %d / %s %s, up to a maximun of %s', 'ecpay-ecommerce-for-woocommerce'),
-                $cart_total,
-                $dca_option['frequency'],
-                $periodTypeMethod[$dca_option['periodType']],
-                $dca_option['execTimes']
-            );
-            $szHtml .= $this->generate_option($dca_option['periodType'] . '_' . $dca_option['frequency'] . '_' . $dca_option['execTimes'], $option);
+
+        // 避免初始預設欄位為空
+        if (count($ecpay_dca_options) > 0) {
+            foreach ($ecpay_dca_options as $dca_option) {
+                $option = sprintf(
+                    __('NT$ %d / %s %s, up to a maximun of %s', 'ecpay-ecommerce-for-woocommerce'),
+                    $cart_total,
+                    $dca_option['frequency'],
+                    $periodTypeMethod[$dca_option['periodType']],
+                    $dca_option['execTimes']
+                );
+                $szHtml .= $this->generate_option($dca_option['periodType'] . '_' . $dca_option['frequency'] . '_' . $dca_option['execTimes'], $option);
+            }
         }
+        
         $szHtml .= '</select>';
 
         $szHtml .= '<div id="ecpay_dca_show"></div>';
