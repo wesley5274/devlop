@@ -53,7 +53,7 @@ class Wooecpay_Logistic
 		include WOOECPAY_PLUGIN_INCLUDE_DIR . '/services/logistic/ecpay-logistic-cvs-hilife.php';
 		include WOOECPAY_PLUGIN_INCLUDE_DIR . '/services/logistic/ecpay-logistic-cvs-family.php';
 
-		if (get_option('wooecpay_logistic_cvs_type') == 'C2C') {
+		if (get_option('wooecpay_logistic_cvs_type', 'C2C') == 'C2C') {
 			include WOOECPAY_PLUGIN_INCLUDE_DIR . '/services/logistic/ecpay-logistic-cvs-okmart.php';
 		}
 
@@ -74,7 +74,7 @@ class Wooecpay_Logistic
         $methods['Wooecpay_Logistic_CVS_Hilife']    = 'Wooecpay_Logistic_CVS_Hilife';
         $methods['Wooecpay_Logistic_CVS_Family']    = 'Wooecpay_Logistic_CVS_Family';
 
-        if (get_option('wooecpay_logistic_cvs_type') == 'C2C') {
+        if (get_option('wooecpay_logistic_cvs_type', 'C2C') == 'C2C') {
         	$methods['Wooecpay_Logistic_CVS_Okmart']    = 'Wooecpay_Logistic_CVS_Okmart';
     	}
 

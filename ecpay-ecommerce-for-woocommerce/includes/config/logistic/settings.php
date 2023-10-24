@@ -117,7 +117,7 @@ return [
         'type'     => 'checkbox',
         'desc'     => __( 'ECPay sandbox', 'ecpay-ecommerce-for-woocommerce'),
         'id'       => 'wooecpay_enabled_logistic_stage',
-        'default'  => 'no',
+        'default'  => 'yes',
         'desc' => __('ECPay sandbox', 'ecpay-ecommerce-for-woocommerce')
     ],
     [
