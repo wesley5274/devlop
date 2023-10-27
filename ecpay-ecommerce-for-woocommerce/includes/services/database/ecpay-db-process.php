@@ -7,7 +7,7 @@ final class Wooecpay_Db_Process
      *
      * @var string
      */
-    public static $ecpay_db_version = '1.7';
+    public static $ecpay_db_version = '1.0';
 
     /**
      * 資料庫處理程序
@@ -19,28 +19,29 @@ final class Wooecpay_Db_Process
 
         // 檢查綠界模組資料庫版本，若有差異則更新
         if ($site_option_ecpay_db_version == NULL || $site_option_ecpay_db_version != self::$ecpay_db_version) {
-            self::create_db_table_ecpay_paid_merchant_trade_no();
+            self::create_db_table_ecpay_orders_payment_status();
         }
     }
 
     /**
-     * 新增 Table - ecpay_paid_merchant_trade_no
+     * 新增 Table - ecpay_orders_payment_status
      *
      * @return void
      */
-    protected static function create_db_table_ecpay_paid_merchant_trade_no() {
+    protected static function create_db_table_ecpay_orders_payment_status() {
         global $wpdb;
 
-        $table_name = $wpdb->prefix . 'ecpay_paid_merchant_trade_no';
+        $table_name = $wpdb->prefix . 'ecpay_orders_payment_status';
         $sql = "CREATE TABLE $table_name (
-            id                      BIGINT        NOT NULL AUTO_INCREMENT,
-            order_id                bigint(60)    NOT NULL,
-            merchant_trade_no       varchar(60)   NOT NULL,
-            is_completed_duplicate  int(1)        NOT NULL,
+            id                      bigint        NOT NULL AUTO_INCREMENT,
+            order_id                bigint        NOT NULL,
+            payment_method          varchar(60)   NOT NULL,
+            merchant_trade_no       varchar(60)   NOT NULL DEFAULT '',
+            payment_status          int(10)       NOT NULL DEFAULT 0,
+            is_completed_duplicate  int(1)        NOT NULL DEFAULT 0,
             updated_at              timestamp     NOT NULL DEFAULT CURRENT_TIMESTAMP,
             created_at              timestamp     NOT NULL DEFAULT CURRENT_TIMESTAMP,
-            PRIMARY KEY (id),
-            UNIQUE KEY merchant_trade_no (merchant_trade_no)
+            PRIMARY KEY (id)
         )";
 
         self::modify_db_table($table_name, $sql);

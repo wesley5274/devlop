@@ -671,15 +671,21 @@ class Wooecpay_Order
 	{
 		$is_duplicate_payment = $this->paymentHelper->check_order_is_duplicate_payment($order);
 
+		// 顯示提示訊息
 		if ($is_duplicate_payment['code'] === 1) {
-			echo wp_kses_post('<div><p style="color: red;"><span class="dashicons dashicons-warning"></span><strong>' . __('Please confirm the order. The system has detected that there may be duplicate payments for ecpay orders.', 'ecpay-ecommerce-for-woocommerce') . '</strong></p>');
+			echo wp_kses_post('<div><p style="color: red;"><span class="dashicons dashicons-warning"></span><strong>' . __('Please confirm the order. The system has detected that there may be duplicate payments for orders. (The order has multiple ecpay payment orders or cash on delivery has been selected.)', 'ecpay-ecommerce-for-woocommerce') . '</strong></p>');
 			echo wp_kses_post('<p style="color: red;"><strong>' . __('Abnormal ecpay merchant trade no', 'ecpay-ecommerce-for-woocommerce') . ':</strong></p>');
 
-			foreach ($is_duplicate_payment['merchant_trade_no'] as $result) {
-				echo wp_kses_post('<p style="color: red;">- ' . $result->merchant_trade_no . '</p>');
+			// 移除空值
+			$merchant_trade_no_list = array_filter($is_duplicate_payment['merchant_trade_no'], function ($value, $key) {
+				return !is_null($value) && $value !== '';
+			}, ARRAY_FILTER_USE_BOTH);
+
+			foreach ($merchant_trade_no_list as $merchant_trade_no) {
+				echo wp_kses_post('<p style="color: red;">- ' . $merchant_trade_no . '</p>');
 			}
 
-			echo '<input class=\'button\' type=\'button\' onclick=\'wooecpayDuplicatePaymentComplete(' . $order->get_id() .  ');\' value=\'標示已處理\' /></div>';
+			echo '<input class=\'button\' type=\'button\' onclick=\'wooecpayDuplicatePaymentComplete(' . $order->get_id() .  ', ' . json_encode($merchant_trade_no_list) . ');\' value=\'標示已處理\' /></div>';
 		}
 	}
 
@@ -689,10 +695,16 @@ class Wooecpay_Order
 	public function ajax_duplicate_payment_complete()
 	{
 		if ($order = wc_get_order($_POST['order_id'])) {
-			$result = $this->paymentHelper->set_order_ecpay_paid_merchant_trade_no_complete($_POST['order_id']);
+			$result = $this->paymentHelper->update_order_ecpay_orders_payment_status_complete($_POST['order_id']);
 
 			if (isset($result)) {
-				$order->add_order_note(__('Duplicate payments for ecpay orders are marked as processed.', 'ecpay-ecommerce-for-woocommerce'));
+				// 組合綠界金流特店交易編號
+				$merchant_trade_no_list = '';
+				foreach ($_POST['merchant_trade_no_list'] as $merchant_trade_no) {
+					$merchant_trade_no_list .= PHP_EOL . $merchant_trade_no;
+				}
+
+				$order->add_order_note(sprintf(__('Duplicate payments for ecpay orders are marked as processed.%s', 'ecpay-ecommerce-for-woocommerce'), $merchant_trade_no_list));
 			}
 		}
 	}
