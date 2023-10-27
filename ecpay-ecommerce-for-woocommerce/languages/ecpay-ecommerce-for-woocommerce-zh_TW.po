@@ -844,3 +844,25 @@ msgstr "財政部系統目前維護中，無法驗證載具，請選擇其他發
 
 #~ msgid "shipping fee"
 #~ msgstr "物流費用"
+
+#: includes/services/logistic/class-wooecpay-logistic.php:180
+msgid "Ecpay Sipping Setting Error："
+msgstr "綠界物流設定錯誤："
+
+#: includes/services/helpers/logistic/ecpay-logistic-helper.php:681
+msgid "● The sender name insufficient or exceeded character limit"
+msgstr "● 寄件人姓名低於或超過長度限制"
+
+#: includes/services/helpers/logistic/ecpay-logistic-helper.php:686
+msgid "● The sender name cannot contain numbers"
+msgstr "● 寄件人姓名不能包含數字"
+
+#: includes/services/helpers/logistic/ecpay-logistic-helper.php:691
+msgid "● The sender name contains special symbols that cannot be used"
+msgstr "● 寄件人姓名包含不支援的特殊符號"
+
+#: includes/services/helpers/logistic/ecpay-logistic-helper.php:696
+msgid "● The sender name contains ASCII that cannot be used"
+msgstr "● 寄件人姓名包含不支援的ASCII碼"
+
+

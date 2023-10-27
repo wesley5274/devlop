@@ -668,5 +668,51 @@ class Wooecpay_Logistic_Helper
         return $encryption_order_id;
     }
 
+    public function validate_shipping_sender_name($value) {
+		$error_message = '';
+        
+        // 定義正則式
+		$number_pattern = '/\d/';
+		$special_symbol_pattern = '/[\^\'`!@#%&*+\\""<>|_\[\]~$\-={}\/?;():︿‘‵！＠＃％＆＊＋＼＂＜＞｜＿［］～＄－＝｛｝／？；（）：]/';
+		$ascii_pattern = '/[\x00-\x1F\x7F]/';
+		
+		// 驗證字串長度
+		if (!$this->calculateStringLength($value)) {
+			$error_message = $error_message . __('● The sender name insufficient or exceeded character limit', 'ecpay-ecommerce-for-woocommerce') . '<br>'; 
+		}
 
+        // 驗證是否含有數字
+		if (preg_match($number_pattern, $value)) {
+			$error_message = $error_message . __('● The sender name cannot contain numbers', 'ecpay-ecommerce-for-woocommerce') . '<br>'; 
+        }
+
+        // 驗證是否包含特殊符號
+		if (preg_match($special_symbol_pattern, $value)) {
+			$error_message = $error_message . __('● The sender name contains special symbols that cannot be used', 'ecpay-ecommerce-for-woocommerce') . '<br>'; 
+        }
+
+        // 驗證是否包含ASCII
+		if (preg_match($ascii_pattern, $value)) {
+			$error_message = $error_message . __('● The sender name contains ASCII that cannot be used', 'ecpay-ecommerce-for-woocommerce') . '<br>'; 
+        }
+
+        return $error_message;
+    }
+
+    private function calculateStringLength($value) {
+        $length = 0;
+        $str_len = strlen($value);
+        for($i = 0; $i < $str_len; $i++) {
+            if (ctype_alpha($value[$i])) {
+                // 英文字母算一個字
+                $length += 1;
+            } else {
+                // 非英文字母字算兩個字符
+                $length += 2;
+            }
+        }
+        
+        if ($length < 4 || $length > 10) return false;
+        else return true;
+    }
 }
