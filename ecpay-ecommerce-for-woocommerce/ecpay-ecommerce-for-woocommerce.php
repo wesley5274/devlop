@@ -54,17 +54,17 @@ add_action('plugins_loaded', array('Wooecpay_Db_Process', 'ecpay_db_process'));
 $plugin_main        = new Wooecpay_Setting();
 $plugin_order       = new Wooecpay_Order();
 
-if ('yes' === get_option('wooecpay_enabled_payment', 'yes')) {
+if ('yes' === get_option('wooecpay_enabled_payment', 'no')) {
     require plugin_dir_path( __FILE__ ) . 'includes/services/payment/class-wooecpay-gateway.php';
     $plugin_payment     = new Wooecpay_Gateway();
 }
 
-if ('yes' === get_option('wooecpay_enabled_logistic', 'yes')) {
+if ('yes' === get_option('wooecpay_enabled_logistic', 'no')) {
     require plugin_dir_path( __FILE__ ) . 'includes/services/logistic/class-wooecpay-logistic.php';
     $plugin_logistic    = new Wooecpay_Logistic();
 }
 
-if ('yes' === get_option('wooecpay_enabled_invoice', 'yes')) {
+if ('yes' === get_option('wooecpay_enabled_invoice', 'no')) {
     require plugin_dir_path( __FILE__ ) . 'includes/services/invoice/class-wooecpay-invoice.php';
     $plugin_invoice     = new Wooecpay_invoice();
 }
