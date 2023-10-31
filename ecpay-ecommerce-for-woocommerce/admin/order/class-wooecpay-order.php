@@ -396,7 +396,7 @@ class Wooecpay_Order
 			'wooecpay_main',
 			WOOECPAY_PLUGIN_URL . 'public/js/wooecpay-main.js',
 			array(),
-			'1.0.0',
+			'1.0.1',
 			true
 		);
 
