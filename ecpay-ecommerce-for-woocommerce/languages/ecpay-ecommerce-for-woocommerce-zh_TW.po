@@ -599,8 +599,8 @@ msgid "CVS allowable payment deadline from 1 minute to 30 days."
 msgstr "超商代碼允許的繳費期限為 1分鐘到 30 天。"
 
 #: includes/config/payment/settings-gateway-dca.php:47
-msgid "Test DCA"
-msgstr ""
+msgid "DCA"
+msgstr "定期定額"
 
 #: includes/config/payment/settings.php:27
 msgid "Show payment info in email"
