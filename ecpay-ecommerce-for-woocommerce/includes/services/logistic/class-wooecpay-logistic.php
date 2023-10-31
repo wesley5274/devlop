@@ -169,7 +169,7 @@ class Wooecpay_Logistic
      */
 	public function validate_admin_shipping_field($input) {
 		$new_value = sanitize_text_field($input);
-		$error_message = $this->logisticHelper->validate_shipping_name_field($new_value);
+		$error_message = $this->logisticHelper->validate_shipping_field('name', $new_value);
 
 		if ($error_message != '') {
 			add_action('admin_notices', function() use ($error_message) {
