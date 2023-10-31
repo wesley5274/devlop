@@ -76,42 +76,32 @@ class Wooecpay_Gateway_Cod extends Wooecpay_Gateway_Base
             $shippping_tag  &&
             $this->logisticHelper->is_ecpay_cvs_logistics($shipping_method_id)
         ) {
-            // 取出商店代號
-            $CVSStoreID = $order->get_meta('_ecpay_logistic_cvs_store_id') ;
+            $client_back_url = WC()->api_request_url('wooecpay_logistic_map_response', true) . '&id=' . $id;
+            $api_logistic_info  = $this->logisticHelper->get_ecpay_logistic_api_info('map');
+            $MerchantTradeNo    = $this->logisticHelper->get_merchant_trade_no($order->get_id(), get_option('wooecpay_logistic_order_prefix'));
+            $LogisticsType      = $this->logisticHelper->get_logistics_sub_type($shipping_method_id) ;
 
-            // 判斷是否存在
+            try {
+                $factory = new Factory([
+                    'hashKey'       => $api_logistic_info['hashKey'],
+                    'hashIv'        => $api_logistic_info['hashIv'],
+                    'hashMethod'    => 'md5',
+                ]);
+                $autoSubmitFormService = $factory->create('AutoSubmitFormWithCmvService');
 
-            // 不存在
-            if (empty($CVSStoreID)) {
+                $input = [
+                    'MerchantID'        => $api_logistic_info['merchant_id'],
+                    'MerchantTradeNo'   => $MerchantTradeNo,
+                    'LogisticsType'     => $LogisticsType['type'],
+                    'LogisticsSubType'  => $LogisticsType['sub_type'],
+                    'IsCollection'      => 'Y',
+                    'ServerReplyURL'    => $client_back_url,
+                ];
 
-                // 不存在則走向地圖API
-                $client_back_url = WC()->api_request_url('wooecpay_logistic_map_response', true) . '&id=' . $id;
-                $api_logistic_info  = $this->logisticHelper->get_ecpay_logistic_api_info('map');
-                $MerchantTradeNo    = $this->logisticHelper->get_merchant_trade_no($order->get_id(), get_option('wooecpay_logistic_order_prefix'));
-                $LogisticsType      = $this->logisticHelper->get_logistics_sub_type($shipping_method_id) ;
+                echo $autoSubmitFormService->generate($input, $api_logistic_info['action']);
 
-                try {
-                    $factory = new Factory([
-                        'hashKey'       => $api_logistic_info['hashKey'],
-                        'hashIv'        => $api_logistic_info['hashIv'],
-                        'hashMethod'    => 'md5',
-                    ]);
-                    $autoSubmitFormService = $factory->create('AutoSubmitFormWithCmvService');
-
-                    $input = [
-                        'MerchantID'        => $api_logistic_info['merchant_id'],
-                        'MerchantTradeNo'   => $MerchantTradeNo,
-                        'LogisticsType'     => $LogisticsType['type'],
-                        'LogisticsSubType'  => $LogisticsType['sub_type'],
-                        'IsCollection'      => 'Y',
-                        'ServerReplyURL'    => $client_back_url,
-                    ];
-
-                    echo $autoSubmitFormService->generate($input, $api_logistic_info['action']);
-
-                } catch (RtnException $e) {
-                    // echo wp_kses_post( '(' . $e->getCode() . ')' . $e->getMessage() ) . PHP_EOL;
-                }
+            } catch (RtnException $e) {
+                // echo wp_kses_post( '(' . $e->getCode() . ')' . $e->getMessage() ) . PHP_EOL;
             }
         }
 
