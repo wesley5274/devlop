@@ -16,6 +16,10 @@ class Wooecpay_Logistic
 		add_filter('woocommerce_shipping_methods', array($this, 'add_method'));
 		add_action('woocommerce_shipping_init', array($this, 'load_logistic_logistic'));
 
+
+		// 驗證物流寄件人姓名欄位
+		add_filter('sanitize_option_wooecpay_logistic_sender_name', array($this, 'validate_admin_shipping_field'));
+
 		add_filter('woocommerce_available_payment_gateways', array($this, 'gateway_disable_for_shipping_rate'), 1);
 
 		if ('yes' === get_option('wooecpay_keep_logistic_phone', 'yes')) {
@@ -25,10 +29,7 @@ class Wooecpay_Logistic
 
 		add_action('woocommerce_checkout_update_order_meta', array($this, 'save_weight_order'));
 
-		if (in_array('Wooecpay_Logistic_Home_Tcat', get_option('wooecpay_enabled_logistic_outside', []))) {
-			// 前台結帳頁欄位檢查 Hook
-			add_action('woocommerce_after_checkout_validation', array($this, 'wooecpay_check_logistic_home_tcat_fields'), 10, 2);
-		}
+		add_action('woocommerce_after_checkout_validation', array($this, 'validate_checkout_shipping_field'), 10, 2);
 	}
 
 	/**
@@ -94,7 +95,7 @@ class Wooecpay_Logistic
 	/**
 	 * wc_get_chosen_shipping_method_ids
 	 */
-	function get_chosen_shipping_method_ids()
+	public function get_chosen_shipping_method_ids()
 	{
 		$method_ids     = array();
 		$chosen_methods = is_null(WC()->session) ? [] : WC()->session->get('chosen_shipping_methods', array());
@@ -108,7 +109,7 @@ class Wooecpay_Logistic
 	/**
 	 * 限制綠界物流僅能使用綠界金流
 	 */
-    function gateway_disable_for_shipping_rate($available_gateways)
+    public function gateway_disable_for_shipping_rate($available_gateways)
 	{
         if (!is_admin()) {
 
@@ -163,22 +164,57 @@ class Wooecpay_Logistic
     }
 
 	/**
-	 * 前台結帳頁欄位檢查 - 黑貓
-	 */
-	public function wooecpay_check_logistic_home_tcat_fields($data, $errors)
+     * 驗證物流寄件人姓名欄位
+     * @param string $input
+     */
+	public function validate_admin_shipping_field($input) {
+		$new_value = sanitize_text_field($input);
+		$error_message = $this->logisticHelper->validate_shipping_field('name', $new_value);
+
+		if ($error_message != '') {
+			add_action('admin_notices', function() use ($error_message) {
+				echo '<div class="error"><p><strong>' . __('Ecpay Sipping Setting Error：', 'ecpay-ecommerce-for-woocommerce') . '</strong><br>' . $error_message . '</p></div>';
+			});
+			return get_option('wooecpay_logistic_sender_name', '');
+		}
+
+		return $new_value;
+	}
+
+	public function validate_checkout_shipping_field($data, $errors) 
 	{
 		// 取得當前選擇的運送方式
 		$chosen_shipping = $this->get_chosen_shipping_method_ids();
 		$chosen_shipping = (empty($chosen_shipping)) ? '' : $chosen_shipping[0];
 
-		// 當前選擇的運送方式是否為綠界宅配黑貓
-		if (in_array($chosen_shipping, ['Wooecpay_Logistic_Home_Tcat', 'Wooecpay_Logistic_Home_Tcat_Outside'])) {
-			// 比對運送方式與地址
-			$result = $this->logisticHelper->is_available_state_home_tcat($chosen_shipping, $data['shipping_state']);
-			if (!$result) {
-				// 比對失敗，顯示錯誤訊息
-				$errors->add('validation', __('The selected shipping method does not match the shipping address. Please choose again.', 'ecpay-ecommerce-for-woocommerce'));
-			}
+		// 收件人姓名檢查
+		$error_message = $this->logisticHelper->validate_shipping_field('name', $data['shipping_last_name'] . $data['shipping_first_name']);
+		if ($error_message != '') {
+			$errors->add('validation', $error_message);
+		}
+
+		// 驗證收件人電話
+		$error_message = $this->logisticHelper->validate_shipping_field('phone', $data['billing_phone']);
+		if ($error_message != '') {
+			$errors->add('validation', $error_message);
+		}
+
+		// 黑貓宅配離島檢查
+		if (in_array($chosen_shipping, ['Wooecpay_Logistic_Home_Tcat', 'Wooecpay_Logistic_Home_Tcat_Outside']) && in_array('Wooecpay_Logistic_Home_Tcat', get_option('wooecpay_enabled_logistic_outside', []))) {
+			$this->wooecpay_check_logistic_home_fields($data, $errors, $chosen_shipping);
+		}
+	}
+
+	/**
+	 * 前台結帳頁欄位檢查 - 宅配
+	 */
+	public function wooecpay_check_logistic_home_fields($data, $errors, $chosen_shipping)
+	{
+		// 比對運送方式與地址
+		$result = $this->logisticHelper->is_available_state_home_tcat($chosen_shipping, $data['shipping_state']);
+		if(!$result) {
+			// 比對失敗，顯示錯誤訊息
+			$errors->add('validation', __('The selected shipping method does not match the shipping address. Please choose again.', 'ecpay-ecommerce-for-woocommerce'));
 		}
 	}
 

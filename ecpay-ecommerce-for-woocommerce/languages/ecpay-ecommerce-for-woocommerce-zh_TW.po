@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ECPay Ecommerce for WooCommerce\n"
 "POT-Creation-Date: 2023-10-12 14:28+0800\n"
-"PO-Revision-Date: 2023-10-17 14:27+0800\n"
+"PO-Revision-Date: 2023-10-30 13:52+0800\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: zh_TW\n"
@@ -829,6 +829,30 @@ msgstr "綠界科技."
 
 msgid "Ministry of Finance system is currently under maintenance, unable to verify the carrier. Please choose another invoice mode."
 msgstr "財政部系統目前維護中，無法驗證載具，請選擇其他發票開立方式"
+
+#: includes/services/logistic/class-wooecpay-logistic.php:180
+msgid "Ecpay Sipping Setting Error："
+msgstr "綠界物流設定錯誤："
+
+#: includes/services/helpers/logistic/ecpay-logistic-helper.php:681
+msgid "The name insufficient or exceeded character limit"
+msgstr "姓名低於或超過長度限制"
+
+#: includes/services/helpers/logistic/ecpay-logistic-helper.php:686
+msgid "The name cannot contain numbers"
+msgstr "姓名不能包含數字"
+
+#: includes/services/helpers/logistic/ecpay-logistic-helper.php:691
+msgid "The name contains special symbols that cannot be used"
+msgstr "姓名包含不支援的特殊符號"
+
+#: includes/services/helpers/logistic/ecpay-logistic-helper.php:696
+msgid "The name contains ASCII that cannot be used"
+msgstr "姓名包含不支援的ASCII碼"
+
+#: includes/services/helpers/logistic/ecpay-logistic-helper.php:703
+msgid "No special symbols are allowed in the phone number, it must be ten digits long and start with 09"
+msgstr "電話號碼不允許使用特殊符號，長度必須為十碼且為09開頭"
 
 #~ msgid "Maximum order amount"
 #~ msgstr "訂單最高金額"

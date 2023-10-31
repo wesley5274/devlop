@@ -668,5 +668,60 @@ class Wooecpay_Logistic_Helper
         return $encryption_order_id;
     }
 
+    public function validate_shipping_field($type, $value) {
+		$error_message = '';
+        
+        switch ($type) {
+            case 'name':
+                // 定義正則式
+                $number_pattern = '/\d/';
+                $special_symbol_pattern = '/[\^\'`!@#%&*+\\""<>|_\[\]~$\-={}\/?;():︿‘‵！＠＃％＆＊＋＼＂＜＞｜＿［］～＄－＝｛｝／？；（）：]/u';
+                $ascii_pattern = '/[\x00-\x1F\x7F]/';
 
+                // 驗證字串長度
+                if (!$this->calculate_string_length($value)) {
+                    $error_message = $error_message . __('The name insufficient or exceeded character limit', 'ecpay-ecommerce-for-woocommerce') . '<br>'; 
+                }
+
+                // 驗證是否含有數字
+                if (preg_match($number_pattern, $value)) {
+                    $error_message = $error_message . __('The name cannot contain numbers', 'ecpay-ecommerce-for-woocommerce') . '<br>'; 
+                }
+
+                // 驗證是否包含特殊符號
+                if (preg_match($special_symbol_pattern, $value)) {
+                    $error_message = $error_message . __('The name contains special symbols that cannot be used', 'ecpay-ecommerce-for-woocommerce') . '<br>'; 
+                }
+
+                // 驗證是否包含ASCII
+                if (preg_match($ascii_pattern, $value)) {
+                    $error_message = $error_message . __('The name contains ASCII that cannot be used', 'ecpay-ecommerce-for-woocommerce') . '<br>'; 
+                }
+                break;
+            case 'phone':
+                if (!preg_match('/^09\d{8}$/', $value)) {
+                    $error_message = $error_message . __('No special symbols are allowed in the phone number, it must be ten digits long and start with 09', 'ecpay-ecommerce-for-woocommerce') . '<br>'; 
+                }
+                break;
+        }
+
+        return $error_message;
+    }
+
+    private function calculate_string_length($value) {
+        $length = 0;
+        $str_len = mb_strlen($value);
+        for($i = 0; $i < $str_len; $i++) {
+            if (ctype_alpha($value[$i])) {
+                // 英文字母算一個字
+                $length += 1;
+            } else {
+                // 非英文字母字算兩個字符
+                $length += 2;
+            }
+        }
+        
+        if ($length < 4 || $length > 10) return false;
+        else return true;
+    }
 }
