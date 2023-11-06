@@ -223,4 +223,269 @@ class Wooecpay_Payment_Helper
 
         return $choose_payment;
     }
+
+    /**
+     * 新增訂單付款資訊
+     *
+     * @param  int    $order_id
+     * @param  string $payment_method
+     * @param  string $merchant_trade_no
+     * @param  int    $payment_status
+     * @return void
+     */
+    public function insert_ecpay_orders_payment_status($order_id, $payment_method, $merchant_trade_no, $payment_status = 0)
+    {
+        global $wpdb;
+
+        $is_exist        = false;
+        $table_name      = $wpdb->prefix . 'ecpay_orders_payment_status';
+        $isTableExists   = $wpdb->get_var( "SHOW TABLES LIKE '$table_name'" ) === $table_name;
+
+        // Table 存在才能新增資料
+        if ($isTableExists) {
+
+            // 檢查資料是否存在
+            if ($payment_method === 'cod') {
+                $is_exist = $this->is_cod_payment_status_exist($order_id);
+            } else {
+                $is_exist = $this->is_ecpay_orders_payment_status_exist($order_id, $merchant_trade_no);
+            }
+
+            // 資料存在不新增
+            if (!$is_exist) {
+                $insert = [
+                    'order_id'          => $order_id,
+                    'payment_method'    => $payment_method,
+                    'merchant_trade_no' => $merchant_trade_no,
+                    'payment_status'    => $payment_status
+                ];
+
+                $format = [
+                    '%d',
+                    '%s',
+                    '%s',
+                    '%d'
+                ];
+
+                $wpdb->insert($table_name, $insert, $format);
+            }
+        }
+    }
+
+    /**
+     * 取得重複付款訂單的綠界金流特店交易編號
+     *
+     * @param  string $order_id
+     * @return array
+     */
+    public function get_duplicate_payment_orders_merchant_trade_no($order_id) {
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'ecpay_orders_payment_status';
+
+        $results = $wpdb->get_results(
+            $wpdb->prepare(
+                "SELECT merchant_trade_no
+                FROM $table_name
+                WHERE order_id = %d AND payment_status = 1 AND is_completed_duplicate = 0
+                ORDER BY id DESC",
+                $order_id
+            )
+        );
+
+        if (!empty($results)) {
+            $merchant_trade_no_list = [];
+            foreach ($results as $result) {
+				array_push($merchant_trade_no_list, $result->merchant_trade_no);
+			}
+            return $merchant_trade_no_list;
+        } else {
+            return [];
+        }
+    }
+
+    /**
+     * 檢查是否已存在貨到付款紀錄
+     *
+     * @param  string $order_id
+     * @return bool
+     */
+    public function is_cod_payment_status_exist($order_id) {
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'ecpay_orders_payment_status';
+
+        $count = (int) $wpdb->get_var(
+            $wpdb->prepare(
+                "SELECT COUNT(merchant_trade_no)
+                FROM $table_name
+                WHERE order_id = %d AND payment_method = %s",
+                $order_id,
+                'cod'
+            )
+        );
+
+        return ($count > 0);
+    }
+
+    /**
+     * 檢查綠界金流特店交易編號是否已存在
+     *
+     * @param  string $order_id
+     * @param  string $merchant_trade_no
+     * @return bool
+     */
+    public function is_ecpay_orders_payment_status_exist($order_id, $merchant_trade_no) {
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'ecpay_orders_payment_status';
+
+        $count = (int) $wpdb->get_var(
+            $wpdb->prepare(
+                "SELECT COUNT(merchant_trade_no)
+                FROM $table_name
+                WHERE order_id = %d AND merchant_trade_no = %s",
+                $order_id, $merchant_trade_no
+            )
+        );
+
+        return ($count > 0);
+    }
+
+    /**
+     * 檢查綠界金流特店交易編號是否已付款
+     *
+     * @param  string $order_id
+     * @param  string $merchant_trade_no
+     * @return bool
+     */
+    public function is_ecpay_order_paid($order_id, $merchant_trade_no) {
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'ecpay_orders_payment_status';
+
+        $results = $wpdb->get_results(
+            $wpdb->prepare(
+                "SELECT payment_status
+                FROM $table_name
+                WHERE order_id = %d AND merchant_trade_no = %s
+                LIMIT 1",
+                $order_id, $merchant_trade_no
+            )
+        );
+
+        if (!empty($results)) {
+            return ($results[0]->payment_status === 1);
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * 標示重複付款訂單已處理
+     *
+     * @param  string            $order_id
+     * @return array|object|null
+     */
+    public function update_order_ecpay_orders_payment_status_complete($order_id) {
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'ecpay_orders_payment_status';
+
+        $result = $wpdb->get_results(
+            $wpdb->prepare(
+                "UPDATE $table_name
+                SET is_completed_duplicate = 1, updated_at = CURRENT_TIMESTAMP
+                WHERE order_id = %d AND is_completed_duplicate = 0",
+                $order_id
+            )
+        );
+
+        return $result;
+    }
+
+    /**
+     * 更新訂單付款結果
+     *
+     * @param  string $order_id
+     * @param  array  $info
+     * @return void
+     */
+    public function update_order_ecpay_orders_payment_status($order_id, $info) {
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'ecpay_orders_payment_status';
+
+        // 模擬付款不更新付款狀態
+        if (isset($info['SimulatePaid']) && $info['SimulatePaid'] == 0) {
+            $wpdb->get_results(
+                $wpdb->prepare(
+                    "UPDATE $table_name
+                    SET payment_status = %d, updated_at = CURRENT_TIMESTAMP
+                    WHERE order_id = %d AND merchant_trade_no = %s AND is_completed_duplicate = 0",
+                    $info['RtnCode'],
+                    $order_id,
+                    $info['MerchantTradeNo'],
+                )
+            );
+        }
+    }
+
+    /**
+     * 取得綠界金流
+     *
+     * @return array
+     */
+    public function get_ecpay_payment_method()
+    {
+        return [
+            'Wooecpay_Gateway_Credit',
+			'Wooecpay_Gateway_Credit_Installment',
+			'Wooecpay_Gateway_Webatm',
+			'Wooecpay_Gateway_Atm',
+			'Wooecpay_Gateway_Cvs',
+			'Wooecpay_Gateway_Barcode',
+			'Wooecpay_Gateway_Applepay',
+			'Wooecpay_Gateway_Dca',
+			'Wooecpay_Gateway_Twqr',
+			'Wooecpay_Gateway_Bnpl'
+        ];
+    }
+
+    /**
+     * 判斷是否為綠界金流
+     *
+     * @param  string $payment_method
+     * @return bool
+     */
+    public function is_ecpay_payment_method($payment_method)
+    {
+        return in_array($payment_method, $this->get_ecpay_payment_method());
+    }
+
+    /**
+	 * 檢查訂單是否重複付款
+	 *
+     * @param  WC_Order $order
+	 * @return array
+	 */
+	public function check_order_is_duplicate_payment($order)
+	{
+        $is_duplicate_payment = 0; // 0:沒有重複付款紀錄、1:有重複付款紀錄
+        $merchant_trade_no_list = [];
+
+		// 取得訂單付款方式
+		$payment_method = get_post_meta($order->get_id(), '_payment_method', true);
+
+        // 取得重複付款訂單的綠界金流特店交易編號
+        $merchant_trade_no_list = $this->get_duplicate_payment_orders_merchant_trade_no($order->get_id());
+        $count_merchant_trade_no = count($merchant_trade_no_list);
+
+        // 僅檢查付款方式是綠界金流或貨到付款的訂單
+		if ($this->is_ecpay_payment_method($payment_method) || $payment_method === 'cod') {
+			// 超過 1 筆已付款的紀錄
+			if ($count_merchant_trade_no > 1) {
+				$is_duplicate_payment = 1;
+			}
+		}
+
+        return [
+            'code' => $is_duplicate_payment,
+            'merchant_trade_no'  => $merchant_trade_no_list
+        ];
+	}
 }

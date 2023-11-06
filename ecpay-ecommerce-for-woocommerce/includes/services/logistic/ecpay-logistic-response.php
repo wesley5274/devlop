@@ -43,34 +43,31 @@ class Wooecpay_Logistic_Response
                 // 判斷是否為超商取貨
                 if ($this->logisticHelper->is_ecpay_cvs_logistics($shipping_method_id)) {
 
-                    // 是否啟用超商離島物流
-                    if (in_array('Wooecpay_Logistic_CVS_711', get_option('wooecpay_enabled_logistic_outside', []))) {
+                    // 判斷是否有回傳資訊
+                    if (isset($_POST['CVSStoreID'])) {
 
-                        // 門市檢查
-                        $is_valid = $this->logisticHelper->check_cvs_is_valid($shipping_method_id, $_POST['CVSOutSide']);
-                        if (!$is_valid) {
-                            $confirm_msg = __('The selected store does not match the chosen shipping method (Outlying Island/Main Island). Please select a different store or cancel the transaction and place a new order.', 'ecpay-ecommerce-for-woocommerce');
-                            $encryption_order_id = $this->logisticHelper->encrypt_order_id($order_id);
-                            $url = WC()->api_request_url('wooecpay_logistic_redirect_map', true) . '&id=' . $encryption_order_id;
+                        // 是否啟用超商離島物流
+                        if (in_array('Wooecpay_Logistic_CVS_711', get_option('wooecpay_enabled_logistic_outside', []))) {
 
-                            // 提示訊息
-                            echo '<script>';
-                            echo '    if (confirm("' . $confirm_msg . '")) {';
-                            echo '        window.location.href = "' . $url . '"; ';
-                            echo '    } else {';
-                            echo '        window.location.href = "' . wc_get_page_permalink('checkout') . '"; ';
-                            echo '    }';
-                            echo '</script>';
+                            // 門市檢查
+                            $is_valid = $this->logisticHelper->check_cvs_is_valid($shipping_method_id, $_POST['CVSOutSide']);
+                            if (!$is_valid) {
+                                $confirm_msg = __('The selected store does not match the chosen shipping method (Outlying Island/Main Island). Please select a different store or cancel the transaction and place a new order.', 'ecpay-ecommerce-for-woocommerce');
+                                $encryption_order_id = $this->logisticHelper->encrypt_order_id($order_id);
+                                $url = WC()->api_request_url('wooecpay_logistic_redirect_map', true) . '&id=' . $encryption_order_id;
 
-                            exit;
+                                // 提示訊息
+                                echo '<script>';
+                                echo '    if (confirm("' . $confirm_msg . '")) {';
+                                echo '        window.location.href = "' . $url . '"; ';
+                                echo '    } else {';
+                                echo '        window.location.href = "' . wc_get_page_permalink('checkout') . '"; ';
+                                echo '    }';
+                                echo '</script>';
+
+                                exit;
+                            }
                         }
-                    }
-
-                    // 取出商店代號
-                    $CVSStoreID = $order->get_meta('_ecpay_logistic_cvs_store_id');
-
-                    // 不存在
-                    if (empty($CVSStoreID)) {
 
                         $CVSStoreID   = sanitize_text_field($_POST['CVSStoreID']);
                         $CVSStoreName = sanitize_text_field($_POST['CVSStoreName']);
@@ -137,6 +134,9 @@ class Wooecpay_Logistic_Response
 
                 $order->save();
 
+                // 紀錄訂單付款資訊進 DB
+                $this->paymentHelper->insert_ecpay_orders_payment_status($order_id, $order->get_payment_method(), $merchant_trade_no);
+
                 // 組合AIO參數
                 try {
                     $factory = new Factory([
@@ -197,7 +197,6 @@ class Wooecpay_Logistic_Response
                 WC()->cart->empty_cart();
             }
         }
-
         exit;
     }
 

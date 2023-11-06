@@ -44,7 +44,7 @@ return [
         ]
     ],
     'ecpay_dca' => [
-        'title' => __('Test DCA', 'ecpay-ecommerce-for-woocommerce'),
+        'title' => __('DCA', 'ecpay-ecommerce-for-woocommerce'),
         'type' => 'ecpay_dca',
         'default' => '',
         'description' => '',

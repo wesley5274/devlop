@@ -107,6 +107,9 @@ class Wooecpay_Gateway_Base extends WC_Payment_Gateway
 
                 $order->save();
 
+                // 紀錄訂單付款資訊進 DB
+                $this->paymentHelper->insert_ecpay_orders_payment_status($order_id, $order->get_payment_method(), $merchant_trade_no);
+
                 // 組合AIO參數
                 try {
                     $factory = new Factory([
@@ -185,9 +188,6 @@ class Wooecpay_Gateway_Base extends WC_Payment_Gateway
     // 感謝頁面
     public function thankyou_page($order_id)
     {
-        // var_dump($order->get_payment_method());
-        // var_dump($order->get_meta('wooecpay_payment_order_prefix'));
-
         if (empty($order_id)) {
             return;
         }

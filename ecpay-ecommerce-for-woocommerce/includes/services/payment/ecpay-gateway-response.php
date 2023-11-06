@@ -47,6 +47,9 @@ class Wooecpay_Gateway_Response
                 // 金額比對
                 if ($info['TradeAmt'] == $order_total) {
 
+                    // 更新訂單付款結果
+                    $this->paymentHelper->update_order_ecpay_orders_payment_status($order_id, $info);
+
                     // 判斷狀態
                     switch ($info['RtnCode']) {
 
@@ -58,11 +61,10 @@ class Wooecpay_Gateway_Response
                                     $order = $this->create_cda_new_order($info, $order_id);
                                 }
 
-                                // 判斷付款完成旗標，如果旗標不存或為0則執行 僅允許綠界一次作動
-                                $payment_complete_flag = get_post_meta($order->get_id(), '_payment_complete_flag', true);
+                                // 判斷回傳的綠界金流特店交易編號是否已付款
+                                $is_ecpay_paid = $this->paymentHelper->is_ecpay_order_paid($order_id, $info['MerchantTradeNo']);
 
-                                if (empty($payment_complete_flag)) {
-
+                                if (!$is_ecpay_paid) {
                                     $order->add_order_note(__('Payment completed', 'ecpay-ecommerce-for-woocommerce'));
 
                                     $order->update_meta_data('_ecpay_card6no', $info['card6no']);
@@ -79,18 +81,8 @@ class Wooecpay_Gateway_Response
 
                                     // 產生物流訂單
                                     if ('yes' === get_option('wooecpay_enable_logistic_auto', 'yes')) {
-
-                                        // 是否已經開立
-                                        $wooecpay_logistic_AllPayLogisticsID = get_post_meta($order->get_id(), '_wooecpay_logistic_AllPayLogisticsID', true);
-
-                                        if (empty($wooecpay_logistic_AllPayLogisticsID)) {
-                                            $this->logisticHelper->send_logistic_order_action($order->get_id(), false);
-                                        }
+                                        $this->logisticHelper->send_logistic_order_action($order->get_id(), false);
                                     }
-
-                                    // 異動付款完成旗標為1
-                                    $order->update_meta_data('_payment_complete_flag', 1);
-                                    $order->save_meta_data();
                                 }
                             } else {
                                 // 模擬付款 僅執行備註寫入
