@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ECPay Ecommerce for WooCommerce\n"
 "POT-Creation-Date: 2023-10-12 14:28+0800\n"
-"PO-Revision-Date: 2023-11-06 10:18+0800\n"
+"PO-Revision-Date: 2023-11-07 10:38+0800\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: zh_TW\n"
@@ -874,6 +874,14 @@ msgstr "電話號碼不允許使用特殊符號，長度必須為十碼且為09�
 #: admin/order/class-wooecpay-order.php:691
 msgid "Duplicate payments for ecpay orders are marked as processed."
 msgstr "綠界訂單重複付款提示標示為已處理"
+
+#: includes/config/main/settings.php:36
+msgid "Tools"
+msgstr "工具"
+
+#: includes/config/main/settings.php:41 includes/config/main/settings.php:43
+msgid "Enable ECPay debug log"
+msgstr "啟用綠界偵錯 Log 記錄"
 
 #~ msgid "Maximum order amount"
 #~ msgstr "訂單最高金額"

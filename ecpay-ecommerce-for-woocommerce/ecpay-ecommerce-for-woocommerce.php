@@ -51,6 +51,17 @@ register_activation_hook( __FILE__, array('Wooecpay_Db_Process', 'ecpay_db_proce
 add_action('upgrader_process_complete', array('Wooecpay_Db_Process', 'ecpay_db_process'));
 add_action('plugins_loaded', array('Wooecpay_Db_Process', 'ecpay_db_process'));
 
+// 載入 log 功能
+require WOOECPAY_PLUGIN_DIR . 'includes/services/helpers/logger/ecpay-logger.php';
+function ecpay_log($content, $code = '', $order_id = '') {
+    $logger = new Helpers\Logger\Wooecpay_Logger;
+    return $logger->log($content, $code, $order_id);
+}
+function ecpay_log_replace_symbol($type, $data) {
+    $logger = new Helpers\Logger\Wooecpay_Logger;
+    return $logger->replace_symbol($type, $data);
+}
+
 $plugin_main        = new Wooecpay_Setting();
 $plugin_order       = new Wooecpay_Order();
 

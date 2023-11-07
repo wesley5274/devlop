@@ -455,6 +455,9 @@ class Wooecpay_Invoice_Helper
      * @return void
      */
     public function invoice_create($order) {
+
+        ecpay_log('開立發票程序', 'A10000', $order->get_id());
+
         // 判斷發票是否存在，不存在則開立
         $wooecpay_invoice_process = get_post_meta($order->get_id(), '_wooecpay_invoice_process', true);
 
