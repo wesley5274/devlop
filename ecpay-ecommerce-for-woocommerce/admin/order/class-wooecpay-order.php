@@ -57,7 +57,7 @@ class Wooecpay_Order
 				add_action('wp_ajax_send_invoice_invalid', array($this, 'ajax_send_invoice_invalid'));
 
 				// 自動作廢
-				if ('auto_cancel' === get_option('wooecpay_enabled_cancel_invoice_auto', 'auto_cancel')) {
+				if ('auto_cancel' === get_option('wooecpay_enabled_cancel_invoice_auto', 'manual')) {
 					add_action('woocommerce_order_status_cancelled', array($this, 'auto_invoice_invalid'));
 					add_action('woocommerce_order_status_refunded', array($this, 'auto_invoice_invalid'));
 				}
@@ -66,7 +66,7 @@ class Wooecpay_Order
 
     	if ('yes' === get_option('wooecpay_enabled_invoice', 'yes')) {
 			// 自動開立
-			if ('auto_paid' === get_option('wooecpay_enabled_invoice_auto', 'auto_paid')) {
+			if ('auto_paid' === get_option('wooecpay_enabled_invoice_auto', 'manual')) {
 				add_action('woocommerce_order_status_processing', array($this, 'auto_invoice_create'));
 			}
 		}

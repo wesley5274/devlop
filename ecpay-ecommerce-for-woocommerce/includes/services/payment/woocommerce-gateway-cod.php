@@ -184,7 +184,7 @@ class Wooecpay_Gateway_Cod extends Wooecpay_Gateway_Base
                     $order->update_status('processing');
 
                     // 產生物流訂單
-                    if ('yes' === get_option('wooecpay_enable_logistic_auto', 'yes')) {
+                    if ('yes' === get_option('wooecpay_enable_logistic_auto', 'no')) {
                         $this->logisticHelper->send_logistic_order_action($order_id, false);
                     }
 
