@@ -80,7 +80,7 @@ class Wooecpay_Gateway_Response
                                     $order->save_meta_data();
 
                                     // 產生物流訂單
-                                    if ('yes' === get_option('wooecpay_enable_logistic_auto', 'yes')) {
+                                    if ('yes' === get_option('wooecpay_enable_logistic_auto', 'no')) {
                                         $this->logisticHelper->send_logistic_order_action($order->get_id(), false);
                                     }
                                 }
