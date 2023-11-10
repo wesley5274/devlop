@@ -21,8 +21,8 @@ class Wooecpay_invoice {
 
         // 功能開關設定
         $this->my_custom_features_switch = array(
-            'billing_love_code_api_check' 	=> false,
-            'billing_carruer_num_api_check' => false
+            'billing_love_code_api_check' 	=> true,
+            'billing_carruer_num_api_check' => true
         );
 	}
 
