@@ -98,6 +98,8 @@ class Wooecpay_Gateway_Cod extends Wooecpay_Gateway_Base
                     'ServerReplyURL'    => $client_back_url,
                 ];
 
+                ecpay_log('轉導電子地圖', 'B00004', $order_id);
+
                 echo $autoSubmitFormService->generate($input, $api_logistic_info['action']);
 
             } catch (RtnException $e) {
@@ -132,6 +134,8 @@ class Wooecpay_Gateway_Cod extends Wooecpay_Gateway_Base
             $shippping_tag  &&
             $this->logisticHelper->is_ecpay_cvs_logistics($shipping_method_id)
         ) {
+            ecpay_log('貨到付款選擇門市回傳 ' . print_r($_POST, true), 'D00001', $order_id);
+
             // 判斷是否有回傳資訊
             if (isset($_POST['CVSStoreID'])) {
 
@@ -184,7 +188,8 @@ class Wooecpay_Gateway_Cod extends Wooecpay_Gateway_Base
                     $order->update_status('processing');
 
                     // 產生物流訂單
-                    if ('yes' === get_option('wooecpay_enable_logistic_auto', 'no')) {
+                    if ('yes' === get_option('wooecpay_enable_logistic_auto', 'yes')) {
+                        ecpay_log('自動產生物流訂單', 'B00007', $order_id);
                         $this->logisticHelper->send_logistic_order_action($order_id, false);
                     }
 
@@ -260,6 +265,8 @@ class Wooecpay_Gateway_Cod extends Wooecpay_Gateway_Base
             $order->update_status('failed');
             // 提示文字
             $order->add_order_note(__('The selected store does not match the chosen shipping method (Outlying Island/Main Island).', 'ecpay-ecommerce-for-woocommerce'));
+
+            ecpay_log('取消貨到付款訂單', 'D00020', $order_id);
         }
 
         // 錯誤提示畫面
@@ -283,6 +290,7 @@ class Wooecpay_Gateway_Cod extends Wooecpay_Gateway_Base
         $CVSStoreID = $order->get_meta('_ecpay_logistic_cvs_store_id') ;
 
         if (!empty($CVSStoreID)) {
+            ecpay_log('貨到付款 Thankyou page', 'D00010', $order_id);
 
             $template_file = 'logistic/cvs_map.php';
 

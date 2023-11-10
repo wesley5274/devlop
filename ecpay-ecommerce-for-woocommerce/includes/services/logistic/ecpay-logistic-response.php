@@ -30,6 +30,8 @@ class Wooecpay_Logistic_Response
 
             $order_id = $this->logisticHelper->get_order_id_by_merchant_trade_no($_POST);
 
+            ecpay_log('選擇超商結果回傳 ' . print_r($_POST, true), 'B00005', $order_id);
+
             if ($order = wc_get_order($order_id)) {
 
                 // 物流相關程序
@@ -188,10 +190,13 @@ class Wooecpay_Logistic_Response
 
                     $generateForm = $autoSubmitFormService->generate($input, $api_payment_info['action']);
 
+                    ecpay_log('轉導 AIO 付款頁', 'A00006', $order_id);
+
                     echo $generateForm;
                     exit;
 
                 } catch (RtnException $e) {
+                    ecpay_log('[Exception] (' . $e->getCode() . ')' . $e->getMessage(), 'B90005', $order_id ?: $_POST['MerchantTradeNo']);
                     echo wp_kses_post('(' . $e->getCode() . ')' . $e->getMessage()) . PHP_EOL;
                 }
                 WC()->cart->empty_cart();
@@ -205,6 +210,8 @@ class Wooecpay_Logistic_Response
         if (isset($_POST['MerchantTradeNo'])) {
 
             $order_id = $this->logisticHelper->get_order_id_by_merchant_trade_no($_POST);
+
+            ecpay_log('後台變更門市結果回傳 ' . print_r($_POST, true), 'B00010', $order_id);
 
             if ($order = wc_get_order($order_id)) {
 
@@ -256,6 +263,8 @@ class Wooecpay_Logistic_Response
 
                         $order->save();
 
+                        ecpay_log('後台變更門市成功', 'B00011', $order_id);
+
                         echo '<section>';
                         echo '<h2>變更後門市資訊:</h2>';
                         echo '<table>';
@@ -276,6 +285,8 @@ class Wooecpay_Logistic_Response
                         echo '</table>';
                         echo '</section>';
                     } else {
+                        ecpay_log('後台變更門市失敗', 'B00012', $order_id);
+
                         // 組合地圖FORM
                         $form_map = $this->logisticHelper->generate_ecpay_map_form($shipping_method_id, $order->get_id());
                         $form_map = str_replace('<!DOCTYPE html><html><head><meta charset="utf-8"></head><body>', '', $form_map);
@@ -309,6 +320,8 @@ class Wooecpay_Logistic_Response
 
                 $order_id = $this->logisticHelper->get_order_id_by_merchant_trade_no($_POST);
 
+                ecpay_log('接收物流貨態回傳 ' . print_r($_POST, true), 'B00020', $order_id);
+
                 if ($order = wc_get_order($order_id)) {
 
                     // 物流方式
@@ -331,6 +344,7 @@ class Wooecpay_Logistic_Response
             }
 
         } catch (RtnException $e) {
+            ecpay_log('[Exception] ' . '(' . $e->getCode() . ')' . $e->getMessage(). print_r($_POST, true), 'B90020', $order_id ?: $_POST['MerchantTradeNo']);
             echo wp_kses_post('(' . $e->getCode() . ')' . $e->getMessage()) . PHP_EOL;
         }
 

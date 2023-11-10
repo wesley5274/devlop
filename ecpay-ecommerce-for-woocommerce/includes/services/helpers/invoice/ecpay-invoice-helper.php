@@ -456,8 +456,6 @@ class Wooecpay_Invoice_Helper
      */
     public function invoice_create($order) {
 
-        ecpay_log('開立發票程序', 'A10000', $order->get_id());
-
         // 判斷發票是否存在，不存在則開立
         $wooecpay_invoice_process = get_post_meta($order->get_id(), '_wooecpay_invoice_process', true);
 
@@ -596,6 +594,8 @@ class Wooecpay_Invoice_Helper
                         'Data' => $data,
                     ];
 
+                    ecpay_log('送出立即開立發票請求 ' . print_r(ecpay_log_replace_symbol('invoice', $input), true), 'C00005', $order->get_id());
+
                     $response = $postService->post($input, $api_payment_info['action']);
 
                     if ($response['TransCode'] == 1) {
@@ -613,15 +613,22 @@ class Wooecpay_Invoice_Helper
 
                             $order->add_order_note('發票開立成功:狀態:' . $response['Data']['RtnMsg'] . '(' . $response['Data']['RtnCode'] . ')');
                             $order->save();
+
+                            ecpay_log('立即開立發票成功', 'C00006', $order->get_id());
                         } else {
                             $order->add_order_note('發票開立失敗:狀態:' . $response['Data']['RtnMsg'] . '(' . $response['Data']['RtnCode'] . ')');
                             $order->save();
+
+                            ecpay_log('立即開立發票失敗', 'C00007', $order->get_id());
                         }
                     } else {
                         $order->add_order_note('發票開立失敗:狀態:' . $response['TransMsg'] . '(' . $response['TransCode'] . ')');
                         $order->save();
+
+                        ecpay_log('立即開立發票失敗', 'C00008', $order->get_id());
                     }
                 } catch (RtnException $e) {
+                    ecpay_log('[Exception] (' . $e->getCode() . ')' . $e->getMessage(), 'C90005', $order->get_id());
                     echo wp_kses_post('(' . $e->getCode() . ')' . $e->getMessage()) . PHP_EOL;
                 }
             } else {
@@ -748,6 +755,8 @@ class Wooecpay_Invoice_Helper
                         'Data' => $data,
                     ];
 
+                    ecpay_log('送出延遲開立發票請求 ' . print_r(ecpay_log_replace_symbol('invoice', $input), true), 'C00009', $order->get_id());
+
                     $response = $postService->post($input, $api_payment_info['action']);
 
                     if ($response['TransCode'] == 1) {
@@ -763,15 +772,22 @@ class Wooecpay_Invoice_Helper
 
                             $order->add_order_note('發票開立成功:狀態:' . $response['Data']['RtnMsg'] . '('. $response['Data']['RtnCode'] . ')');
                             $order->save();
+
+                            ecpay_log('延遲開立發票成功', 'C00010', $order->get_id());
                         } else {
                             $order->add_order_note('發票開立失敗:狀態:' . $response['Data']['RtnMsg'] . '('. $response['Data']['RtnCode'] . ')');
                             $order->save();
+
+                            ecpay_log('延遲開立發票失敗', 'C00011', $order->get_id());
                         }
                     } else {
                         $order->add_order_note('發票開立失敗:狀態:' . $response['TransMsg'] . '('. $response['TransCode'] . ')');
                         $order->save();
+
+                        ecpay_log('延遲開立發票失敗', 'C00012', $order->get_id());
                     }
                 } catch (RtnException $e) {
+                    ecpay_log('[Exception] (' . $e->getCode() . ')' . $e->getMessage(), 'C90009', $order->get_id());
                     echo wp_kses_post('(' . $e->getCode() . ')' . $e->getMessage()) . PHP_EOL;
                 }
             }
@@ -823,6 +839,8 @@ class Wooecpay_Invoice_Helper
                         'Data' => $data,
                     ];
 
+                    ecpay_log('送出立即開立發票作廢請求 ' . print_r(ecpay_log_replace_symbol('invoice', $input), true), 'C00013', $order->get_id());
+
                     $response = $postService->post($input, $api_payment_info['action']);
 
                     if ($response['Data']['RtnCode'] == 1 || $response['Data']['RtnCode'] == 5070453) {
@@ -839,11 +857,16 @@ class Wooecpay_Invoice_Helper
 
                         $order->add_order_note('發票作廢成功: 發票號碼:' .$wooecpay_invoice_no . ' 狀態:' . $response['Data']['RtnMsg'] . '('. $response['Data']['RtnCode'] . ')');
                         $order->save();
+
+                        ecpay_log('立即開立發票作廢成功', 'C00014', $order->get_id());
                     } else {
                         $order->add_order_note('發票作廢失敗:狀態:' . $response['Data']['RtnMsg'] . '('. $response['Data']['RtnCode'] . ')');
                         $order->save();
+
+                        ecpay_log('立即開立發票作廢失敗', 'C00015', $order->get_id());
                     }
                 } catch (RtnException $e) {
+                    ecpay_log('[Exception] (' . $e->getCode() . ')' . $e->getMessage(), 'C90013', $order->get_id());
                     echo wp_kses_post('(' . $e->getCode() . ')' . $e->getMessage()) . PHP_EOL;
                 }
             } else if ($wooecpay_invoice_issue_type == 2) {
@@ -871,6 +894,8 @@ class Wooecpay_Invoice_Helper
                         'Data' => $data,
                     ];
 
+                    ecpay_log('送出延遲開立發票作廢請求 ' . print_r(ecpay_log_replace_symbol('invoice', $input), true), 'C00016', $order->get_id());
+
                     $response = $postService->post($input, $api_payment_info['action']);
 
                     if ($response['Data']['RtnCode'] == 1) {
@@ -889,11 +914,16 @@ class Wooecpay_Invoice_Helper
                         $order->add_order_note('發票作廢成功: 交易單號:' . $wooecpay_invoice_tsr . ' 狀態:' . $response['Data']['RtnMsg'] . '('. $response['Data']['RtnCode'] . ')');
 
                         $order->save();
+
+                        ecpay_log('延遲開立發票作廢成功', 'C00017', $order->get_id());
                     } else {
                         $order->add_order_note('發票作廢失敗:狀態:' . $response['Data']['RtnMsg'] . '('. $response['Data']['RtnCode'] . ')');
                         $order->save();
+
+                        ecpay_log('延遲開立發票作廢失敗', 'C00018', $order->get_id());
                     }
                 } catch (RtnException $e) {
+                    ecpay_log('[Exception] (' . $e->getCode() . ')' . $e->getMessage(), 'C90016', $order->get_id());
                     echo wp_kses_post('(' . $e->getCode() . ')' . $e->getMessage()) . PHP_EOL;
                 }
             }

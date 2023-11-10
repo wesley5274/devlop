@@ -596,6 +596,9 @@ class Wooecpay_Order
 	 */
 	public function ajax_send_logistic_order_action()
 	{
+		$order_id = isset($_POST['order_id']) ? sanitize_text_field($_POST['order_id']) : '' ;
+		ecpay_log('手動產生物流訂單', 'B00008', $order_id);
+
 		$this->logisticHelper->send_logistic_order_action();
 	}
 
@@ -607,6 +610,7 @@ class Wooecpay_Order
 		$order_id = isset($_POST['order_id']) ? sanitize_text_field($_POST['order_id']) : '' ;
 
 		if ($order = wc_get_order($order_id)) {
+			ecpay_log('手動開立發票', 'C00001', $order_id);
 			$this->invoiceHelper->invoice_create($order);
 		}
 	}
@@ -617,6 +621,7 @@ class Wooecpay_Order
 	public function auto_invoice_create($order_id)
 	{
 		if ($order = wc_get_order($order_id)) {
+			ecpay_log('自動開立發票', 'C00002', $order_id);
 			$this->invoiceHelper->invoice_create($order);
 		}
 
@@ -630,6 +635,7 @@ class Wooecpay_Order
 		$order_id = isset($_POST['order_id'])	? sanitize_text_field($_POST['order_id']) : '';
 
 		if ($order = wc_get_order($order_id)) {
+			ecpay_log('手動作廢發票', 'C00003', $order_id);
 			$this->invoiceHelper->invoice_invalid($order);
 		}
 	}
@@ -640,6 +646,7 @@ class Wooecpay_Order
 	public function auto_invoice_invalid($order_id)
 	{
 		if ($order = wc_get_order($order_id)) {
+			ecpay_log('自動作廢發票', 'C00004', $order_id);
 			$this->invoiceHelper->invoice_invalid($order);
 		}
 
