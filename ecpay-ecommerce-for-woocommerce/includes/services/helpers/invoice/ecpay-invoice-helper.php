@@ -598,6 +598,8 @@ class Wooecpay_Invoice_Helper
 
                     $response = $postService->post($input, $api_payment_info['action']);
 
+                    ecpay_log('立即開立發票結果回傳 ' . print_r(ecpay_log_replace_symbol('invoice', $response), true), 'C00020', $order->get_id());
+
                     if ($response['TransCode'] == 1) {
                         if ($response['Data']['RtnCode'] == 1) {
                             // 更新訂單
@@ -759,6 +761,8 @@ class Wooecpay_Invoice_Helper
 
                     $response = $postService->post($input, $api_payment_info['action']);
 
+                    ecpay_log('延遲開立發票結果回傳 ' . print_r($response, true), 'C00021', $order->get_id());
+
                     if ($response['TransCode'] == 1) {
                         if ($response['Data']['RtnCode'] == 1) {
                             // 更新訂單
@@ -843,6 +847,8 @@ class Wooecpay_Invoice_Helper
 
                     $response = $postService->post($input, $api_payment_info['action']);
 
+                    ecpay_log('立即開立發票作廢結果回傳 ' . print_r(ecpay_log_replace_symbol('invoice', $response), true), 'C00022', $order->get_id());
+
                     if ($response['Data']['RtnCode'] == 1 || $response['Data']['RtnCode'] == 5070453) {
                         // 更新訂單
                         $order->update_meta_data('_wooecpay_invoice_relate_number', '');
@@ -897,6 +903,8 @@ class Wooecpay_Invoice_Helper
                     ecpay_log('送出延遲開立發票作廢請求 ' . print_r(ecpay_log_replace_symbol('invoice', $input), true), 'C00016', $order->get_id());
 
                     $response = $postService->post($input, $api_payment_info['action']);
+
+                    ecpay_log('延遲開立發票作廢結果回傳 ' . print_r(ecpay_log_replace_symbol('invoice', $input), true), 'C00023', $order->get_id());
 
                     if ($response['Data']['RtnCode'] == 1) {
                         // 更新訂單

@@ -190,7 +190,7 @@ class Wooecpay_Logistic_Response
 
                     $generateForm = $autoSubmitFormService->generate($input, $api_payment_info['action']);
 
-                    ecpay_log('轉導 AIO 付款頁', 'A00006', $order_id);
+                    ecpay_log('轉導 AIO 付款頁 ' . print_r($input, true), 'A00006', $order_id);
 
                     echo $generateForm;
                     exit;

@@ -85,7 +85,7 @@ class Wooecpay_Gateway_Response
 
                                     // 產生物流訂單
                                     if ('yes' === get_option('wooecpay_enable_logistic_auto', 'yes')) {
-                                        ecpay_log('自動產生物流訂單', 'B00006', $order_id);
+                                        ecpay_log('自動產生物流訂單', 'A00014', $order_id);
                                         $this->logisticHelper->send_logistic_order_action($order->get_id(), false);
                                     }
                                 }

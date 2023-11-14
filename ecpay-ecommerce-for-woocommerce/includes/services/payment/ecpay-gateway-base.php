@@ -77,7 +77,7 @@ class Wooecpay_Gateway_Base extends WC_Payment_Gateway
 
                     $form_map = $autoSubmitFormService->generate($input, $api_logistic_info['action']);
 
-                    ecpay_log('轉導電子地圖', 'A00003', $order_id);
+                    ecpay_log('轉導電子地圖 ' . print_r($input, true), 'A00003', $order_id);
 
                     echo $form_map ;
 
@@ -165,7 +165,7 @@ class Wooecpay_Gateway_Base extends WC_Payment_Gateway
                         break;
                     }
 
-                    ecpay_log('轉導 AIO 付款頁-' . $this->payment_type, 'A00004', $order_id);
+                    ecpay_log('轉導 AIO 付款頁 ' . print_r($input, true), 'A00004', $order_id);
 
                     $generateForm = $autoSubmitFormService->generate($input, $api_payment_info['action']);
                     // $generateForm = str_replace('document.getElementById("ecpay-form").submit();', '', $generateForm) ;

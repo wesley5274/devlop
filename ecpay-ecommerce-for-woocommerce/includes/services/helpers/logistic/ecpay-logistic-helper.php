@@ -155,6 +155,8 @@ class Wooecpay_Logistic_Helper
 
                         $response = $postService->post($inputLogisticOrder, $api_logistic_info['action']);
 
+                        ecpay_log('產生物流訂單結果回傳 ' . print_r(ecpay_log_replace_symbol('logistic', $response), true), 'B00013', $order_id);
+
                         if (isset($response['RtnCode']) &&
                             ($response['RtnCode'] == 300 || $response['RtnCode'] == 2001)) {
 
@@ -592,6 +594,8 @@ class Wooecpay_Logistic_Helper
             ];
 
             $form_map = $autoSubmitFormService->generate($inputMap, $api_logistic_info['action'], 'ecpay_map');
+
+            ecpay_log('組合地圖 FORM ' . print_r($inputMap, true), 'B00015', $order_id);
 
             return $form_map;
         } catch (RtnException $e) {
