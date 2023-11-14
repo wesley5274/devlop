@@ -90,3 +90,21 @@ function wooecpayDuplicatePaymentComplete(order_id, merchant_trade_no_list) {
         jQuery.unblockUI()
     });
 }
+
+// (工具)清理 Log
+function wooecpayClearEcpayDebugLog() {
+
+    query = {
+        action: 'clear_ecpay_debug_log'
+    };
+
+    jQuery.post(ajaxurl, query, function(response) {
+        //
+    })
+    .success (function() {
+        alert('Log 已清空!');
+    })
+    .error (function () {
+        console.log('清理Log失敗')
+    });
+}

@@ -8,7 +8,7 @@ class Wooecpay_Logger
      * 寫 Log
      *
      * @param  string|array $content
-     * @param  string       $code
+     * @param  string       $code      A:Ecpay payment flow/B:Ecpay logistic flow/C:Ecpay invoice flow/D:Cod flow
      * @param  string       $order_id
      * @return void
      */
@@ -19,9 +19,8 @@ class Wooecpay_Logger
             if ('yes' === get_option('wooecpay_enabled_debug_log', 'no')) {
 
                 // 檢查 Log 目錄是否存在
-                $log_folder = WOOECPAY_PLUGIN_DIR . '/logs';
-                if (!is_dir($log_folder)) {
-                    wp_mkdir_p($log_folder);
+                if (!is_dir(WOOECPAY_PLUGIN_LOG_DIR)) {
+                    wp_mkdir_p(WOOECPAY_PLUGIN_LOG_DIR);
                 }
 
                 // 組合 Log 固定開頭
@@ -35,11 +34,31 @@ class Wooecpay_Logger
 
                 // 新增 Log
                 // 注意：'外掛檔案編輯器'有限制允許編輯的檔案類型
-                $debug_log_file_path = $log_folder . '/ecpay_debug_' . date_i18n('Ymd') . '.txt';
+                $debug_log_file_path = WOOECPAY_PLUGIN_LOG_DIR . '/ecpay_debug_' . date_i18n('Ymd') . '.txt';
                 file_put_contents($debug_log_file_path, ($content . PHP_EOL), FILE_APPEND);
             }
         } catch (Exception $e){
+            error_log(print_r($e->getMessage(), true));
+        }
+    }
 
+    /**
+     * 清理 Log
+     *
+     * @return bool
+     */
+    public function clear_log(){
+        if (WP_Filesystem()) {
+            global $wp_filesystem;
+
+            if ($wp_filesystem->is_dir(WOOECPAY_PLUGIN_LOG_DIR)) {
+                // Delete the folder and its contents
+                $wp_filesystem->rmdir(WOOECPAY_PLUGIN_LOG_DIR, true);
+
+                return true;
+            }
+
+            return false;
         }
     }
 

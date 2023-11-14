@@ -40,7 +40,7 @@ return [
     [
         'name'     => __('Enable ECPay debug log', 'ecpay-ecommerce-for-woocommerce'),
         'type'     => 'checkbox',
-        'desc'     => __('Enable ECPay debug log', 'ecpay-ecommerce-for-woocommerce'),
+        'desc'     => __('Enable ECPay debug log', 'ecpay-ecommerce-for-woocommerce') . '<br>' . __('Due to the large size of the log file, please remember to disable this feature if not in use.', 'ecpay-ecommerce-for-woocommerce') . '<br>' . sprintf(__('Log folder : <code>%s</code>', 'ecpay-ecommerce-for-woocommerce'), WOOECPAY_PLUGIN_LOG_DIR) . '<br>' . __('<input class="button" style="margin-top: 5px;" type="button" value="Clear Log" onclick="wooecpayClearEcpayDebugLog();">', 'ecpay-ecommerce-for-woocommerce'),
         'id'       => 'wooecpay_enabled_debug_log',
         'default'  => 'no',
         'desc_tip' => true,
