@@ -38,6 +38,8 @@ class Wooecpay_Gateway_Response
             // 解析訂單編號
             $order_id = $this->paymentHelper->get_order_id_by_merchant_trade_no($info) ;
 
+            ecpay_log('AIO 付款結果 ' . print_r($_POST, true), 'A00007', $order_id);
+
             // 取出訂單資訊
             if ($order = wc_get_order($order_id)) {
 
@@ -79,8 +81,11 @@ class Wooecpay_Gateway_Response
 
                                     $order->save_meta_data();
 
+                                    ecpay_log('綠界訂單付款完成', 'A00009', $order_id);
+
                                     // 產生物流訂單
-                                    if ('yes' === get_option('wooecpay_enable_logistic_auto', 'no')) {
+                                    if ('yes' === get_option('wooecpay_enable_logistic_auto', 'yes')) {
+                                        ecpay_log('自動產生物流訂單', 'A00014', $order_id);
                                         $this->logisticHelper->send_logistic_order_action($order->get_id(), false);
                                     }
                                 }
@@ -88,6 +93,8 @@ class Wooecpay_Gateway_Response
                                 // 模擬付款 僅執行備註寫入
                                 $note = print_r($info, true);
                                 $order->add_order_note('模擬付款/回傳參數：'. $note);
+
+                                ecpay_log('綠界訂單模擬付款', 'A00008', $order_id);
                             }
 
                             break;
@@ -111,6 +118,8 @@ class Wooecpay_Gateway_Response
                                 $order->save_meta_data();
 
                                 $order->update_status('on-hold');
+
+                                ecpay_log('綠界訂單取號或申請成功', 'A00010', $order_id);
                             }
                             break;
 
@@ -136,6 +145,8 @@ class Wooecpay_Gateway_Response
                                 $order->save_meta_data();
 
                                 $order->update_status('on-hold');
+
+                                ecpay_log('綠界訂單超商條代碼取得成功', 'A00011', $order_id);
                             }
 
                             break;
@@ -147,9 +158,13 @@ class Wooecpay_Gateway_Response
 
                                 $order->add_order_note(__('Payment failed within paid order', 'ecpay-ecommerce-for-woocommerce'));
                                 $order->save();
+
+                                ecpay_log('綠界訂單付款失敗', 'A00012', $order_id);
                             } else {
 
                                 $order->update_status('failed');
+
+                                ecpay_log('綠界訂單付款失敗', 'A00013', $order_id);
                             }
 
                             break;
@@ -165,6 +180,7 @@ class Wooecpay_Gateway_Response
             }
 
         } catch (RtnException $e) {
+            ecpay_log('[Exception] (' . $e->getCode() . ')' . $e->getMessage(), 'A90007', $order_id ?: $_POST['MerchantTradeNo']);
             echo wp_kses_post('(' . $e->getCode() . ')' . $e->getMessage()) . PHP_EOL;
         }
     }

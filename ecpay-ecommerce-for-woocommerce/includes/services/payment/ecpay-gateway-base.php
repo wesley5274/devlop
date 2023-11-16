@@ -29,6 +29,7 @@ class Wooecpay_Gateway_Base extends WC_Payment_Gateway
     public function receipt_page($order_id)
     {
         if ($order = wc_get_order($order_id)) {
+            ecpay_log('前往付款', 'A00001', $order_id);
 
             // 判斷物流類型
 
@@ -44,6 +45,8 @@ class Wooecpay_Gateway_Base extends WC_Payment_Gateway
                 $shipping_method_id = $shipping_method_id->get_method_id() ;
                 $shippping_tag = true ;
             }
+
+            ecpay_log('物流方式-' . $shipping_method_id, 'A00002', $order_id);
 
             if ($shippping_tag  && $this->logisticHelper->is_ecpay_cvs_logistics($shipping_method_id)) {
 
@@ -74,9 +77,12 @@ class Wooecpay_Gateway_Base extends WC_Payment_Gateway
 
                     $form_map = $autoSubmitFormService->generate($input, $api_logistic_info['action']);
 
+                    ecpay_log('轉導電子地圖 ' . print_r($input, true), 'A00003', $order_id);
+
                     echo $form_map ;
 
                 } catch (RtnException $e) {
+                    ecpay_log('[Exception] (' . $e->getCode() . ')' . $e->getMessage(), 'A90003', $order_id);
                     echo wp_kses_post('(' . $e->getCode() . ')' . $e->getMessage()) . PHP_EOL;
                 }
 
@@ -159,12 +165,15 @@ class Wooecpay_Gateway_Base extends WC_Payment_Gateway
                         break;
                     }
 
+                    ecpay_log('轉導 AIO 付款頁 ' . print_r($input, true), 'A00004', $order_id);
+
                     $generateForm = $autoSubmitFormService->generate($input, $api_payment_info['action']);
                     // $generateForm = str_replace('document.getElementById("ecpay-form").submit();', '', $generateForm) ;
 
                     echo $generateForm ;
 
                 } catch (RtnException $e) {
+                    ecpay_log('[Exception] (' . $e->getCode() . ')' . $e->getMessage(), 'A90004', $order_id);
                     echo wp_kses_post('(' . $e->getCode() . ')' . $e->getMessage()) . PHP_EOL;
                 }
 
@@ -211,6 +220,8 @@ class Wooecpay_Gateway_Base extends WC_Payment_Gateway
         }
 
         if (isset($template_file)) {
+            ecpay_log('Thankyou page', 'A00020', $order_id);
+
             $args = array(
                 'order' => $order
            );

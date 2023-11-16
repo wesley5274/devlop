@@ -3,12 +3,14 @@
 use Ecpay\Sdk\Factories\Factory;
 use Ecpay\Sdk\Exceptions\RtnException;
 
+use Helpers\Logger\Wooecpay_Logger;
 use Helpers\Logistic\Wooecpay_Logistic_Helper;
 use Helpers\Payment\Wooecpay_Payment_Helper;
 use Helpers\Invoice\Wooecpay_Invoice_Helper;
 
 class Wooecpay_Order
 {
+	protected $loggerHelper;
     protected $logisticHelper;
     protected $paymentHelper;
     protected $invoiceHelper;
@@ -16,6 +18,7 @@ class Wooecpay_Order
 	public function __construct()
 	{
 		// 載入共用
+		$this->loggerHelper = new Wooecpay_Logger;
 		$this->logisticHelper = new Wooecpay_Logistic_Helper;
 		$this->paymentHelper = new Wooecpay_Payment_Helper;
 		$this->invoiceHelper = new Wooecpay_Invoice_Helper;
@@ -62,6 +65,9 @@ class Wooecpay_Order
 					add_action('woocommerce_order_status_refunded', array($this, 'auto_invoice_invalid'));
 				}
 			}
+
+			// 清理 Log
+			add_action('wp_ajax_clear_ecpay_debug_log', array($this, 'ajax_clear_ecpay_debug_log'));
 		}
 
     	if ('yes' === get_option('wooecpay_enabled_invoice', 'yes')) {
@@ -396,7 +402,7 @@ class Wooecpay_Order
 			'wooecpay_main',
 			WOOECPAY_PLUGIN_URL . 'public/js/wooecpay-main.js',
 			array(),
-			'1.0.1',
+			'1.0.2',
 			true
 		);
 
@@ -596,6 +602,9 @@ class Wooecpay_Order
 	 */
 	public function ajax_send_logistic_order_action()
 	{
+		$order_id = isset($_POST['order_id']) ? sanitize_text_field($_POST['order_id']) : '' ;
+		ecpay_log('手動產生物流訂單', 'B00008', $order_id);
+
 		$this->logisticHelper->send_logistic_order_action();
 	}
 
@@ -607,6 +616,7 @@ class Wooecpay_Order
 		$order_id = isset($_POST['order_id']) ? sanitize_text_field($_POST['order_id']) : '' ;
 
 		if ($order = wc_get_order($order_id)) {
+			ecpay_log('手動開立發票', 'C00001', $order_id);
 			$this->invoiceHelper->invoice_create($order);
 		}
 	}
@@ -617,6 +627,7 @@ class Wooecpay_Order
 	public function auto_invoice_create($order_id)
 	{
 		if ($order = wc_get_order($order_id)) {
+			ecpay_log('自動開立發票', 'C00002', $order_id);
 			$this->invoiceHelper->invoice_create($order);
 		}
 
@@ -630,6 +641,7 @@ class Wooecpay_Order
 		$order_id = isset($_POST['order_id'])	? sanitize_text_field($_POST['order_id']) : '';
 
 		if ($order = wc_get_order($order_id)) {
+			ecpay_log('手動作廢發票', 'C00003', $order_id);
 			$this->invoiceHelper->invoice_invalid($order);
 		}
 	}
@@ -640,6 +652,7 @@ class Wooecpay_Order
 	public function auto_invoice_invalid($order_id)
 	{
 		if ($order = wc_get_order($order_id)) {
+			ecpay_log('自動作廢發票', 'C00004', $order_id);
 			$this->invoiceHelper->invoice_invalid($order);
 		}
 
@@ -707,5 +720,15 @@ class Wooecpay_Order
 				$order->add_order_note(sprintf(__('Duplicate payments for ecpay orders are marked as processed.%s', 'ecpay-ecommerce-for-woocommerce'), $merchant_trade_no_list));
 			}
 		}
+	}
+
+	/**
+	 * 清理 Log
+	 */
+	public function ajax_clear_ecpay_debug_log() {
+
+		$this->loggerHelper->clear_log();
+
+		wp_die();
 	}
 }

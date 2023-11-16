@@ -25,6 +25,7 @@ define( 'WOOECPAY_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'WOOECPAY_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'WOOECPAY_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
 define( 'WOOECPAY_PLUGIN_INCLUDE_DIR', WOOECPAY_PLUGIN_DIR.'includes' );
+define( 'WOOECPAY_PLUGIN_LOG_DIR', WOOECPAY_PLUGIN_DIR . 'logs' );
 
 //
 require_once(WOOECPAY_PLUGIN_DIR . '/vendor/autoload.php');
@@ -50,6 +51,17 @@ require_once WOOECPAY_PLUGIN_DIR . 'includes/services/database/ecpay-db-process.
 register_activation_hook( __FILE__, array('Wooecpay_Db_Process', 'ecpay_db_process') );
 add_action('upgrader_process_complete', array('Wooecpay_Db_Process', 'ecpay_db_process'));
 add_action('plugins_loaded', array('Wooecpay_Db_Process', 'ecpay_db_process'));
+
+// 載入 log 功能
+require WOOECPAY_PLUGIN_DIR . 'includes/services/helpers/logger/ecpay-logger.php';
+function ecpay_log($content, $code = '', $order_id = '') {
+    $logger = new Helpers\Logger\Wooecpay_Logger;
+    return $logger->log($content, $code, $order_id);
+}
+function ecpay_log_replace_symbol($type, $data) {
+    $logger = new Helpers\Logger\Wooecpay_Logger;
+    return $logger->replace_symbol($type, $data);
+}
 
 $plugin_main        = new Wooecpay_Setting();
 $plugin_order       = new Wooecpay_Order();

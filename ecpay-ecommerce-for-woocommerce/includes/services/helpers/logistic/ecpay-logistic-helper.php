@@ -120,7 +120,7 @@ class Wooecpay_Logistic_Helper
                             'ServerReplyURL'        => $serverReplyURL,
                         ];
 
-                    } 
+                    }
                     else if ($LogisticsType['type'] == 'CVS') {
 
                         $inputLogisticOrder = [
@@ -150,7 +150,12 @@ class Wooecpay_Logistic_Helper
                         ]);
 
                         $postService = $factory->create('PostWithCmvEncodedStrResponseService');
+
+                        ecpay_log('送出產生物流訂單請求 ' . print_r(ecpay_log_replace_symbol('logistic', $inputLogisticOrder), true), 'B00001', $order_id);
+
                         $response = $postService->post($inputLogisticOrder, $api_logistic_info['action']);
+
+                        ecpay_log('產生物流訂單結果回傳 ' . print_r(ecpay_log_replace_symbol('logistic', $response), true), 'B00013', $order_id);
 
                         if (isset($response['RtnCode']) &&
                             ($response['RtnCode'] == 300 || $response['RtnCode'] == 2001)) {
@@ -172,17 +177,20 @@ class Wooecpay_Logistic_Helper
                                 'code'  => '9999',
                                 'msg'   => '成功',
                             ];
-
-                        } 
+                            ecpay_log('產生物流訂單成功', 'B00002', $order_id);
+                        }
                         else {
 
                             // add note
                             $order->add_order_note(print_r($response, true));
                             $order->save();
+
+                            ecpay_log('產生物流訂單失敗 ' . print_r($response, true), 'B00003', $order_id);
                         }
 
                         // var_dump($response);
                     } catch (RtnException $e) {
+                        ecpay_log('[Exception] (' . $e->getCode() . ')' . $e->getMessage(), 'B90001', $order_id);
                         echo wp_kses_post('(' . $e->getCode() . ')' . $e->getMessage()) . PHP_EOL;
                     }
                 } else {
@@ -193,7 +201,7 @@ class Wooecpay_Logistic_Helper
                     ];
                 }
             }
-        }  
+        }
         else {
             $ajaxReturn = [
                 'code' 	=> '0001',
@@ -237,7 +245,7 @@ class Wooecpay_Logistic_Helper
                 ];
             }
 
-        } 
+        }
         else {
 
             $merchant_id = get_option('wooecpay_logistic_mid');
@@ -587,6 +595,8 @@ class Wooecpay_Logistic_Helper
 
             $form_map = $autoSubmitFormService->generate($inputMap, $api_logistic_info['action'], 'ecpay_map');
 
+            ecpay_log('組合地圖 FORM ' . print_r($inputMap, true), 'B00015', $order_id);
+
             return $form_map;
         } catch (RtnException $e) {
             return wp_kses_post('(' . $e->getCode() . ')' . $e->getMessage()) . PHP_EOL;
@@ -670,7 +680,7 @@ class Wooecpay_Logistic_Helper
 
     public function validate_shipping_field($type, $value) {
 		$error_message = '';
-        
+
         switch ($type) {
             case 'name':
                 // 定義正則式
@@ -680,27 +690,27 @@ class Wooecpay_Logistic_Helper
 
                 // 驗證字串長度
                 if (!$this->calculate_string_length($value)) {
-                    $error_message = $error_message . __('The name insufficient or exceeded character limit', 'ecpay-ecommerce-for-woocommerce') . '<br>'; 
+                    $error_message = $error_message . __('The name insufficient or exceeded character limit', 'ecpay-ecommerce-for-woocommerce') . '<br>';
                 }
 
                 // 驗證是否含有數字
                 if (preg_match($number_pattern, $value)) {
-                    $error_message = $error_message . __('The name cannot contain numbers', 'ecpay-ecommerce-for-woocommerce') . '<br>'; 
+                    $error_message = $error_message . __('The name cannot contain numbers', 'ecpay-ecommerce-for-woocommerce') . '<br>';
                 }
 
                 // 驗證是否包含特殊符號
                 if (preg_match($special_symbol_pattern, $value)) {
-                    $error_message = $error_message . __('The name contains special symbols that cannot be used', 'ecpay-ecommerce-for-woocommerce') . '<br>'; 
+                    $error_message = $error_message . __('The name contains special symbols that cannot be used', 'ecpay-ecommerce-for-woocommerce') . '<br>';
                 }
 
                 // 驗證是否包含ASCII
                 if (preg_match($ascii_pattern, $value)) {
-                    $error_message = $error_message . __('The name contains ASCII that cannot be used', 'ecpay-ecommerce-for-woocommerce') . '<br>'; 
+                    $error_message = $error_message . __('The name contains ASCII that cannot be used', 'ecpay-ecommerce-for-woocommerce') . '<br>';
                 }
                 break;
             case 'phone':
                 if (!preg_match('/^09\d{8}$/', $value)) {
-                    $error_message = $error_message . __('No special symbols are allowed in the phone number, it must be ten digits long and start with 09', 'ecpay-ecommerce-for-woocommerce') . '<br>'; 
+                    $error_message = $error_message . __('No special symbols are allowed in the phone number, it must be ten digits long and start with 09', 'ecpay-ecommerce-for-woocommerce') . '<br>';
                 }
                 break;
         }
@@ -720,7 +730,7 @@ class Wooecpay_Logistic_Helper
                 $length += 2;
             }
         }
-        
+
         if ($length < 4 || $length > 10) return false;
         else return true;
     }
