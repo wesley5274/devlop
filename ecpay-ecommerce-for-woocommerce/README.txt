@@ -3,15 +3,15 @@ Contributors: ecpaytechsupport
 Tags: ecommerce, e-commerce, store, sales, sell, shop, cart, checkout, payment, ecpay
 Requires at least: 6.0
 Tested up to: 6.0
-Requires PHP: 7.4
-Stable tag: 1.0.2310050
+Requires PHP: 8.1
+Stable tag: 1.1.2311240
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
 == Frequently Asked Questions ==
 = 系統需求 =
 
-- PHP version 7.4
+- PHP version 8.1
 - MySQL version 5.7 or greater
 
 = 其它問題 =
@@ -45,6 +45,13 @@ v1.0.2309210
 
 v1.0.2310050
 新增定期定額付款方式
+
+v1.1.2311240
+修正相容性至 WordPress Version 6.3.1
+修正相容性至 WooCommerce Version 8.1.1
+新增歐付寶TWQR行動支付付款方式
+新增無卡分期付款方式
+綠界服務優化設定
 
 == Upgrade Notice ==
 
