@@ -1,31 +1,26 @@
 <?php
 
-
-use Ecpay\Sdk\Factories\Factory;
 use Ecpay\Sdk\Exceptions\RtnException;
+use Ecpay\Sdk\Factories\Factory;
 use Ecpay\Sdk\Response\VerifiedArrayResponse;
-
 use Helpers\Logistic\Wooecpay_Logistic_Helper;
 use Helpers\Payment\Wooecpay_Payment_Helper;
 
-class Wooecpay_Logistic_Response
-{
+class Wooecpay_Logistic_Response {
     protected $logisticHelper;
     protected $paymentHelper;
 
-    public function __construct()
-    {
-        add_action('woocommerce_api_wooecpay_logistic_map_callback', array($this, 'map_response'));                 // 前台選擇門市 Response
-        add_action('woocommerce_api_wooecpay_change_logistic_map_callback', array($this, 'change_map_response'));   // 後台變更門市 Response
-        add_action('woocommerce_api_wooecpay_logistic_status_callback', array($this, 'logistic_status_response'));  // 貨態回傳
+    public function __construct() {
+        add_action('woocommerce_api_wooecpay_logistic_map_callback', array($this, 'map_response')); // 前台選擇門市 Response
+        add_action('woocommerce_api_wooecpay_change_logistic_map_callback', array($this, 'change_map_response')); // 後台變更門市 Response
+        add_action('woocommerce_api_wooecpay_logistic_status_callback', array($this, 'logistic_status_response')); // 貨態回傳
 
         // 載入共用
         $this->logisticHelper = new Wooecpay_Logistic_Helper;
-        $this->paymentHelper = new Wooecpay_Payment_Helper;
+        $this->paymentHelper  = new Wooecpay_Payment_Helper;
     }
 
-    public function map_response()
-    {
+    public function map_response() {
         if (isset($_POST['MerchantTradeNo'])) {
 
             $order_id = $this->logisticHelper->get_order_id_by_merchant_trade_no($_POST);
@@ -54,9 +49,9 @@ class Wooecpay_Logistic_Response
                             // 門市檢查
                             $is_valid = $this->logisticHelper->check_cvs_is_valid($shipping_method_id, $_POST['CVSOutSide']);
                             if (!$is_valid) {
-                                $confirm_msg = __('The selected store does not match the chosen shipping method (Outlying Island/Main Island). Please select a different store or cancel the transaction and place a new order.', 'ecpay-ecommerce-for-woocommerce');
+                                $confirm_msg         = __('The selected store does not match the chosen shipping method (Outlying Island/Main Island). Please select a different store or cancel the transaction and place a new order.', 'ecpay-ecommerce-for-woocommerce');
                                 $encryption_order_id = $this->logisticHelper->encrypt_order_id($order_id);
-                                $url = WC()->api_request_url('wooecpay_logistic_redirect_map', true) . '&id=' . $encryption_order_id;
+                                $url                 = WC()->api_request_url('wooecpay_logistic_redirect_map', true) . '&id=' . $encryption_order_id;
 
                                 // 提示訊息
                                 echo '<script>';
@@ -81,13 +76,13 @@ class Wooecpay_Logistic_Response
                             $CVSStoreName = mb_substr($CVSStoreName, 0, 10, "utf-8");
                         }
                         if (mb_strlen($CVSAddress, "utf-8") > 60) {
-                            $CVSAddress = mb_substr($CVSAddress , 0, 60, "utf-8");
+                            $CVSAddress = mb_substr($CVSAddress, 0, 60, "utf-8");
                         }
                         if (strlen($CVSTelephone) > 20) {
-                            $CVSTelephone = substr($CVSTelephone  , 0, 20);
+                            $CVSTelephone = substr($CVSTelephone, 0, 20);
                         }
                         if (strlen($CVSStoreID) > 10) {
-                            $CVSStoreID = substr($CVSTelephone , 0, 10);
+                            $CVSStoreID = substr($CVSTelephone, 0, 10);
                         }
 
                         $order->set_shipping_company('');
@@ -111,7 +106,7 @@ class Wooecpay_Logistic_Response
                 // 金流相關程序
                 // -----------------------------------------------------------------------------------------------
 
-                $api_payment_info = $this->paymentHelper->get_ecpay_payment_api_info('AioCheckOut');
+                $api_payment_info  = $this->paymentHelper->get_ecpay_payment_api_info('AioCheckOut');
                 $merchant_trade_no = $this->paymentHelper->get_merchant_trade_no($order->get_id(), get_option('wooecpay_payment_order_prefix'));
 
                 // 綠界訂單顯示商品名稱判斷
@@ -123,9 +118,8 @@ class Wooecpay_Logistic_Response
                     $item_name = '網路商品一批';
                 }
 
-                $return_url = WC()->api_request_url('wooecpay_payment_callback', true);
+                $return_url      = WC()->api_request_url('wooecpay_payment_callback', true);
                 $client_back_url = $order->get_checkout_order_received_url();
-
 
                 // 紀錄訂單其他資訊
                 $order->update_meta_data('_wooecpay_payment_order_prefix', get_option('wooecpay_payment_order_prefix')); // 前綴
@@ -142,15 +136,15 @@ class Wooecpay_Logistic_Response
                 // 組合AIO參數
                 try {
                     $factory = new Factory([
-                        'hashKey'   => $api_payment_info['hashKey'],
-                        'hashIv'    => $api_payment_info['hashIv'],
+                        'hashKey' => $api_payment_info['hashKey'],
+                        'hashIv'  => $api_payment_info['hashIv'],
                     ]);
 
                     $autoSubmitFormService = $factory->create('AutoSubmitFormWithCmvService');
 
                     $input = [
                         'MerchantID'        => $api_payment_info['merchant_id'],
-                        'MerchantTradeNo'   => $merchant_trade_no ,
+                        'MerchantTradeNo'   => $merchant_trade_no,
                         'MerchantTradeDate' => date_i18n('Y/m/d H:i:s'),
                         'PaymentType'       => 'aio',
                         'TotalAmount'       => (int) ceil($order->get_total()),
@@ -167,24 +161,24 @@ class Wooecpay_Logistic_Response
                     $input = $this->paymentHelper->add_type_info($input, $order);
 
                     switch (get_locale()) {
-                        case 'zh_HK':
-                        case 'zh_TW':
+                    case 'zh_HK':
+                    case 'zh_TW':
                         break;
-                        case 'ko_KR':
-                            $input['Language'] = 'KOR';
+                    case 'ko_KR':
+                        $input['Language'] = 'KOR';
                         break;
-                        case 'ja':
-                            $input['Language'] = 'JPN';
+                    case 'ja':
+                        $input['Language'] = 'JPN';
                         break;
-                        case 'zh_CN':
-                            $input['Language'] = 'CHI';
+                    case 'zh_CN':
+                        $input['Language'] = 'CHI';
                         break;
-                        case 'en_US':
-                        case 'en_AU':
-                        case 'en_CA':
-                        case 'en_GB':
-                        default:
-                            $input['Language'] = 'ENG';
+                    case 'en_US':
+                    case 'en_AU':
+                    case 'en_CA':
+                    case 'en_GB':
+                    default:
+                        $input['Language'] = 'ENG';
                         break;
                     }
 
@@ -205,8 +199,7 @@ class Wooecpay_Logistic_Response
         exit;
     }
 
-    public function change_map_response()
-    {
+    public function change_map_response() {
         if (isset($_POST['MerchantTradeNo'])) {
 
             $order_id = $this->logisticHelper->get_order_id_by_merchant_trade_no($_POST);
@@ -245,13 +238,13 @@ class Wooecpay_Logistic_Response
                             $CVSStoreName = mb_substr($CVSStoreName, 0, 10, "utf-8");
                         }
                         if (mb_strlen($CVSAddress, "utf-8") > 60) {
-                            $CVSAddress = mb_substr($CVSAddress , 0, 60, "utf-8");
+                            $CVSAddress = mb_substr($CVSAddress, 0, 60, "utf-8");
                         }
                         if (strlen($CVSTelephone) > 20) {
-                            $CVSTelephone = substr($CVSTelephone  , 0, 20);
+                            $CVSTelephone = substr($CVSTelephone, 0, 20);
                         }
                         if (strlen($CVSStoreID) > 10) {
-                            $CVSStoreID = substr($CVSTelephone , 0, 10);
+                            $CVSStoreID = substr($CVSTelephone, 0, 10);
                         }
 
                         $order->update_meta_data('_ecpay_logistic_cvs_store_id', $CVSStoreID);
@@ -259,7 +252,7 @@ class Wooecpay_Logistic_Response
                         $order->update_meta_data('_ecpay_logistic_cvs_store_address', $CVSAddress);
                         $order->update_meta_data('_ecpay_logistic_cvs_store_telephone', $CVSTelephone);
 
-                        $order->add_order_note(sprintf(__('Change store %1$s (%2$s)', 'ecpay-ecommerce-for-woocommerce'),$CVSStoreName,$CVSStoreID));
+                        $order->add_order_note(sprintf(__('Change store %1$s (%2$s)', 'ecpay-ecommerce-for-woocommerce'), $CVSStoreName, $CVSStoreID));
 
                         $order->save();
 
@@ -271,15 +264,15 @@ class Wooecpay_Logistic_Response
                         echo '<tbody>';
                         echo '<tr>';
                         echo '<td>超商店舖編號:</td>';
-                        echo wp_kses_post('<td>'. $CVSStoreID.'</td>');
+                        echo wp_kses_post('<td>' . $CVSStoreID . '</td>');
                         echo '</tr>';
                         echo '<tr>';
                         echo '<td>超商店舖名稱:</td>';
-                        echo wp_kses_post('<td>'. $CVSStoreName.'</td>');
+                        echo wp_kses_post('<td>' . $CVSStoreName . '</td>');
                         echo '</tr>';
                         echo '<tr>';
                         echo '<td>超商店舖地址:</td>';
-                        echo wp_kses_post('<td>'. $CVSAddress.'</td>');
+                        echo wp_kses_post('<td>' . $CVSAddress . '</td>');
                         echo '</tr>';
                         echo '</tbody>';
                         echo '</table>';
@@ -295,8 +288,8 @@ class Wooecpay_Logistic_Response
 
                         echo '</form>';
                         echo $form_map;
-						echo '<p>選擇門市地點與運送方式不符(離島/本島)，若要重選門市請點擊「變更門市」按鈕。</p>';
-						echo '<input class=\'button\' type=\'button\' onclick=\'document.getElementById("ecpay-form").submit();\' value=\'變更門市\' />&nbsp;&nbsp;';
+                        echo '<p>選擇門市地點與運送方式不符(離島/本島)，若要重選門市請點擊「變更門市」按鈕。</p>';
+                        echo '<input class=\'button\' type=\'button\' onclick=\'document.getElementById("ecpay-form").submit();\' value=\'變更門市\' />&nbsp;&nbsp;';
                     }
                 }
             }
@@ -304,15 +297,14 @@ class Wooecpay_Logistic_Response
         exit;
     }
 
-    public function logistic_status_response()
-    {
-        $api_logistic_info  = $this->logisticHelper->get_ecpay_logistic_api_info();
+    public function logistic_status_response() {
+        $api_logistic_info = $this->logisticHelper->get_ecpay_logistic_api_info();
 
         try {
             $factory = new Factory([
-                'hashKey'       => $api_logistic_info['hashKey'],
-                'hashIv'        => $api_logistic_info['hashIv'],
-                'hashMethod'    => 'md5',
+                'hashKey'    => $api_logistic_info['hashKey'],
+                'hashIv'     => $api_logistic_info['hashIv'],
+                'hashMethod' => 'md5',
             ]);
             $checkoutResponse = $factory->create(VerifiedArrayResponse::class);
 
@@ -335,7 +327,7 @@ class Wooecpay_Logistic_Response
                         $RtnMsg  = sanitize_text_field($_POST['RtnMsg']);
                         $RtnCode = sanitize_text_field($_POST['RtnCode']);
 
-                        $order->add_order_note('物流貨態回傳:'.$RtnMsg.' ('.$RtnCode.')');
+                        $order->add_order_note('物流貨態回傳:' . $RtnMsg . ' (' . $RtnCode . ')');
                         $order->save();
 
                         echo '1|OK';
@@ -344,7 +336,7 @@ class Wooecpay_Logistic_Response
             }
 
         } catch (RtnException $e) {
-            ecpay_log('[Exception] ' . '(' . $e->getCode() . ')' . $e->getMessage(). print_r($_POST, true), 'B90020', $order_id ?: $_POST['MerchantTradeNo']);
+            ecpay_log('[Exception] ' . '(' . $e->getCode() . ')' . $e->getMessage() . print_r($_POST, true), 'B90020', $order_id ?: $_POST['MerchantTradeNo']);
             echo wp_kses_post('(' . $e->getCode() . ')' . $e->getMessage()) . PHP_EOL;
         }
 

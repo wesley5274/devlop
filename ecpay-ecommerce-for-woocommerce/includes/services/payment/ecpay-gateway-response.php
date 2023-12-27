@@ -1,15 +1,12 @@
 <?php
 
-use Ecpay\Sdk\Factories\Factory;
-use Ecpay\Sdk\Services\UrlService;
 use Ecpay\Sdk\Exceptions\RtnException;
+use Ecpay\Sdk\Factories\Factory;
 use Ecpay\Sdk\Response\VerifiedArrayResponse;
-
 use Helpers\Logistic\Wooecpay_Logistic_Helper;
 use Helpers\Payment\Wooecpay_Payment_Helper;
 
-class Wooecpay_Gateway_Response
-{
+class Wooecpay_Gateway_Response {
     protected $logisticHelper;
     protected $paymentHelper;
 
@@ -18,25 +15,24 @@ class Wooecpay_Gateway_Response
 
         // 載入共用
         $this->logisticHelper = new Wooecpay_Logistic_Helper;
-        $this->paymentHelper = new Wooecpay_Payment_Helper;
+        $this->paymentHelper  = new Wooecpay_Payment_Helper;
     }
 
     // payment response
-    public function check_callback()
-    {
+    public function check_callback() {
         $api_info = $this->paymentHelper->get_ecpay_payment_api_info();
 
         try {
             $factory = new Factory([
-                'hashKey'   => $api_info['hashKey'],
-                'hashIv'    => $api_info['hashIv'],
+                'hashKey' => $api_info['hashKey'],
+                'hashIv'  => $api_info['hashIv'],
             ]);
 
             $checkoutResponse = $factory->create(VerifiedArrayResponse::class);
-            $info = $checkoutResponse->get($_POST);
+            $info             = $checkoutResponse->get($_POST);
 
             // 解析訂單編號
-            $order_id = $this->paymentHelper->get_order_id_by_merchant_trade_no($info) ;
+            $order_id = $this->paymentHelper->get_order_id_by_merchant_trade_no($info);
 
             ecpay_log('AIO 付款結果 ' . print_r($_POST, true), 'A00007', $order_id);
 
@@ -55,123 +51,123 @@ class Wooecpay_Gateway_Response
                     // 判斷狀態
                     switch ($info['RtnCode']) {
 
-                        // 付款完成
-                        case 1:
-                            if (isset($info['SimulatePaid']) && $info['SimulatePaid'] == 0) {
-                                // 定期定額付款回傳(非第一次)
-                                if ($info['PeriodType'] == 'Y' && $info['TotalSuccessTimes'] > 1) {
-                                    $order = $this->create_cda_new_order($info, $order_id);
-                                }
-
-                                // 判斷回傳的綠界金流特店交易編號是否已付款
-                                $is_ecpay_paid = $this->paymentHelper->is_ecpay_order_paid($order_id, $info['MerchantTradeNo']);
-
-                                if (!$is_ecpay_paid) {
-                                    $order->add_order_note(__('Payment completed', 'ecpay-ecommerce-for-woocommerce'));
-
-                                    $order->update_meta_data('_ecpay_card6no', $info['card6no']);
-                                    $order->update_meta_data('_ecpay_card4no', $info['card4no']);
-
-                                    $order->payment_complete();
-
-                                    // 加入TWQR參數
-                                    if (isset($info['TWQRTradeNo'])) {
-                                        $order->update_meta_data('_ecpay_twqr_trad_no', $info['TWQRTradeNo']);
-                                    }
-
-                                    $order->save_meta_data();
-
-                                    ecpay_log('綠界訂單付款完成', 'A00009', $order_id);
-
-                                    // 產生物流訂單
-                                    if ('yes' === get_option('wooecpay_enable_logistic_auto', 'yes')) {
-                                        ecpay_log('自動產生物流訂單', 'A00014', $order_id);
-                                        $this->logisticHelper->send_logistic_order_action($order->get_id(), false);
-                                    }
-                                }
-                            } else {
-                                // 模擬付款 僅執行備註寫入
-                                $note = print_r($info, true);
-                                $order->add_order_note('模擬付款/回傳參數：'. $note);
-
-                                ecpay_log('綠界訂單模擬付款', 'A00008', $order_id);
+                    // 付款完成
+                    case 1:
+                        if (isset($info['SimulatePaid']) && $info['SimulatePaid'] == 0) {
+                            // 定期定額付款回傳(非第一次)
+                            if ($info['PeriodType'] == 'Y' && $info['TotalSuccessTimes'] > 1) {
+                                $order = $this->create_cda_new_order($info, $order_id);
                             }
 
-                            break;
+                            // 判斷回傳的綠界金流特店交易編號是否已付款
+                            $is_ecpay_paid = $this->paymentHelper->is_ecpay_order_paid($order_id, $info['MerchantTradeNo']);
 
-                        // ATM匯款帳號回傳、無卡分期申請回傳
-                        case 2:
+                            if (!$is_ecpay_paid) {
+                                $order->add_order_note(__('Payment completed', 'ecpay-ecommerce-for-woocommerce'));
 
-                            if (!$order->is_paid()) {
+                                $order->update_meta_data('_ecpay_card6no', $info['card6no']);
+                                $order->update_meta_data('_ecpay_card4no', $info['card4no']);
 
-                                if ($info['PaymentType'] == 'BNPL_URICH') {
-                                    $order->update_meta_data('_ecpay_bnpl_BNPLTradeNo', $info['BNPLTradeNo']);
-                                    $order->update_meta_data('_ecpay_bnpl_BNPLInstallment', $info['BNPLInstallment']);
-                                } else {
-                                    $expireDate = new DateTime($info['ExpireDate'], new DateTimeZone('Asia/Taipei'));
+                                $order->payment_complete();
 
-                                    $order->update_meta_data('_ecpay_atm_BankCode', $info['BankCode']);
-                                    $order->update_meta_data('_ecpay_atm_vAccount', $info['vAccount']);
-                                    $order->update_meta_data('_ecpay_atm_ExpireDate', $expireDate->format(DATE_ATOM));
+                                // 加入TWQR參數
+                                if (isset($info['TWQRTradeNo'])) {
+                                    $order->update_meta_data('_ecpay_twqr_trad_no', $info['TWQRTradeNo']);
                                 }
 
                                 $order->save_meta_data();
 
-                                $order->update_status('on-hold');
+                                ecpay_log('綠界訂單付款完成', 'A00009', $order_id);
 
-                                ecpay_log('綠界訂單取號或申請成功', 'A00010', $order_id);
+                                // 產生物流訂單
+                                if ('yes' === get_option('wooecpay_enable_logistic_auto', 'yes')) {
+                                    ecpay_log('自動產生物流訂單', 'A00014', $order_id);
+                                    $this->logisticHelper->send_logistic_order_action($order->get_id(), false);
+                                }
                             }
-                            break;
+                        } else {
+                            // 模擬付款 僅執行備註寫入
+                            $note = print_r($info, true);
+                            $order->add_order_note('模擬付款/回傳參數：' . $note);
 
-                        // 超商條代碼資訊回傳
-                        case 10100073:
+                            ecpay_log('綠界訂單模擬付款', 'A00008', $order_id);
+                        }
 
-                            if (!$order->is_paid()) {
+                        break;
 
+                    // ATM匯款帳號回傳、無卡分期申請回傳
+                    case 2:
+
+                        if (!$order->is_paid()) {
+
+                            if ($info['PaymentType'] == 'BNPL_URICH') {
+                                $order->update_meta_data('_ecpay_bnpl_BNPLTradeNo', $info['BNPLTradeNo']);
+                                $order->update_meta_data('_ecpay_bnpl_BNPLInstallment', $info['BNPLInstallment']);
+                            } else {
                                 $expireDate = new DateTime($info['ExpireDate'], new DateTimeZone('Asia/Taipei'));
 
-                                if ($info['PaymentType'] == 'CVS_CVS') {
-
-                                    $order->update_meta_data('_ecpay_cvs_PaymentNo', $info['PaymentNo']);
-                                    $order->update_meta_data('_ecpay_cvs_ExpireDate', $expireDate->format(DATE_ATOM));
-                                } else {
-
-                                    $order->update_meta_data('_ecpay_barcode_Barcode1', $info['Barcode1']);
-                                    $order->update_meta_data('_ecpay_barcode_Barcode2', $info['Barcode2']);
-                                    $order->update_meta_data('_ecpay_barcode_Barcode3', $info['Barcode3']);
-                                    $order->update_meta_data('_ecpay_barcode_ExpireDate', $expireDate->format(DATE_ATOM));
-                                }
-
-                                $order->save_meta_data();
-
-                                $order->update_status('on-hold');
-
-                                ecpay_log('綠界訂單超商條代碼取得成功', 'A00011', $order_id);
+                                $order->update_meta_data('_ecpay_atm_BankCode', $info['BankCode']);
+                                $order->update_meta_data('_ecpay_atm_vAccount', $info['vAccount']);
+                                $order->update_meta_data('_ecpay_atm_ExpireDate', $expireDate->format(DATE_ATOM));
                             }
 
-                            break;
+                            $order->save_meta_data();
 
-                        // 付款失敗
-                        case 10100058:
+                            $order->update_status('on-hold');
 
-                            if ($order->is_paid()) {
+                            ecpay_log('綠界訂單取號或申請成功', 'A00010', $order_id);
+                        }
+                        break;
 
-                                $order->add_order_note(__('Payment failed within paid order', 'ecpay-ecommerce-for-woocommerce'));
-                                $order->save();
+                    // 超商條代碼資訊回傳
+                    case 10100073:
 
-                                ecpay_log('綠界訂單付款失敗', 'A00012', $order_id);
+                        if (!$order->is_paid()) {
+
+                            $expireDate = new DateTime($info['ExpireDate'], new DateTimeZone('Asia/Taipei'));
+
+                            if ($info['PaymentType'] == 'CVS_CVS') {
+
+                                $order->update_meta_data('_ecpay_cvs_PaymentNo', $info['PaymentNo']);
+                                $order->update_meta_data('_ecpay_cvs_ExpireDate', $expireDate->format(DATE_ATOM));
                             } else {
 
-                                $order->update_status('failed');
-
-                                ecpay_log('綠界訂單付款失敗', 'A00013', $order_id);
+                                $order->update_meta_data('_ecpay_barcode_Barcode1', $info['Barcode1']);
+                                $order->update_meta_data('_ecpay_barcode_Barcode2', $info['Barcode2']);
+                                $order->update_meta_data('_ecpay_barcode_Barcode3', $info['Barcode3']);
+                                $order->update_meta_data('_ecpay_barcode_ExpireDate', $expireDate->format(DATE_ATOM));
                             }
 
-                            break;
+                            $order->save_meta_data();
 
-                        default:
+                            $order->update_status('on-hold');
 
-                            break;
+                            ecpay_log('綠界訂單超商條代碼取得成功', 'A00011', $order_id);
+                        }
+
+                        break;
+
+                    // 付款失敗
+                    case 10100058:
+
+                        if ($order->is_paid()) {
+
+                            $order->add_order_note(__('Payment failed within paid order', 'ecpay-ecommerce-for-woocommerce'));
+                            $order->save();
+
+                            ecpay_log('綠界訂單付款失敗', 'A00012', $order_id);
+                        } else {
+
+                            $order->update_status('failed');
+
+                            ecpay_log('綠界訂單付款失敗', 'A00013', $order_id);
+                        }
+
+                        break;
+
+                    default:
+
+                        break;
                     }
 
                     echo '1|OK';
@@ -185,8 +181,7 @@ class Wooecpay_Gateway_Response
         }
     }
 
-    public function create_cda_new_order($info, $order_id)
-    {
+    public function create_cda_new_order($info, $order_id) {
         // 原始訂單
         $source_order = wc_get_order($order_id);
         if (!$source_order) {
@@ -198,13 +193,13 @@ class Wooecpay_Gateway_Response
         // 建立新訂單
         $new_order = wc_create_order([
             'customer_id' => $source_order->get_customer_id(),
-            'status' => 'pending',
+            'status'      => 'pending',
         ]);
 
         // 新訂單加入meta data
-        $invoice_keys = ['_wooecpay_invoice_type', '_wooecpay_invoice_carruer_type', '_wooecpay_invoice_carruer_num', '_wooecpay_invoice_love_code', '_wooecpay_invoice_customer_identifier', '_wooecpay_invoice_customer_company'];
+        $invoice_keys  = ['_wooecpay_invoice_type', '_wooecpay_invoice_carruer_type', '_wooecpay_invoice_carruer_num', '_wooecpay_invoice_love_code', '_wooecpay_invoice_customer_identifier', '_wooecpay_invoice_customer_company'];
         $shipping_keys = ['is_vat_exempt', '_cart_weight'];
-        $payment_keys = ['_ecpay_payment_dca', '_wooecpay_payment_order_prefix', '_wooecpay_query_trade_tag'];
+        $payment_keys  = ['_ecpay_payment_dca', '_wooecpay_payment_order_prefix', '_wooecpay_query_trade_tag'];
         foreach ($source_meta_data as $meta_data) {
             if (in_array($meta_data->key, $invoice_keys)
                 || in_array($meta_data->key, $shipping_keys)
@@ -220,9 +215,9 @@ class Wooecpay_Gateway_Response
                 $item->get_quantity(),
                 [
                     'subtotal' => $item->get_subtotal(),
-                    'total' => $item->get_total(),
+                    'total'    => $item->get_total(),
                 ]
-        );
+            );
         }
 
         // 加入帳單、運送地址
@@ -238,7 +233,7 @@ class Wooecpay_Gateway_Response
 
         // 加入運送內容
         $shipping_items = new WC_Order_Item_Shipping();
-        foreach($source_order->get_items('shipping') as $item){
+        foreach ($source_order->get_items('shipping') as $item) {
             $shipping_items->set_method_title($item->get_method_title());
             $shipping_items->set_method_id($item->get_method_id());
             $shipping_items->set_total($item->get_total());

@@ -1,95 +1,90 @@
 <?php
 
-use Ecpay\Sdk\Factories\Factory;
 use Ecpay\Sdk\Exceptions\RtnException;
-
+use Ecpay\Sdk\Factories\Factory;
 use Helpers\Logistic\Wooecpay_Logistic_Helper;
 use Helpers\Payment\Wooecpay_Payment_Helper;
 
-class Wooecpay_Gateway_Base extends WC_Payment_Gateway
-{
+class Wooecpay_Gateway_Base extends WC_Payment_Gateway {
     protected $logisticHelper;
     protected $paymentHelper;
 
-    public function __construct()
-    {
+    public function __construct() {
         // 載入共用
         $this->logisticHelper = new Wooecpay_Logistic_Helper;
-        $this->paymentHelper = new Wooecpay_Payment_Helper;
+        $this->paymentHelper  = new Wooecpay_Payment_Helper;
 
         if ($this->enabled) {
             add_action('woocommerce_receipt_' . $this->id, array($this, 'receipt_page'));
-            add_action('woocommerce_api_wooecpay_logistic_redirect_map',array($this, 'redirect_map'));
+            add_action('woocommerce_api_wooecpay_logistic_redirect_map', array($this, 'redirect_map'));
         }
 
         // 感謝頁
         add_action('woocommerce_thankyou_' . $this->id, array($this, 'thankyou_page'));
     }
 
-    public function receipt_page($order_id)
-    {
+    public function receipt_page($order_id) {
         if ($order = wc_get_order($order_id)) {
             ecpay_log('前往付款', 'A00001', $order_id);
 
             // 判斷物流類型
 
             // 物流方式
-            $shipping_method_id = $order->get_items('shipping') ;
+            $shipping_method_id = $order->get_items('shipping');
 
             if (empty($shipping_method_id)) {
-                $shippping_tag = false ;
+                $shippping_tag = false;
 
             } else {
 
                 $shipping_method_id = reset($shipping_method_id);
-                $shipping_method_id = $shipping_method_id->get_method_id() ;
-                $shippping_tag = true ;
+                $shipping_method_id = $shipping_method_id->get_method_id();
+                $shippping_tag      = true;
             }
 
             ecpay_log('物流方式-' . $shipping_method_id, 'A00002', $order_id);
 
-            if ($shippping_tag  && $this->logisticHelper->is_ecpay_cvs_logistics($shipping_method_id)) {
+            if ($shippping_tag && $this->logisticHelper->is_ecpay_cvs_logistics($shipping_method_id)) {
 
                 // 執行地圖選擇
 
                 // 不存在則走向地圖API
-                $api_logistic_info  = $this->logisticHelper->get_ecpay_logistic_api_info('map');
-                $client_back_url    = WC()->api_request_url('wooecpay_logistic_map_callback', true);
-                $MerchantTradeNo    = $this->logisticHelper->get_merchant_trade_no($order->get_id(), get_option('wooecpay_logistic_order_prefix'));
-                $LogisticsType      = $this->logisticHelper->get_logistics_sub_type($shipping_method_id) ;
+                $api_logistic_info = $this->logisticHelper->get_ecpay_logistic_api_info('map');
+                $client_back_url   = WC()->api_request_url('wooecpay_logistic_map_callback', true);
+                $MerchantTradeNo   = $this->logisticHelper->get_merchant_trade_no($order->get_id(), get_option('wooecpay_logistic_order_prefix'));
+                $LogisticsType     = $this->logisticHelper->get_logistics_sub_type($shipping_method_id);
 
                 try {
                     $factory = new Factory([
-                        'hashKey'       => $api_logistic_info['hashKey'],
-                        'hashIv'        => $api_logistic_info['hashIv'],
-                        'hashMethod'    => 'md5',
+                        'hashKey'    => $api_logistic_info['hashKey'],
+                        'hashIv'     => $api_logistic_info['hashIv'],
+                        'hashMethod' => 'md5',
                     ]);
                     $autoSubmitFormService = $factory->create('AutoSubmitFormWithCmvService');
 
                     $input = [
-                        'MerchantID'        => $api_logistic_info['merchant_id'],
-                        'MerchantTradeNo'   => $MerchantTradeNo,
-                        'LogisticsType'     => $LogisticsType['type'],
-                        'LogisticsSubType'  => $LogisticsType['sub_type'],
-                        'IsCollection'      => 'Y',
-                        'ServerReplyURL'    => $client_back_url,
+                        'MerchantID'       => $api_logistic_info['merchant_id'],
+                        'MerchantTradeNo'  => $MerchantTradeNo,
+                        'LogisticsType'    => $LogisticsType['type'],
+                        'LogisticsSubType' => $LogisticsType['sub_type'],
+                        'IsCollection'     => 'Y',
+                        'ServerReplyURL'   => $client_back_url,
                     ];
 
                     $form_map = $autoSubmitFormService->generate($input, $api_logistic_info['action']);
 
                     ecpay_log('轉導電子地圖 ' . print_r($input, true), 'A00003', $order_id);
 
-                    echo $form_map ;
+                    echo $form_map;
 
                 } catch (RtnException $e) {
                     ecpay_log('[Exception] (' . $e->getCode() . ')' . $e->getMessage(), 'A90003', $order_id);
                     echo wp_kses_post('(' . $e->getCode() . ')' . $e->getMessage()) . PHP_EOL;
                 }
 
-
             } else {
 
-                $api_payment_info = $this->paymentHelper->get_ecpay_payment_api_info('AioCheckOut');
+                $api_payment_info  = $this->paymentHelper->get_ecpay_payment_api_info('AioCheckOut');
                 $merchant_trade_no = $this->paymentHelper->get_merchant_trade_no($order->get_id(), get_option('wooecpay_payment_order_prefix'));
 
                 // 綠界訂單顯示商品名稱判斷
@@ -101,7 +96,7 @@ class Wooecpay_Gateway_Base extends WC_Payment_Gateway
                     $item_name = '網路商品一批';
                 }
 
-                $return_url = WC()->api_request_url('wooecpay_payment_callback', true);
+                $return_url      = WC()->api_request_url('wooecpay_payment_callback', true);
                 $client_back_url = $this->get_return_url($order);
 
                 // 紀錄訂單其他資訊
@@ -119,15 +114,15 @@ class Wooecpay_Gateway_Base extends WC_Payment_Gateway
                 // 組合AIO參數
                 try {
                     $factory = new Factory([
-                        'hashKey'   => $api_payment_info['hashKey'],
-                        'hashIv'    => $api_payment_info['hashIv'],
+                        'hashKey' => $api_payment_info['hashKey'],
+                        'hashIv'  => $api_payment_info['hashIv'],
                     ]);
 
                     $autoSubmitFormService = $factory->create('AutoSubmitFormWithCmvService');
 
                     $input = [
                         'MerchantID'        => $api_payment_info['merchant_id'],
-                        'MerchantTradeNo'   => $merchant_trade_no ,
+                        'MerchantTradeNo'   => $merchant_trade_no,
                         'MerchantTradeDate' => date_i18n('Y/m/d H:i:s'),
                         'PaymentType'       => 'aio',
                         'TotalAmount'       => (int) ceil($order->get_total()),
@@ -141,27 +136,27 @@ class Wooecpay_Gateway_Base extends WC_Payment_Gateway
                         'NeedExtraPaidInfo' => 'Y',
                     ];
 
-                    $input = $this->paymentHelper->add_type_info($input, $order) ;
+                    $input = $this->paymentHelper->add_type_info($input, $order);
 
                     switch (get_locale()) {
-                        case 'zh_HK':
-                        case 'zh_TW':
+                    case 'zh_HK':
+                    case 'zh_TW':
                         break;
-                        case 'ko_KR':
-                            $input['Language'] = 'KOR';
+                    case 'ko_KR':
+                        $input['Language'] = 'KOR';
                         break;
-                        case 'ja':
-                            $input['Language'] = 'JPN';
+                    case 'ja':
+                        $input['Language'] = 'JPN';
                         break;
-                        case 'zh_CN':
-                            $input['Language'] = 'CHI';
+                    case 'zh_CN':
+                        $input['Language'] = 'CHI';
                         break;
-                        case 'en_US':
-                        case 'en_AU':
-                        case 'en_CA':
-                        case 'en_GB':
-                        default:
-                            $input['Language'] = 'ENG';
+                    case 'en_US':
+                    case 'en_AU':
+                    case 'en_CA':
+                    case 'en_GB':
+                    default:
+                        $input['Language'] = 'ENG';
                         break;
                     }
 
@@ -170,7 +165,7 @@ class Wooecpay_Gateway_Base extends WC_Payment_Gateway
                     $generateForm = $autoSubmitFormService->generate($input, $api_payment_info['action']);
                     // $generateForm = str_replace('document.getElementById("ecpay-form").submit();', '', $generateForm) ;
 
-                    echo $generateForm ;
+                    echo $generateForm;
 
                 } catch (RtnException $e) {
                     ecpay_log('[Exception] (' . $e->getCode() . ')' . $e->getMessage(), 'A90004', $order_id);
@@ -182,9 +177,8 @@ class Wooecpay_Gateway_Base extends WC_Payment_Gateway
         }
     }
 
-    public function redirect_map()
-    {
-        $id = str_replace(' ','+', $_GET['id']);
+    public function redirect_map() {
+        $id       = str_replace(' ', '+', $_GET['id']);
         $order_id = $this->logisticHelper->decrypt_order_id($id);
 
         if (wc_get_order($order_id)) {
@@ -195,8 +189,7 @@ class Wooecpay_Gateway_Base extends WC_Payment_Gateway
     }
 
     // 感謝頁面
-    public function thankyou_page($order_id)
-    {
+    public function thankyou_page($order_id) {
         if (empty($order_id)) {
             return;
         }
@@ -206,16 +199,16 @@ class Wooecpay_Gateway_Base extends WC_Payment_Gateway
         }
 
         switch ($order->get_payment_method()) {
-            case 'Wooecpay_Gateway_Atm':
-                $template_file = 'payment/atm.php';
+        case 'Wooecpay_Gateway_Atm':
+            $template_file = 'payment/atm.php';
             break;
 
-            case 'Wooecpay_Gateway_Cvs':
-                $template_file = 'payment/cvs.php';
+        case 'Wooecpay_Gateway_Cvs':
+            $template_file = 'payment/cvs.php';
             break;
 
-            case 'Wooecpay_Gateway_Barcode':
-                $template_file = 'payment/barcode.php';
+        case 'Wooecpay_Gateway_Barcode':
+            $template_file = 'payment/barcode.php';
             break;
         }
 
@@ -223,8 +216,8 @@ class Wooecpay_Gateway_Base extends WC_Payment_Gateway
             ecpay_log('Thankyou page', 'A00020', $order_id);
 
             $args = array(
-                'order' => $order
-           );
+                'order' => $order,
+            );
 
             wc_get_template($template_file, $args, '', WOOECPAY_PLUGIN_INCLUDE_DIR . '/templates/');
         }
