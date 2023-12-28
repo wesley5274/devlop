@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: ECPay Ecommerce for WooCommerce\n"
-"POT-Creation-Date: 2023-10-12 14:28+0800\n"
-"PO-Revision-Date: 2023-11-24 10:04+0800\n"
+"POT-Creation-Date: 2023-12-28 10:31+0800\n"
+"PO-Revision-Date: 2023-12-28 10:46+0800\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: zh_TW\n"
@@ -15,85 +15,106 @@ msgstr ""
 "X-Poedit-Flags-xgettext: --add-comments=translators:\n"
 "X-Poedit-WPHeader: ecpay-ecommerce-for-woocommerce.php\n"
 "X-Poedit-SourceCharset: UTF-8\n"
-"X-Poedit-KeywordsList: __;_e;_n:1,2;_x:1,2c;_ex:1,2c;_nx:4c,1,2;esc_attr__;esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c;_n_noop:1,2;"
+"X-Poedit-KeywordsList: __;_e;_n:1,2;_x:1,2c;_ex:1,2c;_nx:4c,1,2;esc_attr__;"
+"esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c;_n_noop:1,2;"
 "_nx_noop:3c,1,2;__ngettext_noop:1,2\n"
 "X-Poedit-SearchPath-0: .\n"
 "X-Poedit-SearchPathExcluded-0: *.min.js\n"
 
-#: admin/order/class-wooecpay-order.php:81
+#: admin/order/class-wooecpay-order.php:83
 msgid "Full address"
 msgstr "完整地址"
 
-#: admin/order/class-wooecpay-order.php:118
+#: admin/order/class-wooecpay-order.php:119
 msgid "Gateway info"
 msgstr "金流資訊"
 
-#: admin/order/class-wooecpay-order.php:120
+#: admin/order/class-wooecpay-order.php:121
 msgid "Payment Type"
 msgstr "付款方式"
 
-#: admin/order/class-wooecpay-order.php:131 includes/templates/payment/atm.php:29 includes/templates/payment_email/atm.php:27
+#: admin/order/class-wooecpay-order.php:132
+#: includes/templates/payment/atm.php:29
+#: includes/templates/payment_email/atm.php:27
 msgid "Bank code"
 msgstr "銀行代碼"
 
-#: admin/order/class-wooecpay-order.php:132 includes/templates/payment_email/atm.php:35
+#: admin/order/class-wooecpay-order.php:133
+#: includes/templates/payment_email/atm.php:35
 msgid "ATM No"
 msgstr "匯款帳號"
 
-#: admin/order/class-wooecpay-order.php:133 admin/order/class-wooecpay-order.php:137 admin/order/class-wooecpay-order.php:143
-#: includes/config/payment/settings-gateway-atm.php:46 includes/config/payment/settings-gateway-barcode.php:47 includes/templates/payment/atm.php:43
-#: includes/templates/payment/barcode.php:46 includes/templates/payment/cvs.php:30 includes/templates/payment_email/atm.php:43
-#: includes/templates/payment_email/barcode.php:45 includes/templates/payment_email/cvs.php:29
+#: admin/order/class-wooecpay-order.php:134
+#: admin/order/class-wooecpay-order.php:138
+#: admin/order/class-wooecpay-order.php:144
+#: includes/config/payment/settings-gateway-atm.php:46
+#: includes/config/payment/settings-gateway-barcode.php:47
+#: includes/templates/payment/atm.php:43
+#: includes/templates/payment/barcode.php:46
+#: includes/templates/payment/cvs.php:30
+#: includes/templates/payment_email/atm.php:43
+#: includes/templates/payment_email/barcode.php:45
+#: includes/templates/payment_email/cvs.php:29
 msgid "Payment deadline"
 msgstr "付款截止日"
 
-#: admin/order/class-wooecpay-order.php:136 includes/templates/payment/cvs.php:22 includes/templates/payment_email/cvs.php:21
+#: admin/order/class-wooecpay-order.php:137
+#: includes/templates/payment/cvs.php:22
+#: includes/templates/payment_email/cvs.php:21
 msgid "CVS No"
 msgstr "超商代碼"
 
-#: admin/order/class-wooecpay-order.php:140 includes/templates/payment_email/barcode.php:21
+#: admin/order/class-wooecpay-order.php:141
+#: includes/templates/payment_email/barcode.php:21
 msgid "barcode one"
 msgstr "第一段條碼"
 
-#: admin/order/class-wooecpay-order.php:141 includes/templates/payment_email/barcode.php:29
+#: admin/order/class-wooecpay-order.php:142
+#: includes/templates/payment_email/barcode.php:29
 msgid "barcode two"
 msgstr "第二段條碼"
 
-#: admin/order/class-wooecpay-order.php:142 includes/templates/payment_email/barcode.php:37
+#: admin/order/class-wooecpay-order.php:143
+#: includes/templates/payment_email/barcode.php:37
 msgid "barcode three"
 msgstr "第三段條碼"
 
-#: admin/order/class-wooecpay-order.php:146
+#: admin/order/class-wooecpay-order.php:147
 msgid "TWQR trade no"
 msgstr "綠界TWQR訂單編號"
 
-#: admin/order/class-wooecpay-order.php:149
+#: admin/order/class-wooecpay-order.php:150
 msgid "BNPL Trade No"
 msgstr "申請交易編號"
 
-#: admin/order/class-wooecpay-order.php:150
+#: admin/order/class-wooecpay-order.php:151
 msgid "BNPL Installment"
 msgstr "分期期數"
 
-#: admin/order/class-wooecpay-order.php:385
-msgid "The order update failed as the selected store does not match the chosen shipping method (Outlying Island/Main Island)."
+#: admin/order/class-wooecpay-order.php:391
+msgid ""
+"The order update failed as the selected store does not match the chosen "
+"shipping method (Outlying Island/Main Island)."
 msgstr "訂單更新失敗，選擇門市地點與運送方式不符(離島/本島)。"
 
-#: admin/order/class-wooecpay-order.php:385
+#: admin/order/class-wooecpay-order.php:391
 msgid "Order Save Error"
 msgstr "訂單更新失敗"
 
-#: admin/order/class-wooecpay-order.php:677
+#: admin/order/class-wooecpay-order.php:681
 msgid ""
-"Please confirm the order. The system has detected that there may be duplicate payments for orders. (The order has multiple ecpay payment orders or cash on "
-"delivery has been selected.)"
-msgstr "請確認訂單狀況，系統偵測到可能有訂單重複付款的情形。(訂單存在多筆已付款綠界金流訂單或曾選過貨到付款)"
+"Please confirm the order. The system has detected that there may be "
+"duplicate payments for orders. (The order has multiple ecpay payment orders "
+"or cash on delivery has been selected.)"
+msgstr ""
+"請確認訂單狀況，系統偵測到可能有訂單重複付款的情形。(訂單存在多筆已付款綠界金"
+"流訂單或曾選過貨到付款)"
 
-#: admin/order/class-wooecpay-order.php:678
+#: admin/order/class-wooecpay-order.php:682
 msgid "Abnormal ecpay merchant trade no"
 msgstr "異常綠界金流特店交易編號"
 
-#: admin/order/class-wooecpay-order.php:708
+#: admin/order/class-wooecpay-order.php:711
 #, php-format
 msgid "Duplicate payments for ecpay orders are marked as processed.%s"
 msgstr "綠界訂單重複付款提示標示為已處理%s"
@@ -102,32 +123,53 @@ msgstr "綠界訂單重複付款提示標示為已處理%s"
 msgid "General settings"
 msgstr "主要設定"
 
-#: admin/settings/class-wooecpay-setting-main.php:19 includes/config/payment/settings.php:4
+#: admin/settings/class-wooecpay-setting-main.php:19
+#: includes/config/payment/settings.php:4
 msgid "Gateway settings"
 msgstr "金流設定"
 
-#: admin/settings/class-wooecpay-setting-main.php:20 includes/config/logistic/settings.php:4
+#: admin/settings/class-wooecpay-setting-main.php:20
+#: includes/config/logistic/settings.php:4
 msgid "Shipping settings"
 msgstr "物流設定"
 
-#: admin/settings/class-wooecpay-setting-main.php:21 includes/config/invoice/settings.php:4
+#: admin/settings/class-wooecpay-setting-main.php:21
+#: includes/config/invoice/settings.php:4
 msgid "E-Invoice setting"
 msgstr "電子發票設定"
 
 #: admin/settings/class-wooecpay-setting-main.php:82
 msgid ""
-"When you disable the ECPay gateway method, the ECPay shipping method will be closed at the same time. Are you sure you want to disable the ECPay gateway method?"
+"When you disable the ECPay gateway method, the ECPay shipping method will be "
+"closed at the same time. Are you sure you want to disable the ECPay gateway "
+"method?"
 msgstr "關閉綠界金流服務時，將同時關閉綠界物流服務。確定要關閉金流服務嗎?"
 
-#: admin/settings/class-wooecpay-setting.php:16
+#: admin/settings/class-wooecpay-setting.php:15
 msgid "Ecpay"
 msgstr "綠界科技"
 
-#: includes/config/invoice/settings.php:9 includes/config/logistic/settings.php:9 includes/config/payment/settings.php:9
+#: ecpay-ecommerce-for-woocommerce.php:61
+#, php-format
+msgid ""
+"<strong>%1$s</strong> is inactive. It require WooCommerce version %2$s or "
+"newer."
+msgstr "<strong>%1$s</strong> 暫停運作。 需求 WooCommerce %2$s 以上版本。"
+
+#. Plugin Name of the plugin/theme
+#: ecpay-ecommerce-for-woocommerce.php:62
+msgid "ECPay Ecommerce for WooCommerce"
+msgstr "ECPay Ecommerce for WooCommerce"
+
+#: includes/config/invoice/settings.php:9
+#: includes/config/logistic/settings.php:9
+#: includes/config/payment/settings.php:9
 msgid "Order no prefix"
 msgstr "訂單編號前綴"
 
-#: includes/config/invoice/settings.php:12 includes/config/logistic/settings.php:12 includes/config/payment/settings.php:12
+#: includes/config/invoice/settings.php:12
+#: includes/config/logistic/settings.php:12
+#: includes/config/payment/settings.php:12
 msgid "Only a maximum of 5-character letters and numbers are allowed."
 msgstr "僅允許最多5碼英文與數字。"
 
@@ -135,7 +177,8 @@ msgstr "僅允許最多5碼英文與數字。"
 msgid "Get mode"
 msgstr "開立發票模式"
 
-#: includes/config/invoice/settings.php:24 includes/config/invoice/settings.php:34
+#: includes/config/invoice/settings.php:24
+#: includes/config/invoice/settings.php:34
 msgid "manual"
 msgstr "手動"
 
@@ -155,7 +198,8 @@ msgstr "自動(當訂單狀態為取消或退費)"
 msgid "Delay invoice date"
 msgstr "延期開立天數"
 
-#: includes/config/invoice/settings.php:42 includes/config/invoice/settings.php:49
+#: includes/config/invoice/settings.php:42
+#: includes/config/invoice/settings.php:49
 msgid "Only numbers allowed."
 msgstr "僅允許數字。"
 
@@ -163,96 +207,138 @@ msgstr "僅允許數字。"
 msgid "Donate unit"
 msgstr "預設捐贈單位"
 
-#: includes/config/invoice/settings.php:57 includes/config/logistic/settings.php:111 includes/config/payment/settings.php:39
+#: includes/config/invoice/settings.php:57
+#: includes/config/logistic/settings.php:111
+#: includes/config/payment/settings.php:39
 msgid "API settings"
 msgstr "API設定"
 
-#: includes/config/invoice/settings.php:62 includes/config/invoice/settings.php:64 includes/config/logistic/settings.php:116
-#: includes/config/logistic/settings.php:118 includes/config/logistic/settings.php:121 includes/config/payment/settings.php:44
+#: includes/config/invoice/settings.php:62
+#: includes/config/invoice/settings.php:64
+#: includes/config/logistic/settings.php:116
+#: includes/config/logistic/settings.php:118
+#: includes/config/logistic/settings.php:121
+#: includes/config/payment/settings.php:44
 #: includes/config/payment/settings.php:46
 msgid "ECPay sandbox"
 msgstr "啟用測試模式"
 
-#: includes/config/invoice/settings.php:70 includes/config/logistic/settings.php:124 includes/config/payment/settings.php:52
+#: includes/config/invoice/settings.php:70
+#: includes/config/logistic/settings.php:124
+#: includes/config/payment/settings.php:52
 msgid "MerchantID"
 msgstr "商店代號"
 
-#: includes/config/invoice/settings.php:76 includes/config/logistic/settings.php:130 includes/config/payment/settings.php:58
+#: includes/config/invoice/settings.php:76
+#: includes/config/logistic/settings.php:130
+#: includes/config/payment/settings.php:58
 msgid "HashKey"
 msgstr "HashKey"
 
-#: includes/config/invoice/settings.php:82 includes/config/logistic/settings.php:136 includes/config/payment/settings.php:64
+#: includes/config/invoice/settings.php:82
+#: includes/config/logistic/settings.php:136
+#: includes/config/payment/settings.php:64
 msgid "HashIV"
 msgstr "HashIV"
 
-#: includes/config/logistic/settings-logistic-base.php:4 includes/config/logistic/settings-logistic-post.php:4
-#: includes/config/payment/settings-gateway-applepay.php:11 includes/config/payment/settings-gateway-atm.php:10
-#: includes/config/payment/settings-gateway-barcode.php:11 includes/config/payment/settings-gateway-bnpl.php:10
-#: includes/config/payment/settings-gateway-credit-installment.php:11 includes/config/payment/settings-gateway-credit.php:11
-#: includes/config/payment/settings-gateway-cvs.php:11 includes/config/payment/settings-gateway-dca.php:11 includes/config/payment/settings-gateway-twqr.php:10
+#: includes/config/logistic/settings-logistic-base.php:4
+#: includes/config/logistic/settings-logistic-post.php:4
+#: includes/config/payment/settings-gateway-applepay.php:11
+#: includes/config/payment/settings-gateway-atm.php:10
+#: includes/config/payment/settings-gateway-barcode.php:11
+#: includes/config/payment/settings-gateway-bnpl.php:10
+#: includes/config/payment/settings-gateway-credit-installment.php:11
+#: includes/config/payment/settings-gateway-credit.php:11
+#: includes/config/payment/settings-gateway-cvs.php:11
+#: includes/config/payment/settings-gateway-dca.php:11
+#: includes/config/payment/settings-gateway-twqr.php:10
 #: includes/config/payment/settings-gateway-webatm.php:11
 msgid "Title"
 msgstr "標題"
 
-#: includes/config/logistic/settings-logistic-base.php:7 includes/config/logistic/settings-logistic-post.php:7
-#: includes/config/payment/settings-gateway-applepay.php:14 includes/config/payment/settings-gateway-atm.php:13
-#: includes/config/payment/settings-gateway-barcode.php:14 includes/config/payment/settings-gateway-bnpl.php:13
-#: includes/config/payment/settings-gateway-credit-installment.php:14 includes/config/payment/settings-gateway-credit.php:14
-#: includes/config/payment/settings-gateway-cvs.php:14 includes/config/payment/settings-gateway-dca.php:14 includes/config/payment/settings-gateway-twqr.php:13
+#: includes/config/logistic/settings-logistic-base.php:7
+#: includes/config/logistic/settings-logistic-post.php:7
+#: includes/config/payment/settings-gateway-applepay.php:14
+#: includes/config/payment/settings-gateway-atm.php:13
+#: includes/config/payment/settings-gateway-barcode.php:14
+#: includes/config/payment/settings-gateway-bnpl.php:13
+#: includes/config/payment/settings-gateway-credit-installment.php:14
+#: includes/config/payment/settings-gateway-credit.php:14
+#: includes/config/payment/settings-gateway-cvs.php:14
+#: includes/config/payment/settings-gateway-dca.php:14
+#: includes/config/payment/settings-gateway-twqr.php:13
 #: includes/config/payment/settings-gateway-webatm.php:14
 msgid "This controls the title which the user sees during checkout."
 msgstr "使用者在結帳時所看到的標題."
 
-#: includes/config/logistic/settings-logistic-base.php:11 includes/config/logistic/settings-logistic-post.php:11
+#: includes/config/logistic/settings-logistic-base.php:11
+#: includes/config/logistic/settings-logistic-post.php:11
 msgid "Tax status"
 msgstr "稅金狀態"
 
-#: includes/config/logistic/settings-logistic-base.php:15 includes/config/logistic/settings-logistic-post.php:15
+#: includes/config/logistic/settings-logistic-base.php:15
+#: includes/config/logistic/settings-logistic-post.php:15
 msgid "Taxable"
 msgstr "應課稅"
 
-#: includes/config/logistic/settings-logistic-base.php:16 includes/config/logistic/settings-logistic-post.php:16
+#: includes/config/logistic/settings-logistic-base.php:16
+#: includes/config/logistic/settings-logistic-post.php:16
 msgctxt "Tax status"
 msgid "None"
 msgstr "無"
 
-#: includes/config/logistic/settings-logistic-base.php:21 includes/services/helpers/invoice/ecpay-invoice-helper.php:501
-#: includes/services/helpers/invoice/ecpay-invoice-helper.php:655
+#: includes/config/logistic/settings-logistic-base.php:21
+#: includes/services/helpers/invoice/ecpay-invoice-helper.php:501
+#: includes/services/helpers/invoice/ecpay-invoice-helper.php:666
 msgid "Shipping fee"
 msgstr "物流費"
 
-#: includes/config/logistic/settings-logistic-base.php:28 includes/config/logistic/settings-logistic-post.php:49
+#: includes/config/logistic/settings-logistic-base.php:28
+#: includes/config/logistic/settings-logistic-post.php:49
 msgid "Free shipping requires..."
 msgstr "免費運送需要條件..."
 
-#: includes/config/logistic/settings-logistic-base.php:32 includes/config/logistic/settings-logistic-post.php:53
+#: includes/config/logistic/settings-logistic-base.php:32
+#: includes/config/logistic/settings-logistic-post.php:53
 msgid "N/A"
 msgstr "N/A"
 
-#: includes/config/logistic/settings-logistic-base.php:33 includes/config/logistic/settings-logistic-post.php:54
+#: includes/config/logistic/settings-logistic-base.php:33
+#: includes/config/logistic/settings-logistic-post.php:54
 msgid "A valid free shipping coupon"
 msgstr "一個有效的免運費折價卷"
 
-#: includes/config/logistic/settings-logistic-base.php:34 includes/config/logistic/settings-logistic-base.php:41
-#: includes/config/logistic/settings-logistic-post.php:55 includes/config/logistic/settings-logistic-post.php:62
-#: includes/config/payment/settings-gateway-applepay.php:25 includes/config/payment/settings-gateway-atm.php:24
-#: includes/config/payment/settings-gateway-barcode.php:25 includes/config/payment/settings-gateway-bnpl.php:24
-#: includes/config/payment/settings-gateway-credit-installment.php:25 includes/config/payment/settings-gateway-credit.php:25
-#: includes/config/payment/settings-gateway-cvs.php:25 includes/config/payment/settings-gateway-dca.php:25 includes/config/payment/settings-gateway-twqr.php:24
+#: includes/config/logistic/settings-logistic-base.php:34
+#: includes/config/logistic/settings-logistic-base.php:41
+#: includes/config/logistic/settings-logistic-post.php:55
+#: includes/config/logistic/settings-logistic-post.php:62
+#: includes/config/payment/settings-gateway-applepay.php:25
+#: includes/config/payment/settings-gateway-atm.php:24
+#: includes/config/payment/settings-gateway-barcode.php:25
+#: includes/config/payment/settings-gateway-bnpl.php:24
+#: includes/config/payment/settings-gateway-credit-installment.php:25
+#: includes/config/payment/settings-gateway-credit.php:25
+#: includes/config/payment/settings-gateway-cvs.php:25
+#: includes/config/payment/settings-gateway-dca.php:25
+#: includes/config/payment/settings-gateway-twqr.php:24
 #: includes/config/payment/settings-gateway-webatm.php:25
 msgid "A minimum order amount"
 msgstr "訂單最低金額"
 
-#: includes/config/logistic/settings-logistic-base.php:35 includes/config/logistic/settings-logistic-post.php:56
+#: includes/config/logistic/settings-logistic-base.php:35
+#: includes/config/logistic/settings-logistic-post.php:56
 msgid "A minimum order amount OR a coupon"
 msgstr "每筆訂單的最小金額或使用折價卷"
 
-#: includes/config/logistic/settings-logistic-base.php:36 includes/config/logistic/settings-logistic-post.php:57
+#: includes/config/logistic/settings-logistic-base.php:36
+#: includes/config/logistic/settings-logistic-post.php:57
 msgid "A minimum order amount AND a coupon"
 msgstr "每筆訂單的最小金額以及使用折價卷"
 
-#: includes/config/logistic/settings-logistic-base.php:45 includes/config/logistic/settings-logistic-post.php:66
-msgid "Users will need to spend this amount to get free shipping (if enabled above)."
+#: includes/config/logistic/settings-logistic-base.php:45
+#: includes/config/logistic/settings-logistic-post.php:66
+msgid ""
+"Users will need to spend this amount to get free shipping (if enabled above)."
 msgstr "消費者可以獲得免運費的最低消費金額 (如果上面有啟用)"
 
 #: includes/config/logistic/settings-logistic-post.php:21
@@ -271,7 +357,10 @@ msgstr "物流費(10-15kg)"
 msgid "Shipping fee4"
 msgstr "物流費(15-20kg以下)"
 
-#: includes/config/logistic/settings.php:19 includes/config/logistic/settings.php:23 includes/config/payment/settings.php:19 includes/config/payment/settings.php:21
+#: includes/config/logistic/settings.php:19
+#: includes/config/logistic/settings.php:23
+#: includes/config/payment/settings.php:19
+#: includes/config/payment/settings.php:21
 msgid "Display order item name"
 msgstr "綠界訂單顯示商品名稱"
 
@@ -292,7 +381,8 @@ msgid "Auto get shipping payment no"
 msgstr "自動建立物流訂單"
 
 #: includes/config/logistic/settings.php:41
-msgid "Auto get shipping payment no when payment complete ( only for ecpay gateway )"
+msgid ""
+"Auto get shipping payment no when payment complete ( only for ecpay gateway )"
 msgstr "當付款完成後自動建立物流訂單，僅支援綠界付款方式"
 
 #: includes/config/logistic/settings.php:45
@@ -327,7 +417,8 @@ msgstr "寄件人郵遞區號"
 msgid "Sender address"
 msgstr "寄件人地址"
 
-#: includes/config/logistic/settings.php:84 includes/config/logistic/settings.php:88
+#: includes/config/logistic/settings.php:84
+#: includes/config/logistic/settings.php:88
 msgid "Keep shipping phone"
 msgstr "永遠顯示收件人行動電話"
 
@@ -337,21 +428,32 @@ msgstr "啟用離島物流"
 
 #: includes/config/logistic/settings.php:96
 msgid ""
-"Notice：<br>1. The option will only appear in the 「Shipping Method」 after activation.<br>2. If 「Ecpay CVS 7-11」 outlying islands shipping is not enabled, "
-"there will be no distinction between outlying island and main island shipments; shipping settings will be shared.<br>3. If 「Ecpay CVS 7-11」 outlying islands "
-"shipping is enabled, after selecting a store, it will verify if the chosen store aligns with the selected shipping method.<br>4. If 「Ecpay Home Tcat」 outlying "
-"islands shipping is not enabled, there will be no distinction between outlying island and main island shipments; shipping settings will be shared.<br>5. If "
-"「Ecpay Home Tcat」 outlying islands shipping is enabled, it will verify before checkout whether the shipping destination matches the selected shipping method."
+"Notice：<br>1. The option will only appear in the 「Shipping Method」 after "
+"activation.<br>2. If 「Ecpay CVS 7-11」 outlying islands shipping is not "
+"enabled, there will be no distinction between outlying island and main "
+"island shipments; shipping settings will be shared.<br>3. If 「Ecpay CVS "
+"7-11」 outlying islands shipping is enabled, after selecting a store, it "
+"will verify if the chosen store aligns with the selected shipping method."
+"<br>4. If 「Ecpay Home Tcat」 outlying islands shipping is not enabled, "
+"there will be no distinction between outlying island and main island "
+"shipments; shipping settings will be shared.<br>5. If 「Ecpay Home Tcat」 "
+"outlying islands shipping is enabled, it will verify before checkout whether "
+"the shipping destination matches the selected shipping method."
 msgstr ""
-"離島物流注意事項：<br>1. 啟用後才會在「運送方式」出現選項<br>2. 若未啟用「綠界物流 超商取貨 7-ELEVEN」離島物流，則不分本島離島，共用物流設定<br>3. 若啟用「綠界物"
-"流 超商取貨 7-ELEVEN」離島物流，選擇門市後會檢查所選門市是否與所選物流方式相符<br>4. 若未啟用「綠界物流 宅配 黑貓」離島物流，則不分本島離島，共用物流設定<br>5. 若"
-"啟用「綠界物流 宅配 黑貓」離島物流，結帳前會檢查運送地點是否與所選物流方式相符"
+"離島物流注意事項：<br>1. 啟用後才會在「運送方式」出現選項<br>2. 若未啟用「綠"
+"界物流 超商取貨 7-ELEVEN」離島物流，則不分本島離島，共用物流設定<br>3. 若啟用"
+"「綠界物流 超商取貨 7-ELEVEN」離島物流，選擇門市後會檢查所選門市是否與所選物"
+"流方式相符<br>4. 若未啟用「綠界物流 宅配 黑貓」離島物流，則不分本島離島，共用"
+"物流設定<br>5. 若啟用「綠界物流 宅配 黑貓」離島物流，結帳前會檢查運送地點是否"
+"與所選物流方式相符。"
 
-#: includes/config/logistic/settings.php:98 includes/services/logistic/ecpay-logistic-cvs-711.php:12
+#: includes/config/logistic/settings.php:98
+#: includes/services/logistic/ecpay-logistic-cvs-711.php:12
 msgid "Ecpay CVS 7-11"
 msgstr "綠界物流 超商取貨 7-ELEVEN"
 
-#: includes/config/logistic/settings.php:99 includes/services/logistic/ecpay-logistic-home-tcat.php:9
+#: includes/config/logistic/settings.php:99
+#: includes/services/logistic/ecpay-logistic-home-tcat.php:9
 msgid "Ecpay Home Tcat"
 msgstr "綠界物流 宅配 黑貓"
 
@@ -359,76 +461,141 @@ msgstr "綠界物流 宅配 黑貓"
 msgid "Ecpay shipping methods"
 msgstr "綠界物流"
 
-#: includes/config/main/settings.php:5
+#: includes/config/main/settings.php:4
 msgid "Enable ECPay method"
 msgstr "綠界設定"
 
-#: includes/config/main/settings.php:11 includes/config/main/settings.php:13
+#: includes/config/main/settings.php:9 includes/config/main/settings.php:11
 msgid "Enable ECPay gateway method"
 msgstr "啟用綠界金流"
 
-#: includes/config/main/settings.php:19
+#: includes/config/main/settings.php:17
 msgid "Enable ECPay shipping method"
 msgstr "啟用綠界物流"
 
-#: includes/config/main/settings.php:21
+#: includes/config/main/settings.php:19
 #, php-format
 msgid ""
-"Enable ECPay shipping method <br> If you want to use the cash on delivery service for your shop, you must enable the ECPay gateway method and <a href=\"%1$s\">set "
-"up the delivery payment.</a>"
-msgstr "啟用綠界物流 <br> 若要使用超商貨到付款時,須啟用綠界金流且開啟 <a href=\"%1$s\">貨到付款金流設定</a>"
+"Enable ECPay shipping method <br> If you want to use the cash on delivery "
+"service for your shop, you must enable the ECPay gateway method and <a href="
+"\"%1$s\">set up the delivery payment.</a>"
+msgstr ""
+"啟用綠界物流 <br> 若要使用超商貨到付款時,須啟用綠界金流且開啟 <a href=\"%1$s"
+"\">貨到付款金流設定</a>"
 
-#: includes/config/main/settings.php:28 includes/config/main/settings.php:30
+#: includes/config/main/settings.php:25 includes/config/main/settings.php:27
 msgid "Enable ECPay invoice method"
 msgstr "啟用綠界電子發票"
 
-#: includes/config/payment/settings-gateway-applepay.php:4 includes/config/payment/settings-gateway-atm.php:4 includes/config/payment/settings-gateway-barcode.php:4
-#: includes/config/payment/settings-gateway-bnpl.php:4 includes/config/payment/settings-gateway-credit-installment.php:4
-#: includes/config/payment/settings-gateway-credit.php:4 includes/config/payment/settings-gateway-cvs.php:4 includes/config/payment/settings-gateway-dca.php:4
-#: includes/config/payment/settings-gateway-twqr.php:4 includes/config/payment/settings-gateway-webatm.php:4
+#: includes/config/main/settings.php:36
+msgid "Tools"
+msgstr "工具"
+
+#: includes/config/main/settings.php:41 includes/config/main/settings.php:43
+msgid "Enable ECPay debug log"
+msgstr "啟用綠界偵錯 Log 記錄"
+
+#: includes/config/main/settings.php:43
+msgid ""
+"Due to the large size of the log file, please remember to disable this "
+"feature if not in use."
+msgstr "因產生的 Log 檔案較大，若不使用請記得關閉此功能。"
+
+#: includes/config/main/settings.php:43
+#, php-format
+msgid "Log folder : <code>%s</code>"
+msgstr "Log 目錄 : <code>%s</code>"
+
+#: includes/config/main/settings.php:43
+msgid ""
+"<input class=\"button\" style=\"margin-top: 5px;\" type=\"button\" value="
+"\"Clear Log\" onclick=\"wooecpayClearEcpayDebugLog();\">"
+msgstr ""
+"<input class=\"button\" style=\"margin-top: 5px;\" type=\"button\" value=\"清"
+"理 Log\" onclick=\"wooecpayClearEcpayDebugLog();\">"
+
+#: includes/config/payment/settings-gateway-applepay.php:4
+#: includes/config/payment/settings-gateway-atm.php:4
+#: includes/config/payment/settings-gateway-barcode.php:4
+#: includes/config/payment/settings-gateway-bnpl.php:4
+#: includes/config/payment/settings-gateway-credit-installment.php:4
+#: includes/config/payment/settings-gateway-credit.php:4
+#: includes/config/payment/settings-gateway-cvs.php:4
+#: includes/config/payment/settings-gateway-dca.php:4
+#: includes/config/payment/settings-gateway-twqr.php:4
+#: includes/config/payment/settings-gateway-webatm.php:4
 msgid "Enable/Disable"
 msgstr "啟用/停用"
 
 #. translators: %s: Gateway method title
-#: includes/config/payment/settings-gateway-applepay.php:6 includes/config/payment/settings-gateway-atm.php:5 includes/config/payment/settings-gateway-barcode.php:6
-#: includes/config/payment/settings-gateway-bnpl.php:5 includes/config/payment/settings-gateway-credit-installment.php:6
-#: includes/config/payment/settings-gateway-credit.php:6 includes/config/payment/settings-gateway-cvs.php:6 includes/config/payment/settings-gateway-dca.php:6
-#: includes/config/payment/settings-gateway-twqr.php:5 includes/config/payment/settings-gateway-webatm.php:6
+#: includes/config/payment/settings-gateway-applepay.php:6
+#: includes/config/payment/settings-gateway-atm.php:5
+#: includes/config/payment/settings-gateway-barcode.php:6
+#: includes/config/payment/settings-gateway-bnpl.php:5
+#: includes/config/payment/settings-gateway-credit-installment.php:6
+#: includes/config/payment/settings-gateway-credit.php:6
+#: includes/config/payment/settings-gateway-cvs.php:6
+#: includes/config/payment/settings-gateway-dca.php:6
+#: includes/config/payment/settings-gateway-twqr.php:5
+#: includes/config/payment/settings-gateway-webatm.php:6
 #, php-format
 msgid "Enable %s"
 msgstr "啟用 %s"
 
-#: includes/config/payment/settings-gateway-applepay.php:18 includes/config/payment/settings-gateway-atm.php:17
-#: includes/config/payment/settings-gateway-barcode.php:18 includes/config/payment/settings-gateway-bnpl.php:17
-#: includes/config/payment/settings-gateway-credit-installment.php:18 includes/config/payment/settings-gateway-credit.php:18
-#: includes/config/payment/settings-gateway-cvs.php:18 includes/config/payment/settings-gateway-dca.php:18 includes/config/payment/settings-gateway-twqr.php:17
+#: includes/config/payment/settings-gateway-applepay.php:18
+#: includes/config/payment/settings-gateway-atm.php:17
+#: includes/config/payment/settings-gateway-barcode.php:18
+#: includes/config/payment/settings-gateway-bnpl.php:17
+#: includes/config/payment/settings-gateway-credit-installment.php:18
+#: includes/config/payment/settings-gateway-credit.php:18
+#: includes/config/payment/settings-gateway-cvs.php:18
+#: includes/config/payment/settings-gateway-dca.php:18
+#: includes/config/payment/settings-gateway-twqr.php:17
 #: includes/config/payment/settings-gateway-webatm.php:18
 msgid "Description"
 msgstr "描述"
 
-#: includes/config/payment/settings-gateway-applepay.php:22 includes/config/payment/settings-gateway-atm.php:21
-#: includes/config/payment/settings-gateway-barcode.php:22 includes/config/payment/settings-gateway-bnpl.php:21
-#: includes/config/payment/settings-gateway-credit-installment.php:22 includes/config/payment/settings-gateway-credit.php:22
-#: includes/config/payment/settings-gateway-cvs.php:22 includes/config/payment/settings-gateway-dca.php:22 includes/config/payment/settings-gateway-twqr.php:21
+#: includes/config/payment/settings-gateway-applepay.php:22
+#: includes/config/payment/settings-gateway-atm.php:21
+#: includes/config/payment/settings-gateway-barcode.php:22
+#: includes/config/payment/settings-gateway-bnpl.php:21
+#: includes/config/payment/settings-gateway-credit-installment.php:22
+#: includes/config/payment/settings-gateway-credit.php:22
+#: includes/config/payment/settings-gateway-cvs.php:22
+#: includes/config/payment/settings-gateway-dca.php:22
+#: includes/config/payment/settings-gateway-twqr.php:21
 #: includes/config/payment/settings-gateway-webatm.php:22
 msgid "This controls the description which the user sees during checkout."
 msgstr "此項目控制使用者在結帳時會看到的說明。"
 
-#: includes/config/payment/settings-gateway-applepay.php:29 includes/config/payment/settings-gateway-atm.php:28
-#: includes/config/payment/settings-gateway-barcode.php:29 includes/config/payment/settings-gateway-credit-installment.php:29
-#: includes/config/payment/settings-gateway-credit.php:29 includes/config/payment/settings-gateway-cvs.php:29 includes/config/payment/settings-gateway-dca.php:29
-#: includes/config/payment/settings-gateway-twqr.php:28 includes/config/payment/settings-gateway-webatm.php:29
+#: includes/config/payment/settings-gateway-applepay.php:29
+#: includes/config/payment/settings-gateway-atm.php:28
+#: includes/config/payment/settings-gateway-barcode.php:29
+#: includes/config/payment/settings-gateway-credit-installment.php:29
+#: includes/config/payment/settings-gateway-credit.php:29
+#: includes/config/payment/settings-gateway-cvs.php:29
+#: includes/config/payment/settings-gateway-dca.php:29
+#: includes/config/payment/settings-gateway-twqr.php:28
+#: includes/config/payment/settings-gateway-webatm.php:29
 msgid "0 to disable minimum amount limit."
 msgstr "0 代表停用最小訂單金額限制。"
 
-#: includes/config/payment/settings-gateway-atm.php:35 includes/config/payment/settings-gateway-barcode.php:36 includes/config/payment/settings-gateway-bnpl.php:34
-#: includes/config/payment/settings-gateway-cvs.php:36 includes/config/payment/settings-gateway-dca.php:36 includes/config/payment/settings-gateway-twqr.php:35
+#: includes/config/payment/settings-gateway-atm.php:35
+#: includes/config/payment/settings-gateway-barcode.php:36
+#: includes/config/payment/settings-gateway-bnpl.php:34
+#: includes/config/payment/settings-gateway-cvs.php:36
+#: includes/config/payment/settings-gateway-dca.php:36
+#: includes/config/payment/settings-gateway-twqr.php:35
 #: includes/config/payment/settings-gateway-webatm.php:36
 msgid "A maximum order amount"
 msgstr "訂單最高金額"
 
-#: includes/config/payment/settings-gateway-atm.php:39 includes/config/payment/settings-gateway-barcode.php:40 includes/config/payment/settings-gateway-bnpl.php:38
-#: includes/config/payment/settings-gateway-cvs.php:40 includes/config/payment/settings-gateway-dca.php:40 includes/config/payment/settings-gateway-twqr.php:39
+#: includes/config/payment/settings-gateway-atm.php:39
+#: includes/config/payment/settings-gateway-barcode.php:40
+#: includes/config/payment/settings-gateway-bnpl.php:38
+#: includes/config/payment/settings-gateway-cvs.php:40
+#: includes/config/payment/settings-gateway-dca.php:40
+#: includes/config/payment/settings-gateway-twqr.php:39
 #: includes/config/payment/settings-gateway-webatm.php:40
 msgid "0 to disable maximum amount limit."
 msgstr "0 代表停用最大訂單金額限制。"
@@ -449,8 +616,10 @@ msgstr "交易金額最低需達新台幣3,000元。"
 msgid "Enable number of periods"
 msgstr "允許分期數"
 
-#: includes/config/payment/settings-gateway-credit-installment.php:43 includes/config/payment/settings-gateway-credit-installment.php:44
-#: includes/config/payment/settings-gateway-credit-installment.php:45 includes/config/payment/settings-gateway-credit-installment.php:46
+#: includes/config/payment/settings-gateway-credit-installment.php:43
+#: includes/config/payment/settings-gateway-credit-installment.php:44
+#: includes/config/payment/settings-gateway-credit-installment.php:45
+#: includes/config/payment/settings-gateway-credit-installment.php:46
 #: includes/config/payment/settings-gateway-credit-installment.php:47
 #, php-format
 msgid "%d Periods"
@@ -486,65 +655,96 @@ msgstr "信件內付款資訊"
 msgid "Enabled payment disp email"
 msgstr "保留訂單的信件顯示付款資訊"
 
-#: includes/services/helpers/invoice/ecpay-invoice-helper.php:264
+#: includes/services/helpers/invoice/ecpay-invoice-helper.php:263
 msgid "Please input Unified Business NO"
 msgstr "請輸入統一編號"
 
-#: includes/services/helpers/invoice/ecpay-invoice-helper.php:268
+#: includes/services/helpers/invoice/ecpay-invoice-helper.php:267
 msgid "Invalid tax ID number"
 msgstr "統一編號格式錯誤"
 
-#: includes/services/helpers/invoice/ecpay-invoice-helper.php:273
+#: includes/services/helpers/invoice/ecpay-invoice-helper.php:272
 msgid "Please input the company name"
 msgstr "請輸入公司名稱"
 
-#: includes/services/helpers/invoice/ecpay-invoice-helper.php:296
+#: includes/services/helpers/invoice/ecpay-invoice-helper.php:295
 msgid "Please input Donate number"
 msgstr "請輸入捐贈碼"
 
-#: includes/services/helpers/invoice/ecpay-invoice-helper.php:300
+#: includes/services/helpers/invoice/ecpay-invoice-helper.php:299
 msgid "Invalid Donate number"
 msgstr "捐贈碼格式錯誤"
 
-#: includes/services/helpers/invoice/ecpay-invoice-helper.php:332 includes/services/helpers/invoice/ecpay-invoice-helper.php:431
-msgid "Ministry of Finance system is currently under maintenance, unable to verify the carrier. Please choose another invoice mode."
-msgstr "財政部系統目前維護中，無法驗證載具，請選擇其他發票開立方式"
+#: includes/services/helpers/invoice/ecpay-invoice-helper.php:331
+#: includes/services/helpers/invoice/ecpay-invoice-helper.php:430
+msgid ""
+"Ministry of Finance system is currently under maintenance, unable to verify "
+"the carrier. Please choose another invoice mode."
+msgstr "財政部系統目前維護中，無法驗證載具，請選擇其他發票開立方式."
 
-#: includes/services/helpers/invoice/ecpay-invoice-helper.php:338
+#: includes/services/helpers/invoice/ecpay-invoice-helper.php:337
 msgid "Please Check Donate number"
 msgstr "請確認輸入的捐贈碼是否正確，或選擇其他發票開立方式"
 
-#: includes/services/helpers/invoice/ecpay-invoice-helper.php:367
+#: includes/services/helpers/invoice/ecpay-invoice-helper.php:366
 msgid "Please input Citizen Digital Certificate"
 msgstr "請輸入自然人憑證載具編號"
 
-#: includes/services/helpers/invoice/ecpay-invoice-helper.php:371
+#: includes/services/helpers/invoice/ecpay-invoice-helper.php:370
 msgid "Invalid Citizen Digital Certificate"
 msgstr "自然人憑證格式錯誤"
 
-#: includes/services/helpers/invoice/ecpay-invoice-helper.php:394
+#: includes/services/helpers/invoice/ecpay-invoice-helper.php:393
 msgid "Please input phone barcode"
 msgstr "請輸入手機條碼載具編號"
 
-#: includes/services/helpers/invoice/ecpay-invoice-helper.php:398
+#: includes/services/helpers/invoice/ecpay-invoice-helper.php:397
 msgid "Invalid phone barcode"
 msgstr "手機條碼載具格式錯誤"
 
-#: includes/services/helpers/invoice/ecpay-invoice-helper.php:437
+#: includes/services/helpers/invoice/ecpay-invoice-helper.php:436
 msgid "Please Check phone barcode"
 msgstr "請確認輸入的手機條碼載具是否正確，或選擇其他載具類別"
 
-#: includes/services/helpers/invoice/ecpay-invoice-helper.php:811
+#: includes/services/helpers/invoice/ecpay-invoice-helper.php:833
 msgid "Invalid invoice"
 msgstr "作廢發票"
+
+#: includes/services/helpers/logistic/ecpay-logistic-helper.php:670
+msgid "The name insufficient or exceeded character limit"
+msgstr "姓名低於或超過長度限制"
+
+#: includes/services/helpers/logistic/ecpay-logistic-helper.php:675
+msgid "The name cannot contain numbers"
+msgstr "姓名不能包含數字"
+
+#: includes/services/helpers/logistic/ecpay-logistic-helper.php:680
+msgid "The name contains special symbols that cannot be used"
+msgstr "姓名包含不支援的特殊符號"
+
+#: includes/services/helpers/logistic/ecpay-logistic-helper.php:685
+msgid "The name contains ASCII that cannot be used"
+msgstr "姓名包含不支援的ASCII碼"
+
+#: includes/services/helpers/logistic/ecpay-logistic-helper.php:690
+msgid ""
+"No special symbols are allowed in the phone number, it must be ten digits "
+"long and start with 09"
+msgstr "電話號碼不允許使用特殊符號，長度必須為十碼且為09開頭"
 
 #: includes/services/helpers/payment/ecpay-payment-helper.php:127
 #, php-format
 msgid "Credit installment to %d"
 msgstr "信用卡分期期數 %d"
 
-#: includes/services/logistic/class-wooecpay-logistic.php:180
-msgid "The selected shipping method does not match the shipping address. Please choose again."
+#: includes/services/logistic/class-wooecpay-logistic.php:168
+msgid "Ecpay Sipping Setting Error："
+msgstr "綠界物流設定錯誤："
+
+#: includes/services/logistic/class-wooecpay-logistic.php:207
+msgid ""
+"The selected shipping method does not match the shipping address. Please "
+"choose again."
 msgstr "選擇運送方式與宅配地點不符，請重新選擇。"
 
 #: includes/services/logistic/ecpay-logistic-cvs-711-outside.php:12
@@ -575,23 +775,28 @@ msgstr "綠界物流 宅配 中華郵政"
 msgid "Ecpay Home Tcat Outside"
 msgstr "綠界物流 宅配 黑貓 離島"
 
-#: includes/services/logistic/ecpay-logistic-response.php:55 includes/services/payment/woocommerce-gateway-cod.php:212
+#: includes/services/logistic/ecpay-logistic-response.php:52
+#: includes/services/payment/woocommerce-gateway-cod.php:206
 msgid ""
-"The selected store does not match the chosen shipping method (Outlying Island/Main Island). Please select a different store or cancel the transaction and place a "
-"new order."
-msgstr "選擇門市地點與運送方式不符(離島/本島)，請重新選擇門市或取消交易重新下單。"
+"The selected store does not match the chosen shipping method (Outlying "
+"Island/Main Island). Please select a different store or cancel the "
+"transaction and place a new order."
+msgstr ""
+"選擇門市地點與運送方式不符(離島/本島)，請重新選擇門市或取消交易重新下單。"
 
-#: includes/services/logistic/ecpay-logistic-response.php:103
+#: includes/services/logistic/ecpay-logistic-response.php:100
 #, php-format
 msgid "CVS store %1$s (%2$s)"
 msgstr "超商 %1$s (%2$s)"
 
-#: includes/services/logistic/ecpay-logistic-response.php:133 includes/services/payment/ecpay-gateway-base.php:106
+#: includes/services/logistic/ecpay-logistic-response.php:129
+#: includes/services/payment/ecpay-gateway-base.php:107
 #, php-format
 msgid "Ecpay Payment Merchant Trade No %s"
 msgstr "綠界金流特店交易編號 %s"
 
-#: includes/services/logistic/ecpay-logistic-response.php:255 includes/services/payment/woocommerce-gateway-cod.php:190
+#: includes/services/logistic/ecpay-logistic-response.php:255
+#: includes/services/payment/woocommerce-gateway-cod.php:183
 #, php-format
 msgid "Change store %1$s (%2$s)"
 msgstr "變更門市 %1$s (%2$s)"
@@ -608,8 +813,12 @@ msgstr "透過綠界ApplePay付款"
 msgid "ECPay ATM"
 msgstr "綠界ATM櫃員機"
 
-#: includes/services/payment/ecpay-gateway-atm.php:40 includes/services/payment/ecpay-gateway-barcode.php:49 includes/services/payment/ecpay-gateway-bnpl.php:38
-#: includes/services/payment/ecpay-gateway-cvs.php:45 includes/services/payment/ecpay-gateway-twqr.php:38 includes/services/payment/ecpay-gateway-webatm.php:38
+#: includes/services/payment/ecpay-gateway-atm.php:40
+#: includes/services/payment/ecpay-gateway-barcode.php:49
+#: includes/services/payment/ecpay-gateway-bnpl.php:38
+#: includes/services/payment/ecpay-gateway-cvs.php:45
+#: includes/services/payment/ecpay-gateway-twqr.php:38
+#: includes/services/payment/ecpay-gateway-webatm.php:38
 #, php-format
 msgid "%s minimum amount out of range. Set as default value."
 msgstr "%s 最小訂購金額超過限制，調整為預設值。"
@@ -631,7 +840,8 @@ msgstr "綠界超商條碼"
 msgid "BARCODE payment deadline out of range. Set as default value."
 msgstr "超商條碼繳費期限超過限制，調整為預設值。"
 
-#: includes/services/payment/ecpay-gateway-barcode.php:55 includes/services/payment/ecpay-gateway-cvs.php:51
+#: includes/services/payment/ecpay-gateway-barcode.php:55
+#: includes/services/payment/ecpay-gateway-cvs.php:51
 #, php-format
 msgid "%1$s maximum amount more then normal maximum (%2$d)."
 msgstr "%1$s 最大訂購金額超過標準的限制 (%2$d)。"
@@ -731,18 +941,19 @@ msgid "Don't forget to save modify"
 msgstr "調整完成定期定額方式，請記得儲存修改"
 
 #: includes/services/payment/ecpay-gateway-dca.php:261
-msgid "ECPay paid automatically details has been repeatedly, please confirm again"
+msgid ""
+"ECPay paid automatically details has been repeatedly, please confirm again"
 msgstr "信用卡定期定額方式已重複輸入，請再次確認"
 
 #: includes/services/payment/ecpay-gateway-dca.php:321
 msgid "Pay via ECPay DCA"
 msgstr "透過綠界定期定額付款"
 
-#: includes/services/payment/ecpay-gateway-response.php:69
+#: includes/services/payment/ecpay-gateway-response.php:66
 msgid "Payment completed"
 msgstr "付款完成"
 
-#: includes/services/payment/ecpay-gateway-response.php:153
+#: includes/services/payment/ecpay-gateway-response.php:155
 msgid "Payment failed within paid order"
 msgstr "已付款的訂單收到付款失敗訊息"
 
@@ -762,8 +973,10 @@ msgstr "綠界網路ATM"
 msgid "Pay via ECPay Web ATM"
 msgstr "透過綠界網路ATM付款"
 
-#: includes/services/payment/woocommerce-gateway-cod.php:272
-msgid "The selected store does not match the chosen shipping method (Outlying Island/Main Island)."
+#: includes/services/payment/woocommerce-gateway-cod.php:266
+msgid ""
+"The selected store does not match the chosen shipping method (Outlying "
+"Island/Main Island)."
 msgstr "選擇門市地點與運送方式不符(離島/本島)。"
 
 #: includes/templates/logistic/cvs_map.php:8
@@ -782,12 +995,17 @@ msgstr "超商店舖名稱"
 msgid "Ecpay CVS store address"
 msgstr "超商店舖地址"
 
-#: includes/templates/payment/atm.php:16 includes/templates/payment/barcode.php:16 includes/templates/payment/cvs.php:16 includes/templates/payment_email/atm.php:12
-#: includes/templates/payment_email/barcode.php:15 includes/templates/payment_email/cvs.php:15
+#: includes/templates/payment/atm.php:16
+#: includes/templates/payment/barcode.php:16
+#: includes/templates/payment/cvs.php:16
+#: includes/templates/payment_email/atm.php:12
+#: includes/templates/payment_email/barcode.php:15
+#: includes/templates/payment_email/cvs.php:15
 msgid "Payment info"
 msgstr "付款資訊"
 
-#: includes/templates/payment/atm.php:22 includes/templates/payment_email/atm.php:19
+#: includes/templates/payment/atm.php:22
+#: includes/templates/payment_email/atm.php:19
 msgid "Bank"
 msgstr "銀行"
 
@@ -807,16 +1025,14 @@ msgstr "第二段條碼"
 msgid "Barcode 3"
 msgstr "第三段條碼"
 
-#: includes/templates/payment/barcode.php:50 includes/templates/payment/cvs.php:34 includes/templates/payment_email/barcode.php:49
+#: includes/templates/payment/barcode.php:50
+#: includes/templates/payment/cvs.php:34
+#: includes/templates/payment_email/barcode.php:49
 #: includes/templates/payment_email/cvs.php:33
 #, php-format
 msgctxt "Datetime"
 msgid "%1$s %2$s"
 msgstr "%1$s %2$s"
-
-#. Plugin Name of the plugin/theme
-msgid "ECPay Ecommerce for WooCommerce"
-msgstr "ECPay Ecommerce for WooCommerce"
 
 #. Plugin URI of the plugin/theme
 #. Author URI of the plugin/theme
@@ -831,53 +1047,8 @@ msgstr "Ecpay Plug for WooCommerce"
 msgid "ECPay Green World FinTech Service Co., Ltd."
 msgstr "綠界科技."
 
-#: includes/services/logistic/class-wooecpay-logistic.php:180
-msgid "Ecpay Sipping Setting Error："
-msgstr "綠界物流設定錯誤："
-
-#: includes/services/helpers/logistic/ecpay-logistic-helper.php:681
-msgid "The name insufficient or exceeded character limit"
-msgstr "姓名低於或超過長度限制"
-
-#: includes/services/helpers/logistic/ecpay-logistic-helper.php:686
-msgid "The name cannot contain numbers"
-msgstr "姓名不能包含數字"
-
-#: includes/services/helpers/logistic/ecpay-logistic-helper.php:691
-msgid "The name contains special symbols that cannot be used"
-msgstr "姓名包含不支援的特殊符號"
-
-#: includes/services/helpers/logistic/ecpay-logistic-helper.php:696
-msgid "The name contains ASCII that cannot be used"
-msgstr "姓名包含不支援的ASCII碼"
-
-#: includes/services/helpers/logistic/ecpay-logistic-helper.php:703
-msgid "No special symbols are allowed in the phone number, it must be ten digits long and start with 09"
-msgstr "電話號碼不允許使用特殊符號，長度必須為十碼且為09開頭"
-
-#: admin/order/class-wooecpay-order.php:691
-msgid "Duplicate payments for ecpay orders are marked as processed."
-msgstr "綠界訂單重複付款提示標示為已處理"
-
-#: includes/config/main/settings.php:36
-msgid "Tools"
-msgstr "工具"
-
-#: includes/config/main/settings.php:41 includes/config/main/settings.php:43
-msgid "Enable ECPay debug log"
-msgstr "啟用綠界偵錯 Log 記錄"
-
-#: includes/config/main/settings.php:43
-msgid "Log folder : <code>%s</code>"
-msgstr "Log 目錄 : <code>%s</code>"
-
-#: includes/config/main/settings.php:43
-msgid "Due to the large size of the log file, please remember to disable this feature if not in use."
-msgstr "因產生的 Log 檔案較大，若不使用請記得關閉此功能"
-
-#: includes/config/main/settings.php:41 includes/config/main/settings.php:43
-msgid "<input class=\"button\" style=\"margin-top: 5px;\" type=\"button\" value=\"Clear Log\" onclick=\"wooecpayClearEcpayDebugLog();\">"
-msgstr "<input class=\"button\" style=\"margin-top: 5px;\" type=\"button\" value=\"清理 Log\" onclick=\"wooecpayClearEcpayDebugLog();\">"
+#~ msgid "Duplicate payments for ecpay orders are marked as processed."
+#~ msgstr "綠界訂單重複付款提示標示為已處理."
 
 #~ msgid "Maximum order amount"
 #~ msgstr "訂單最高金額"

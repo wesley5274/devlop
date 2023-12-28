@@ -21,6 +21,7 @@ defined('ABSPATH') or exit;
 
 // 相關常數定義
 define('WOOECPAY_VERSION', '1.0.2310050');
+define('REQUIREMENT_WOOCOMMERCE_VERSION', '8.3.0');
 define('WOOECPAY_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('WOOECPAY_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('WOOECPAY_PLUGIN_BASENAME', plugin_basename(__FILE__));
@@ -50,8 +51,23 @@ require plugin_dir_path(__FILE__) . 'includes/services/helpers/invoice/ecpay-inv
 require_once WOOECPAY_PLUGIN_DIR . 'includes/services/database/ecpay-db-process.php';
 register_activation_hook(__FILE__, array('Wooecpay_Db_Process', 'ecpay_db_process'));
 add_action('upgrader_process_complete', array('Wooecpay_Db_Process', 'ecpay_db_process'));
-add_action('plugins_loaded', array('Wooecpay_Db_Process', 'ecpay_db_process'));
+add_action('woocommerce_loaded', array('Wooecpay_Db_Process', 'ecpay_db_process'));
 
+// Woocommerce版本判斷
+add_action('admin_notices',
+    function () {
+        if (!defined('WC_VERSION') || version_compare(WC_VERSION, REQUIREMENT_WOOCOMMERCE_VERSION, '<')) {
+            $notice = sprintf(
+                __('<strong>%1$s</strong> is inactive. It require WooCommerce version %2$s or newer.', 'ecpay-ecommerce-for-woocommerce'),
+                __('ECPay Ecommerce for WooCommerce', 'ecpay-ecommerce-for-woocommerce'),
+                REQUIREMENT_WOOCOMMERCE_VERSION
+            );
+            printf('<div class="error"><p>%s</p></div>', $notice);
+        }
+    }
+);
+
+// 高效能宣告
 add_action('before_woocommerce_init',
     function () {
         if (class_exists(\Automattic\WooCommerce\Utilities\FeaturesUtil::class)) {
@@ -59,6 +75,10 @@ add_action('before_woocommerce_init',
         }
     }
 );
+
+if (is_admin()) {
+
+}
 
 // 載入 log 功能
 require WOOECPAY_PLUGIN_DIR . 'includes/services/helpers/logger/ecpay-logger.php';
