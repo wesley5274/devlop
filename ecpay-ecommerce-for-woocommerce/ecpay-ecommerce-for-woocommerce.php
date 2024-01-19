@@ -76,10 +76,6 @@ add_action('before_woocommerce_init',
     }
 );
 
-if (is_admin()) {
-
-}
-
 // 載入 log 功能
 require WOOECPAY_PLUGIN_DIR . 'includes/services/helpers/logger/ecpay-logger.php';
 function ecpay_log($content, $code = '', $order_id = '') {
