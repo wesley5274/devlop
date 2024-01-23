@@ -12,8 +12,8 @@
  * License: GPLv2
  * License URI: https://www.gnu.org/licenses/gpl-2.0.txt
  * Domain Path: /languages
- * WC requires at least: 6
- * WC tested up to: 6.5.1
+ * WC requires at least: 8
+ * WC tested up to: 8.4.0
  */
 
 // 相關檢查
