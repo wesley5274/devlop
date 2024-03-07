@@ -364,10 +364,12 @@ class Wooecpay_Order {
      */
     public function order_update_sync_shipping_phone($post_id) {
 
-        $shipping_phone = $order->get_meta('_shipping_phone', true);
+        if ($order = wc_get_order($post_id)) {
+            $shipping_phone = $order->get_meta('_shipping_phone', true);
 
-        $order->update_meta_data('wooecpay_shipping_phone', $shipping_phone);
-        $order->save();
+            $order->update_meta_data('wooecpay_shipping_phone', $shipping_phone);
+            $order->save();
+        }
     }
 
     public function ecpay_validate_logistic_fields($post_id, $data) {
