@@ -105,7 +105,7 @@ class Wooecpay_Order {
             echo '<style>.logistic_button_display {display: inline-block;}</style>';
         }
 
-        echo wp_kses_post('<p><strong>帳單姓名:<br/></strong>' . $order->get_meta('_billing_last_name', true) . ' ' . $order->get_meta('_billing_first_name', true) . '</p>');
+        echo wp_kses_post('<p><strong>帳單姓名:<br/></strong>' . $order->get_billing_last_name() . ' ' . $order->get_billing_first_name() . '</p>');
     }
 
     /**
@@ -362,9 +362,8 @@ class Wooecpay_Order {
      * 複寫聯絡電話至收件人電話
      */
     public function order_update_sync_shipping_phone($post_id) {
-
         if ($order = wc_get_order($post_id)) {
-            $shipping_phone = $order->get_meta('_shipping_phone', true);
+            $shipping_phone = (!empty($order->get_shipping_phone())) ?: $order->get_billing_phone();
 
             $order->update_meta_data('wooecpay_shipping_phone', $shipping_phone);
             $order->save();
