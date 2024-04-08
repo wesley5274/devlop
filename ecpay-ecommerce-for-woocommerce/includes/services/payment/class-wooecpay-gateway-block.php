@@ -22,7 +22,6 @@ class Wooecpay_Gateway_Block extends AbstractPaymentMethodType {
     }
 
     public function get_payment_method_script_handles() {
-        error_log('in get_payment_method_script_handles');
         $js_url = '';
         switch ($this->name) {
             case 'Wooecpay_Gateway_Credit':
@@ -56,7 +55,7 @@ class Wooecpay_Gateway_Block extends AbstractPaymentMethodType {
                 $js_url = $this->jsUrl . '/dca-checkout.js';
                 break;
         }
-        
+
         wp_register_script(
             $this->name . '-blocks-integration',
             $js_url,
