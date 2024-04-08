@@ -6,7 +6,6 @@ class Wooecpay_Gateway_Block extends AbstractPaymentMethodType {
 
     protected $gateway;
     protected $name;
-    protected $jsUrl = '/wp-content/plugins/ecpay-ecommerce-for-woocommerce/includes/block';
 
     public function __construct(string $name) {
         $this->name = $name;
@@ -25,34 +24,34 @@ class Wooecpay_Gateway_Block extends AbstractPaymentMethodType {
         $js_url = '';
         switch ($this->name) {
             case 'Wooecpay_Gateway_Credit':
-                $js_url = $this->jsUrl . '/credit-checkout.js';
+			    $js_url = WOOECPAY_PLUGIN_URL . 'public/js/blocks/credit-checkout.js';
                 break;
             case 'Wooecpay_Gateway_Credit_Installment':
-                $js_url = $this->jsUrl . '/credit-installment-checkout.js';
+                $js_url = WOOECPAY_PLUGIN_URL . 'public/js/blocks/credit-installment-checkout.js';
                 break;
             case 'Wooecpay_Gateway_Webatm':
-                $js_url = $this->jsUrl . '/webatm-checkout.js';
+                $js_url = WOOECPAY_PLUGIN_URL . 'public/js/blocks/webatm-checkout.js';
                 break;
             case 'Wooecpay_Gateway_Atm':
-                $js_url = $this->jsUrl . '/atm-checkout.js';
+                $js_url = WOOECPAY_PLUGIN_URL . 'public/js/blocks/atm-checkout.js';
                 break;
             case 'Wooecpay_Gateway_Cvs':
-                $js_url = $this->jsUrl . '/cvs-checkout.js';
+                $js_url = WOOECPAY_PLUGIN_URL . 'public/js/blocks/cvs-checkout.js';
                 break;
             case 'Wooecpay_Gateway_Barcode':
-                $js_url = $this->jsUrl . '/barcode-checkout.js';
+                $js_url = WOOECPAY_PLUGIN_URL . 'public/js/blocks/barcode-checkout.js';
                 break;
             case 'Wooecpay_Gateway_Applepay':
-                $js_url = $this->jsUrl . '/applepay-checkout.js';
+                $js_url = WOOECPAY_PLUGIN_URL . 'public/js/blocks/applepay-checkout.js';
                 break;
             case 'Wooecpay_Gateway_Bnpl':
-                $js_url = $this->jsUrl . '/bnpl-checkout.js';
+                $js_url = WOOECPAY_PLUGIN_URL . 'public/js/blocks/bnpl-checkout.js';
                 break;
             case 'Wooecpay_Gateway_Twqr':
-                $js_url = $this->jsUrl . '/twqr-checkout.js';
+                $js_url = WOOECPAY_PLUGIN_URL . 'public/js/blocks/twqr-checkout.js';
                 break;
             case 'Wooecpay_Gateway_Dca':
-                $js_url = $this->jsUrl . '/dca-checkout.js';
+                $js_url = WOOECPAY_PLUGIN_URL . 'public/js/blocks/dca-checkout.js';
                 break;
         }
 
