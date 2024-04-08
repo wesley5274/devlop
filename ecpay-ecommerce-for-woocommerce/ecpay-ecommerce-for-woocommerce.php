@@ -20,7 +20,7 @@
 defined('ABSPATH') or exit;
 
 // 相關常數定義
-define('WOOECPAY_VERSION', '1.1.2403150');
+define('WOOECPAY_VERSION', '1.1.2404080');
 define('REQUIREMENT_WOOCOMMERCE_VERSION', '8.3.0');
 define('WOOECPAY_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('WOOECPAY_PLUGIN_DIR', plugin_dir_path(__FILE__));
