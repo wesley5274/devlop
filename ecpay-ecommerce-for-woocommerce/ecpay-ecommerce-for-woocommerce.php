@@ -67,11 +67,13 @@ add_action('admin_notices',
     }
 );
 
-// 高效能宣告
 add_action('before_woocommerce_init',
     function () {
         if (class_exists(\Automattic\WooCommerce\Utilities\FeaturesUtil::class)) {
+            // 高效能宣告
             \Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility('custom_order_tables', __FILE__, true);
+            // Woocmmerce Payment Block
+            \Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility('cart_checkout_blocks', __FILE__, true);
         }
     }
 );
