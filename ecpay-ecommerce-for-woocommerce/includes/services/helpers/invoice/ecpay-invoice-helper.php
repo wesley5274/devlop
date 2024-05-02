@@ -190,15 +190,15 @@ class Wooecpay_Invoice_Helper {
      */
     public function check_invoice_fields($fields, $switch) {
         // 發票開立方式
-        if (isset($fields['wooecpay_invoice_type'])) {
-            $wooecpay_invoice_type = sanitize_text_field($fields['wooecpay_invoice_type']);
+        if (isset($fields['invoice_type'])) {
+            $wooecpay_invoice_type = sanitize_text_field($fields['invoice_type']);
 
             switch ($wooecpay_invoice_type) {
             case self::INVOICE_TYPE_COMPANY:
                 // 公司
-                $wooecpay_invoice_customer_identifier = sanitize_text_field($fields['wooecpay_invoice_customer_identifier']);
-                $wooecpay_invoice_customer_company    = sanitize_text_field($fields['wooecpay_invoice_customer_company']);
-                $wooecpay_invoice_carruer_type        = sanitize_text_field($fields['wooecpay_invoice_carruer_type']);
+                $wooecpay_invoice_customer_identifier = sanitize_text_field($fields['invoice_customer_identifier']);
+                $wooecpay_invoice_customer_company    = sanitize_text_field($fields['invoice_customer_company']);
+                $wooecpay_invoice_carruer_type        = sanitize_text_field($fields['invoice_carruer_type']);
 
                 $response = $this->check_customer_identifier($wooecpay_invoice_customer_identifier, $wooecpay_invoice_carruer_type, $wooecpay_invoice_customer_company);
 
@@ -208,7 +208,7 @@ class Wooecpay_Invoice_Helper {
                 break;
             case self::INVOICE_TYPE_DONATE:
                 // 捐贈
-                $wooecpay_invoice_love_code = sanitize_text_field($fields['wooecpay_invoice_love_code']);
+                $wooecpay_invoice_love_code = sanitize_text_field($fields['invoice_love_code']);
 
                 $response = $this->check_love_code($wooecpay_invoice_love_code, $switch['billing_love_code_api_check']);
 
@@ -220,9 +220,9 @@ class Wooecpay_Invoice_Helper {
         }
 
         // 載具類別
-        if (isset($fields['wooecpay_invoice_carruer_type'])) {
-            $wooecpay_invoice_carruer_type = sanitize_text_field($fields['wooecpay_invoice_carruer_type']);
-            $wooecpay_invoice_carruer_num  = sanitize_text_field($fields['wooecpay_invoice_carruer_num']);
+        if (isset($fields['invoice_carruer_type'])) {
+            $wooecpay_invoice_carruer_type = sanitize_text_field($fields['invoice_carruer_type']);
+            $wooecpay_invoice_carruer_num  = sanitize_text_field($fields['invoice_carruer_num']);
 
             switch ($wooecpay_invoice_carruer_type) {
             case self::INVOICE_CARRUER_TYPE_NATURAL_PERSON_ID:

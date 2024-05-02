@@ -58,7 +58,7 @@ class Wooecpay_invoice {
        	wp_enqueue_script('wooecpay_invoice');
 
         // 載具資訊
-        $fields['billing']['wooecpay_invoice_carruer_type'] = [
+        $fields['billing']['invoice_carruer_type'] = [
             'type'          => 'select',
             'label'         => '載具類別',
             'required'      => false,
@@ -66,7 +66,7 @@ class Wooecpay_invoice {
             'options'       => $this->invoiceHelper->invoiceCarruerType
         ];
 
-        $fields['billing']['wooecpay_invoice_type'] = [
+        $fields['billing']['invoice_type'] = [
             'type'          => 'select',
             'label'         => '發票開立',
             'required'      => false,
@@ -74,21 +74,21 @@ class Wooecpay_invoice {
             'options'       => $this->invoiceHelper->invoiceType
         ];
 
-        $fields['billing']['wooecpay_invoice_customer_identifier'] = [
+        $fields['billing']['invoice_customer_identifier'] = [
             'type'          => 'text',
             'label'         => '統一編號',
             'required'      => false,
             'priority'      => 220,
         ];
 
-        $fields['billing']['wooecpay_invoice_customer_company'] = [
+        $fields['billing']['invoice_customer_company'] = [
             'type'          => 'text',
             'label'         => '公司行號',
             'required'      => false,
             'priority'      => 220,
         ];
 
-        $fields['billing']['wooecpay_invoice_love_code'] = [
+        $fields['billing']['invoice_love_code'] = [
             'type'          => 'text',
             'label'         => '捐贈碼',
             'desc_tip'      => true,
@@ -96,7 +96,7 @@ class Wooecpay_invoice {
             'priority'      => 230,
         ];
 
-        $fields['billing']['wooecpay_invoice_carruer_num'] = [
+        $fields['billing']['invoice_carruer_num'] = [
             'type'          => 'text',
             'label'         => '載具編號',
             'required'      => false,
