@@ -8,12 +8,12 @@ const {registerCheckoutBlock} = wc.blocksCheckout;
 const ecpayInvoiceBlock = ({children, checkoutExtensionData}) => {
     const {setExtensionData, getExtensionData} = checkoutExtensionData;
     const [invoiceTypeValue, setInvoiceTypeValue] = useState('p');
-    const [carruerTypeValue, setCarruerTypeValue] = useState('索取紙本');
+    const [carruerTypeValue, setCarruerTypeValue] = useState('0');
     const [carruerTypeOptions, setCarruerTypeOptions] = useState([
-        {label: '索取紙本', value: '1'},
-        {label: '雲端發票(中獎寄送紙本)', value: '2'},
-        {label: '自然人憑證', value: '3'},
-        {label: '手機條碼', value: '4'}
+        {label: '索取紙本', value: '0'},
+        {label: '雲端發票(中獎寄送紙本)', value: '1'},
+        {label: '自然人憑證', value: '2'},
+        {label: '手機條碼', value: '3'}
     ]);
     const [companyNameValue, setCompanyNameValue] = useState('');
     const [companyIdentifierValue, setCompanyIdentifierValue] = useState('');
@@ -30,85 +30,92 @@ const ecpayInvoiceBlock = ({children, checkoutExtensionData}) => {
             setLoveCodeValue(donateCode)
             setExtensionData('ecpay-invoice-block', 'invoice_love_code', donateCode);
        }
-   }, []);
+    }, []);
 
-    const refreshFields = (type) => {
-        if (type !== 'invoice_carruer_type') {
-            if (invoiceTypeValue === 'c') {
+    const refreshFields = (type, value) => {
+        if (type === 'invoice_type') {
+            // 重設載具類型
+            setCarruerTypeValue('0');
+            setExtensionData('ecpay-invoice-block', 'invoice_carruer_type', '0');
+
+            // 重設載具Options
+            if (value === 'c') {
                 setCarruerTypeOptions([
-                    {label: '索取紙本', value: '1'},
-                    {label: '雲端發票(中獎寄送紙本)', value: '2'},
-                    {label: '手機條碼', value: '4'},
+                    {label: '索取紙本', value: '0'},
+                    {label: '雲端發票(中獎寄送紙本)', value: '1'},
+                    {label: '手機條碼', value: '3'},
                 ]);
-           } else if (invoiceTypeValue === 'p') {
+            } else if (value === 'p') {
                 setCarruerTypeOptions([
-                    {label: '索取紙本', value: '1'},
-                    {label: '雲端發票(中獎寄送紙本)', value: '2'},
-                    {label: '自然人憑證', value: '3'},
-                    {label: '手機條碼', value: '4'}
+                    {label: '索取紙本', value: '0'},
+                    {label: '雲端發票(中獎寄送紙本)', value: '1'},
+                    {label: '自然人憑證', value: '2'},
+                    {label: '手機條碼', value: '3'}
                 ]);
-           } else {
+            } else {
                 setCarruerTypeOptions([]);
-           }
+            }
+        }
 
-            setCarruerTypeValue('1');
-       }
-
+        // 重設發票欄位值
         setCompanyNameValue('');
         setCompanyIdentifierValue('');
         setLoveCodeValue(donateCode);
         setCarruerNumValue('');
-   }
+        setExtensionData('ecpay-invoice-block', 'invoice_customer_company', donateCode);
+        setExtensionData('ecpay-invoice-block', 'invoice_customer_identifier', donateCode);
+        setExtensionData('ecpay-invoice-block', 'invoice_love_code', donateCode);
+        setExtensionData('ecpay-invoice-block', 'invoice_carruer_num', donateCode);
+    }
 
-    const handleDataChange = useCallback(
-		(value, type) => {
-            switch (type) {
-                case 'invoice_type':
-                    setInvoiceTypeValue(value);
-                    refreshFields(type);
-                    break;
-                case 'invoice_carruer_type':
-                    setCarruerTypeValue(value);
-                    refreshFields(type);
-                    break;
-                case 'invoice_customer_company':
-                    setCompanyNameValue(value);
-                    break;
-                case 'invoice_customer_identifier':
-                    setCompanyIdentifierValue(value);
-                    break;
-                case 'invoice_love_code':
-                    setLoveCodeValue(value);
-                    break;
-                case 'invoice_carruer_num':
-                    setCarruerNumValue(value);
-                    break;
-           }
-            setExtensionData('ecpay-invoice-block', type, value);
-		},
-		[
-            setInvoiceTypeValue, 
-            setCarruerTypeValue, 
-            setCompanyNameValue, 
-            setCompanyIdentifierValue,
-            setLoveCodeValue,
-            setCarruerNumValue,
-            setExtensionData
-        ]
-	)
+    // 監聽欄位變動
+    const handleDataChange = useCallback((value, type) => {
+        switch (type) {
+            case 'invoice_type':
+                setInvoiceTypeValue(value);
+                refreshFields(type, value);
+                break;
+            case 'invoice_carruer_type':
+                setCarruerTypeValue(value);
+                refreshFields(type, value);
+                break;
+            case 'invoice_customer_company':
+                setCompanyNameValue(value);
+                break;
+            case 'invoice_customer_identifier':
+                setCompanyIdentifierValue(value);
+                break;
+            case 'invoice_love_code':
+                setLoveCodeValue(value);
+                break;
+            case 'invoice_carruer_num':
+                setCarruerNumValue(value);
+                break;
+        }
+
+        // 設定拋往後端值
+        setExtensionData('ecpay-invoice-block', type, value);
+    },
+    [
+        setInvoiceTypeValue, 
+        setCarruerTypeValue, 
+        setCompanyNameValue, 
+        setCompanyIdentifierValue,
+        setLoveCodeValue,
+        setCarruerNumValue,
+        setExtensionData
+    ])
 
     return (
         <div className="ecpay_invoice_fields">
             <SelectControl
                 label="發票開立"
                 value={invoiceTypeValue}
-                options={
-                    [
-                        {label: '個人', value: 'p'},
-                        {label: '公司', value: 'c'},
-                        {label: '捐贈', value: 'd'},
-                    ]
-               }
+                options={[
+                    {label: '個人', value: 'p'},
+                    {label: '公司', value: 'c'},
+                    {label: '捐贈', value: 'd'},
+                ]}
                 onChange={(value) => handleDataChange(value, 'invoice_type')}
                 required={true}
                 style={{height: '3rem'}}
@@ -117,11 +124,9 @@ const ecpayInvoiceBlock = ({children, checkoutExtensionData}) => {
                 <SelectControl
                     label="載具類型"
                     value={carruerTypeValue}
-                    options={
-                        [
-                            ...carruerTypeOptions
-                        ]
-                   }
+                    options={[
+                        ...carruerTypeOptions
+                    ]}
                     onChange={(value) => handleDataChange(value, 'invoice_carruer_type')}
                     required={true}
                     style={{height: '3rem'}}
@@ -154,7 +159,7 @@ const ecpayInvoiceBlock = ({children, checkoutExtensionData}) => {
                     style={{height: '3rem', width: '-webkit-fill-available', padding: '7px'}}
                 />
             )}
-            {(carruerTypeValue === '3' || carruerTypeValue === '4') && (
+            {(carruerTypeValue === '2' || carruerTypeValue === '3') && (
                 <TextControl
                     label="載具編號"
                     value={carruerNumValue}

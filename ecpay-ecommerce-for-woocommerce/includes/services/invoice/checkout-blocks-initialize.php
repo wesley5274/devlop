@@ -38,7 +38,7 @@ add_action(
 function checkout_block_data_callback() {
     return array(
         'invoice_type' => 'p',
-        'invoice_carruer_type' => '1',
+        'invoice_carruer_type' => '0',
         'invoice_customer_company' => '',
         'invoice_customer_identifier' => '',
         'invoice_love_code' => '',
@@ -54,32 +54,32 @@ function checkout_block_data_callback() {
 function checkout_block_schema_callback() {
     return array(
         'invoice_type'  => array(
-            'description' => __('發票開立', 'ecpay-ecommerce-for-woocommerce'),
+            'description' => __('Invoice Type', 'ecpay-ecommerce-for-woocommerce'),
             'type'        => array('string', 'null'),
             'readonly'    => true,
         ),
         'invoice_carruer_type'  => array(
-            'description' => __('發票載具', 'ecpay-ecommerce-for-woocommerce'),
+            'description' => __('Carruer Type', 'ecpay-ecommerce-for-woocommerce'),
             'type'        => array('string', 'null'),
             'readonly'    => true,
         ),
         'invoice_customer_company'  => array(
-            'description' => __('公司行號', 'ecpay-ecommerce-for-woocommerce'),
+            'description' => __('Company Name', 'ecpay-ecommerce-for-woocommerce'),
             'type'        => array('string', 'null'),
             'readonly'    => true,
         ),
         'invoice_customer_identifier'  => array(
-            'description' => __('統一編號', 'ecpay-ecommerce-for-woocommerce'),
+            'description' => __('Uniform Numbers', 'ecpay-ecommerce-for-woocommerce'),
             'type'        => array('string', 'null'),
             'readonly'    => true,
         ),
         'invoice_love_code'  => array(
-            'description' => __('捐贈碼', 'ecpay-ecommerce-for-woocommerce'),
+            'description' => __('Donation', 'ecpay-ecommerce-for-woocommerce'),
             'type'        => array('string', 'null'),
             'readonly'    => true,
         ),
         'invoice_carruer_num'  => array(
-            'description' => __('手機條碼', 'ecpay-ecommerce-for-woocommerce'),
+            'description' => __('Barcode', 'ecpay-ecommerce-for-woocommerce'),
             'type'        => array('string', 'null'),
             'readonly'    => true,
         ),

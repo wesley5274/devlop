@@ -166,9 +166,9 @@ class Wooecpay_invoice {
         wp_register_script('ecpay-invoice-block-param', '');
         wp_enqueue_script('ecpay-invoice-block-param');
 
-        $donateCode = get_option('wooecpay_invoice_donate');
+        $donate_code = get_option('wooecpay_invoice_donate', '');
         wp_localize_script('ecpay-invoice-block-param', 'InvoiceData', array(
-            'DonateCode' => $donateCode 
+            'DonateCode' => $donate_code
         ));
     }
 }

@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ECPay Ecommerce for WooCommerce\n"
 "POT-Creation-Date: 2023-12-28 10:31+0800\n"
-"PO-Revision-Date: 2024-03-07 17:16+0800\n"
+"PO-Revision-Date: 2024-05-03 11:32+0800\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: zh_TW\n"
@@ -1046,6 +1046,30 @@ msgstr "Ecpay Plug for WooCommerce"
 #. Author of the plugin/theme
 msgid "ECPay Green World FinTech Service Co., Ltd."
 msgstr "綠界科技."
+
+#: includes/services/invoice/checkout-blocks-initialize.php:57
+msgid "Invoice Type"
+msgstr "發票開立"
+
+#: includes/services/invoice/checkout-blocks-initialize.php:61
+msgid "Carruer Type"
+msgstr "載具類型"
+
+#: includes/services/invoice/checkout-blocks-initialize.php:66
+msgid "Company Name"
+msgstr "公司行號"
+
+#: includes/services/invoice/checkout-blocks-initialize.php:71
+msgid "Uniform Numbers"
+msgstr "統一編號"
+
+#: includes/services/invoice/checkout-blocks-initialize.php:76
+msgid "Donation"
+msgstr "捐贈碼"
+
+#: includes/services/invoice/checkout-blocks-initialize.php:81
+msgid "Barcode"
+msgstr "手機條碼"
 
 #~ msgid "Duplicate payments for ecpay orders are marked as processed."
 #~ msgstr "綠界訂單重複付款提示標示為已處理."

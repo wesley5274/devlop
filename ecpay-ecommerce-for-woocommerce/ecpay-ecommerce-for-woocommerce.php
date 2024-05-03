@@ -103,8 +103,9 @@ if ('yes' === get_option('wooecpay_enabled_logistic', 'no')) {
     $plugin_logistic = new Wooecpay_Logistic();
 }
 
-require_once plugin_dir_path(__FILE__) . 'includes/services/invoice/checkout-blocks-initialize.php';
 if ('yes' === get_option('wooecpay_enabled_invoice', 'no')) {
+    // WoocommerceBlock 發票前端
+    require_once plugin_dir_path(__FILE__) . 'includes/services/invoice/checkout-blocks-initialize.php';
     require plugin_dir_path(__FILE__) . 'includes/services/invoice/class-wooecpay-invoice.php';
     $plugin_invoice = new Wooecpay_invoice();
 }
