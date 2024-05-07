@@ -22,6 +22,7 @@ defined('ABSPATH') or exit;
 // 相關常數定義
 define('WOOECPAY_VERSION', '1.1.2404080');
 define('REQUIREMENT_WOOCOMMERCE_VERSION', '8.3.0');
+define('WOOECPAY_PLUGIN_NAME', 'ecpay-ecommerce-for-woocommerce');
 define('WOOECPAY_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('WOOECPAY_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('WOOECPAY_PLUGIN_BASENAME', plugin_basename(__FILE__));
@@ -103,6 +104,8 @@ if ('yes' === get_option('wooecpay_enabled_logistic', 'no')) {
 }
 
 if ('yes' === get_option('wooecpay_enabled_invoice', 'no')) {
+    // WoocommerceBlock 發票前端
+    require_once plugin_dir_path(__FILE__) . 'includes/services/invoice/checkout-blocks-initialize.php';
     require plugin_dir_path(__FILE__) . 'includes/services/invoice/class-wooecpay-invoice.php';
     $plugin_invoice = new Wooecpay_invoice();
 }

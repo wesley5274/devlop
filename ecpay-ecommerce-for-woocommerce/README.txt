@@ -4,20 +4,23 @@ Tags: ecommerce, e-commerce, store, sales, sell, shop, cart, checkout, payment, 
 Requires at least: 6.0
 Tested up to: 6.0
 Requires PHP: 8.2
-Stable tag: 1.1.2404080
+Stable tag: 1.1.2405020
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
 == Frequently Asked Questions ==
 = 系統需求 =
 
-- PHP version 8.1
+- PHP version 8.2
 - MySQL version 5.7 or greater
 
 = 其它問題 =
 請來信詢問綠界技術服務信箱: techsupport@ecpay.com.tw
 
 == Changelog ==
+
+v1.1.2405020
+支援 Woocommerce Blocks 結帳區塊(綠界發票)
 
 v1.1.2404080
 支援 Woocommerce Blocks 結帳區塊
