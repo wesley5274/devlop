@@ -6,12 +6,12 @@ class Wooecpay_Gateway {
 
 		$this->load_api();
 
-		add_filter( 'woocommerce_payment_gateways', array( $this, 'add_method' ) );
-		add_action( 'plugins_loaded', array( $this, 'load_payment_gateway' ) );
+		add_filter('woocommerce_payment_gateways', array($this, 'add_method'));
+		add_action('plugins_loaded', array($this, 'load_payment_gateway'));
 
 		// Email發送內容
         if (get_option('wooecpay_enabled_payment_disp_email') == 'yes') {
-            add_action('woocommerce_email_after_order_table', array( $this, 'add_email_payment_info'), 10, 4);
+            add_action('woocommerce_email_after_order_table', array($this, 'add_email_payment_info'), 10, 4);
         }
 	}
 
@@ -34,9 +34,12 @@ class Wooecpay_Gateway {
 		include WOOECPAY_PLUGIN_INCLUDE_DIR . '/services/payment/ecpay-gateway-credit-installment.php';
 		include WOOECPAY_PLUGIN_INCLUDE_DIR . '/services/payment/ecpay-gateway-atm.php';
 		include WOOECPAY_PLUGIN_INCLUDE_DIR . '/services/payment/ecpay-gateway-webatm.php';
-		include WOOECPAY_PLUGIN_INCLUDE_DIR . '/services/payment/ecpay-gateway-barcode.php';	
+		include WOOECPAY_PLUGIN_INCLUDE_DIR . '/services/payment/ecpay-gateway-barcode.php';
 		include WOOECPAY_PLUGIN_INCLUDE_DIR . '/services/payment/ecpay-gateway-cvs.php';
         include WOOECPAY_PLUGIN_INCLUDE_DIR . '/services/payment/ecpay-gateway-applepay.php';
+        include WOOECPAY_PLUGIN_INCLUDE_DIR . '/services/payment/ecpay-gateway-dca.php';
+        include WOOECPAY_PLUGIN_INCLUDE_DIR . '/services/payment/ecpay-gateway-twqr.php';
+        include WOOECPAY_PLUGIN_INCLUDE_DIR . '/services/payment/ecpay-gateway-bnpl.php';
 
         include WOOECPAY_PLUGIN_INCLUDE_DIR . '/services/payment/woocommerce-gateway-cod.php';  // 貨到付款相關程序
 	}
@@ -50,9 +53,12 @@ class Wooecpay_Gateway {
         $methods[] = 'Wooecpay_Gateway_Cvs';
         $methods[] = 'Wooecpay_Gateway_Barcode';
         $methods[] = 'Wooecpay_Gateway_Applepay';
+        $methods[] = 'Wooecpay_Gateway_Dca';
+        $methods[] = 'Wooecpay_Gateway_Twqr';
+        $methods[] = 'Wooecpay_Gateway_Bnpl';
 
         return $methods;
-    }	
+    }
 
     // EMAIL 顯示付款資訊樣板
 	public function add_email_payment_info($order, $sent_to_admin, $plain_text, $email)
@@ -75,13 +81,13 @@ class Wooecpay_Gateway {
             }
 
             if (isset($template_file)) {
-                
+
                 $args = array(
                     'order'         => $order,
                     'sent_to_admin' => $sent_to_admin,
                     'plain_text'    => $plain_text,
                     'email'         => $email,
-                );
+               );
 
                 wc_get_template($template_file, $args, '', WOOECPAY_PLUGIN_INCLUDE_DIR . '/templates/');
             }
