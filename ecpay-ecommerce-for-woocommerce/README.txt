@@ -2,9 +2,9 @@
 Contributors: ecpaytechsupport
 Tags: ecommerce, e-commerce, store, sales, sell, shop, cart, checkout, payment, ecpay
 Requires at least: 6.0
-Tested up to: 6.0
+Tested up to: 6.5
 Requires PHP: 8.2
-Stable tag: 1.1.2405280
+Stable tag: 1.1.2406060
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -19,7 +19,8 @@ License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
 == Changelog ==
 
-v1.1.2405280
+v1.1.2406060
+測試相容性至 WordPress Version 6.5.3
 修正因 PHP8.2 棄用動態變數及參數初始值造成的錯誤
 修正離島物流預設值型態錯誤造成的問題
 
