@@ -65,6 +65,10 @@ class Wooecpay_Gateway_Dca extends Wooecpay_Gateway_Base
                     return false;
                 }
             }
+            // 未設定定期定額選項時，不開方此付款方式
+            if (count(get_option('woocommerce_ecpay_dca', [])) == 0) {
+                return false;
+            }
         }
 
         return parent::is_available();
@@ -107,7 +111,6 @@ class Wooecpay_Gateway_Dca extends Wooecpay_Gateway_Base
         // Html
         $szHtml  = '';
         $szHtml .= '<select id="ecpay_dca_payment" name="ecpay_dca_payment">';
-        $szHtml .= '<option>------</option>';
 
         // 避免初始預設欄位為空
         if (count($ecpay_dca_options) > 0) {

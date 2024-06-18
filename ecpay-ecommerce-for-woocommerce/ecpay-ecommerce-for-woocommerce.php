@@ -1,27 +1,28 @@
 <?php
 /**
  * @copyright Copyright (c) 2016 Green World FinTech Service Co., Ltd. (https://www.ecpay.com.tw)
- * @version 1.1.2406060
+ * @version 1.1.2406180
  *
  * Plugin Name: ECPay Ecommerce for WooCommerce
  * Plugin URI: https://www.ecpay.com.tw
  * Description: Ecpay Plug for WooCommerce
- * Version: 1.1.2406060
+ * Version: 1.1.2406180
  * Author: ECPay Green World FinTech Service Co., Ltd.
  * Author URI: https://www.ecpay.com.tw
  * License: GPLv2
  * License URI: https://www.gnu.org/licenses/gpl-2.0.txt
  * Domain Path: /languages
  * WC requires at least: 8
- * WC tested up to: 8.4.0
+ * WC tested up to: 8.8.0
  */
 
 // 相關檢查
 defined('ABSPATH') or exit;
 
 // 相關常數定義
-define('WOOECPAY_VERSION', '1.1.2406060');
+define('WOOECPAY_VERSION', '1.1.2406180');
 define('REQUIREMENT_WOOCOMMERCE_VERSION', '8.3.0');
+define('WOOECPAY_PLUGIN_NAME', 'ecpay-ecommerce-for-woocommerce');
 define('WOOECPAY_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('WOOECPAY_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('WOOECPAY_PLUGIN_BASENAME', plugin_basename(__FILE__));
@@ -67,11 +68,13 @@ add_action('admin_notices',
     }
 );
 
-// 高效能宣告
 add_action('before_woocommerce_init',
     function () {
         if (class_exists(\Automattic\WooCommerce\Utilities\FeaturesUtil::class)) {
+            // 高效能宣告
             \Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility('custom_order_tables', __FILE__, true);
+            // Woocmmerce Payment Block
+            \Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility('cart_checkout_blocks', __FILE__, true);
         }
     }
 );
@@ -101,6 +104,8 @@ if ('yes' === get_option('wooecpay_enabled_logistic', 'no')) {
 }
 
 if ('yes' === get_option('wooecpay_enabled_invoice', 'no')) {
+    // WoocommerceBlock 發票前端
+    require_once plugin_dir_path(__FILE__) . 'includes/services/invoice/checkout-blocks-initialize.php';
     require plugin_dir_path(__FILE__) . 'includes/services/invoice/class-wooecpay-invoice.php';
     $plugin_invoice = new Wooecpay_invoice();
 }
