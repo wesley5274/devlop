@@ -1,10 +1,10 @@
 === ecpay-ecommerce-for-woocommerce ===
 Contributors: ecpaytechsupport
-Tags: ecommerce, e-commerce, store, sales, sell, shop, cart, checkout, payment, ecpay
+Tags: shop, cart, checkout, payment, ecpay
 Requires at least: 6.0
 Tested up to: 6.5
 Requires PHP: 8.2
-Stable tag: 1.1.2406180
+Stable tag: 1.1.2502030
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -19,9 +19,49 @@ License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
 == Changelog ==
 
-v1.1.2406180
+v1.1.2502030
+安全性修正
+
+v1.1.2501080
+優化接收付款結果資訊
+
+v1.1.2412310
+修正定期定額模擬付款錯誤
+修正定期定額新舊版模組相容性問題
+
+v1.1.2412200
+修正定期定額金額參數回傳造成的錯誤
+修正定期定額無法自動建立週期訂單的錯誤
+
+v1.1.2412120
+定期定額後台設定介面增加結帳畫面說明文字
+定期定額後台設定調整執行頻率下限值
+
+v1.1.2411110
+定期定額後台設定介面優化
+
+v1.1.2411060
+修正傳統短代碼造成定期定額金流錯誤
+
+v1.1.2409301
+修正 woocommerce blocks 造成定期定額金流錯誤
+
+v1.1.2409260
+升級 jQuery 到 3.7.1
+
+v1.1.2409250
+修正前端JS路徑錯誤問題
+修正定期定額無法結帳
+修正中華郵政無法建立訂單
+修正 woocommerce blocks 區塊結帳造成訂單建立錯誤問題
+
+v1.1.2407100
+新增發票索取紙本選項開關
+
+v1.1.2406190
 支援 WooCommerce Blocks 結帳區塊
 調整定期定額付款方式預設選項問題
+調整定期定額付款方式後台設定方式
 
 v1.1.2406060
 測試相容性至 WordPress Version 6.5.3
@@ -88,6 +128,10 @@ Upgrade Notice 請使用https://github.com/ECPay/Woocommerce_ECPAY
 
 * 綠界科技外掛套件，提供合作特店以及個人賣家使用開放原始碼商店系統時，無須自行處理複雜的檢核，直接透過安裝設定外掛套件，便可快速介接綠界科技系統，進行金流、物流、電子發票操作。
 
+== Short Description ==
+
+* 綠界科技外掛套件，提供合作特店以及個人賣家使用開放原始碼商店系統時，無須自行處理複雜的檢核，直接透過安裝設定外掛套件，便可快速介接綠界科技系統，進行金流、物流、電子發票操作。
+
 
 目錄
 -----------------
@@ -106,7 +150,7 @@ Upgrade Notice 請使用https://github.com/ECPay/Woocommerce_ECPAY
 -----------------
 | Wordpress  | WooCommerce | PHP |
 | :---------: | :----------: | :----------: |
-| 6.0 | 6.5.1 | 7.4 |
+| 6.5.3 | 8.8.0 | 8.2 |
 
 
 安裝

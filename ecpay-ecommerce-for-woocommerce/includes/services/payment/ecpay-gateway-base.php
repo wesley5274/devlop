@@ -47,10 +47,10 @@ class Wooecpay_Gateway_Base extends WC_Payment_Gateway {
             if ($shippping_tag && $this->logisticHelper->is_ecpay_cvs_logistics($shipping_method_id)) {
 
                 // 執行地圖選擇
-
                 // 不存在則走向地圖API
                 $api_logistic_info = $this->logisticHelper->get_ecpay_logistic_api_info('map');
-                $client_back_url   = WC()->api_request_url('wooecpay_logistic_map_callback', true);
+                $client_back_url   = $this->logisticHelper->get_permalink(WC()->api_request_url('wooecpay_logistic_map_callback', true)) . 'has_block=' . json_encode(has_block('woocommerce/checkout'));
+                
                 $MerchantTradeNo   = $this->logisticHelper->get_merchant_trade_no($order->get_id(), get_option('wooecpay_logistic_order_prefix'));
                 $LogisticsType     = $this->logisticHelper->get_logistics_sub_type($shipping_method_id);
 
@@ -104,7 +104,12 @@ class Wooecpay_Gateway_Base extends WC_Payment_Gateway {
                 $order->update_meta_data('_wooecpay_payment_merchant_trade_no', $merchant_trade_no); //MerchantTradeNo
                 $order->update_meta_data('_wooecpay_query_trade_tag', 0);
 
-                $order->add_order_note(sprintf(__('Ecpay Payment Merchant Trade No %s', 'ecpay-ecommerce-for-woocommerce'), $merchant_trade_no));
+                // 防止 hook 重複執行導致訂單歷程重複寫入
+                if (!get_transient('wooecpay_receipt_page_executed_' . $order_id)) {
+                    $order->add_order_note(sprintf(__('Ecpay Payment Merchant Trade No %s', 'ecpay-ecommerce-for-woocommerce'), $merchant_trade_no));
+                    set_transient('wooecpay_receipt_page_executed_' . $order_id, true, 3600);
+                }
+                else delete_transient('wooecpay_receipt_page_executed_' . $order_id);
 
                 $order->save();
 
@@ -136,7 +141,7 @@ class Wooecpay_Gateway_Base extends WC_Payment_Gateway {
                         'NeedExtraPaidInfo' => 'Y',
                     ];
 
-                    $input = $this->paymentHelper->add_type_info($input, $order);
+                    $input = $this->paymentHelper->add_type_info($input, $order, has_block('woocommerce/checkout'));
 
                     switch (get_locale()) {
                     case 'zh_HK':
@@ -163,7 +168,6 @@ class Wooecpay_Gateway_Base extends WC_Payment_Gateway {
                     ecpay_log('轉導 AIO 付款頁 ' . print_r($input, true), 'A00004', $order_id);
 
                     $generateForm = $autoSubmitFormService->generate($input, $api_payment_info['action']);
-                    // $generateForm = str_replace('document.getElementById("ecpay-form").submit();', '', $generateForm) ;
 
                     echo $generateForm;
 
@@ -174,6 +178,7 @@ class Wooecpay_Gateway_Base extends WC_Payment_Gateway {
 
                 WC()->cart->empty_cart();
             }
+            WC()->session->set('store_api_draft_order', 0);
         }
     }
 

@@ -21,37 +21,73 @@ const ecpayInvoiceBlock = ({children, checkoutExtensionData}) => {
     const [carruerNumValue, setCarruerNumValue] = useState('');
 
     let donateCode = '';
+    let invoicePapper = 'enable';
 
     // 最後一個參數留空陣列，表示首次渲染才執行
     useEffect(() => {
         // 預設捐贈碼
         if (InvoiceData.DonateCode !== null) {
-            donateCode = InvoiceData.DonateCode
+            donateCode = InvoiceData.DonateCode            
             setLoveCodeValue(donateCode)
             setExtensionData('ecpay-invoice-block', 'invoice_love_code', donateCode);
-       }
+        }
+        if (InvoiceData.InvoicePapper !== null) {
+            invoicePapper = InvoiceData.InvoicePapper
+            if (invoicePapper == 'disable') {
+                setCarruerTypeOptions([
+                    {label: '雲端發票(中獎寄送紙本)', value: '1'},
+                    {label: '自然人憑證', value: '2'},
+                    {label: '手機條碼', value: '3'}
+                ])
+            }
+        }
     }, []);
+
+    useEffect(() => {
+        if (carruerTypeOptions.length > 0) {
+            setCarruerTypeValue(carruerTypeOptions[0].value);
+            setExtensionData('ecpay-invoice-block', 'invoice_carruer_type', carruerTypeOptions[0].value);
+        }
+    }, [carruerTypeOptions]);
 
     const refreshFields = (type, value) => {
         if (type === 'invoice_type') {
-            // 重設載具類型
-            setCarruerTypeValue('0');
-            setExtensionData('ecpay-invoice-block', 'invoice_carruer_type', '0');
-
             // 重設載具Options
             if (value === 'c') {
-                setCarruerTypeOptions([
+                var data = [
                     {label: '索取紙本', value: '0'},
                     {label: '雲端發票(中獎寄送紙本)', value: '1'},
                     {label: '手機條碼', value: '3'},
-                ]);
+                ]
+
+                if (invoicePapper == 'disable') {
+                    data = [
+                        {label: '雲端發票(中獎寄送紙本)', value: '1'},
+                        {label: '手機條碼', value: '3'},
+                    ]
+                }
+                setCarruerTypeOptions(data);
             } else if (value === 'p') {
-                setCarruerTypeOptions([
+                var data = [
                     {label: '索取紙本', value: '0'},
                     {label: '雲端發票(中獎寄送紙本)', value: '1'},
                     {label: '自然人憑證', value: '2'},
                     {label: '手機條碼', value: '3'}
-                ]);
+                ]
+
+                if (invoicePapper == 'disable') {
+                    data = [
+                        {label: '雲端發票(中獎寄送紙本)', value: '1'},
+                        {label: '自然人憑證', value: '2'},
+                        {label: '手機條碼', value: '3'}
+                    ]
+                }
+                setCarruerTypeOptions(data);
+
+                // 重設載具類型
+                setCarruerTypeValue(data[0].value);
+                setExtensionData('ecpay-invoice-block', 'invoice_carruer_type', data[0].value);
+
             } else {
                 setCarruerTypeOptions([]);
             }

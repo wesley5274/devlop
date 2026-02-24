@@ -4,8 +4,6 @@ var $ = jQuery.noConflict();
 $(function() {
     // init發票欄位內容及顯示狀態
     refreshFields();
-    $('#invoice_carruer_type').val('0');  
-    $('#invoice_type').val('p');
 });
 
 // 監聽發票類別
@@ -49,11 +47,15 @@ $('#invoice_carruer_type').on('change', function() {
 
 // 調整欄位值
 function refreshFields(id = null) {
+    var carruer_type_option = $('#invoice_carruer_type option');
+    
     // 初始載入預設值
     if (id == null) {
-        // 發票預設選項
+        // 發票種類預設選項
         $('#invoice_type').val('p');
-        $('#invoice_carruer_type').val('0');       
+        // 載具類別預設選項
+        $('#invoice_carruer_type').val($(carruer_type_option[0]).val());       
+
         // 顯示欄位
         slideField(['invoice_customer_company_field', 'invoice_customer_identifier_field', 'invoice_love_code_field', 'invoice_carruer_num_field']);
         // 隱藏欄位
@@ -73,7 +75,9 @@ function refreshFields(id = null) {
     }
 
     // 發票類別變動時，載具類別刷新
-    if (id == 'invoice_type') $('#invoice_carruer_type').val('0');
+    if (id == 'invoice_type') {
+        $('#invoice_carruer_type').val($(carruer_type_option[0]).val());  
+    }
 
     // 欄位預設值
     $('#love_code').val('');                           // 捐贈碼

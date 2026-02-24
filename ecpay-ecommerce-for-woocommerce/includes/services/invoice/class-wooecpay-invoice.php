@@ -57,13 +57,20 @@ class Wooecpay_invoice {
 
        	wp_enqueue_script('wooecpay_invoice');
 
+        // 判斷是否顯示發票索取紙本選項
+        $wooecpay_invoice_carruer_papper = get_option('wooecpay_invoice_carruer_papper', 'enable') ;
+        $invoiceCarruerType = $this->invoiceHelper->invoiceCarruerType;
+        if ($wooecpay_invoice_carruer_papper == 'disable') {
+            $invoiceCarruerType = array_diff($invoiceCarruerType, array('索取紙本'));
+        }
+        
         // 載具資訊
         $fields['billing']['invoice_carruer_type'] = [
             'type'          => 'select',
             'label'         => '載具類別',
             'required'      => false,
             'priority'      => 200,
-            'options'       => $this->invoiceHelper->invoiceCarruerType
+            'options'       => $invoiceCarruerType
         ];
 
         $fields['billing']['invoice_type'] = [
@@ -167,8 +174,10 @@ class Wooecpay_invoice {
         wp_enqueue_script('ecpay-invoice-block-param');
 
         $donate_code = get_option('wooecpay_invoice_donate', '');
+        $invoice_papper = get_option('wooecpay_invoice_carruer_papper', 'enable') ;
         wp_localize_script('ecpay-invoice-block-param', 'InvoiceData', array(
-            'DonateCode' => $donate_code
+            'DonateCode' => $donate_code,
+            'InvoicePapper' => $invoice_papper
         ));
     }
 }
